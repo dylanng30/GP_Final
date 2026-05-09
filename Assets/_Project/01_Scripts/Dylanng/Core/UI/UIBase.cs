@@ -1,5 +1,7 @@
 ﻿using Dylanng.Core.Base;
+using Dylanng.Core.Managers;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Dylanng.Core.UI
 {
@@ -31,6 +33,27 @@ namespace Dylanng.Core.UI
     {
         [Header("Popup Settings")]
         [SerializeField] protected bool _closeOnBackdropClick = true;
+        [SerializeField] protected Button _closeButton;
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            
+            if (_closeButton)
+            {
+                _closeButton.onClick.AddListener(Close);
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+            if (_closeButton)
+            {
+                _closeButton.onClick.RemoveAllListeners();
+            }
+        }
 
         public virtual void Close()
         {
