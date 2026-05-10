@@ -115,9 +115,8 @@ namespace GAME.Data.Gacha
     public class ShopThemeLocalData
     {
         public string ShopId;
-        public Sprite BackgroundImage;
+        public Sprite BackgroundImage, DeactiveButtonImage, ActiveButtonImage;
         public AudioClip BGM;
-        public GameObject ShopKeeperNPCPrefab;
         
         [Tooltip("Loại UI: Grid, Carousel, Tab, InfiniteScroll")]
         public string UiLayoutType; 

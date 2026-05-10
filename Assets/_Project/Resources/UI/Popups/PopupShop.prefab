@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 7647725821138529066}
   - component: {fileID: 3855822479252189226}
   m_Layer: 0
-  m_Name: ShopTheme_01
+  m_Name: ShopTheme_00
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 3116416090934284458}
   - component: {fileID: 8942870992010813658}
   m_Layer: 0
-  m_Name: ShopTheme_03
+  m_Name: ShopTheme_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -642,7 +642,7 @@ GameObject:
   - component: {fileID: 7210942043095157182}
   - component: {fileID: 5857061386457417391}
   m_Layer: 0
-  m_Name: ShopTheme_04
+  m_Name: ShopTheme_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1144,7 +1144,7 @@ GameObject:
   - component: {fileID: 713315219229988860}
   - component: {fileID: 9097794178052360053}
   m_Layer: 0
-  m_Name: Switch_Button_01
+  m_Name: Switch_Button_00
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1399,7 +1399,7 @@ GameObject:
   - component: {fileID: 767663493671467132}
   - component: {fileID: 7149101316247527139}
   m_Layer: 0
-  m_Name: Switch_Button_03
+  m_Name: Switch_Button_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1653,7 +1653,7 @@ GameObject:
   - component: {fileID: 5547850602650403790}
   - component: {fileID: 4700821247736351512}
   m_Layer: 0
-  m_Name: ShopTheme_02
+  m_Name: ShopTheme_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1729,7 +1729,7 @@ GameObject:
   - component: {fileID: 3829535566853658033}
   - component: {fileID: 8566103076113535456}
   m_Layer: 0
-  m_Name: Switch_Button_05
+  m_Name: Switch_Button_04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1850,7 +1850,7 @@ GameObject:
   - component: {fileID: 2539341999103155722}
   - component: {fileID: 8188140213930161676}
   m_Layer: 0
-  m_Name: Switch_Button_04
+  m_Name: Switch_Button_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2463,7 +2463,7 @@ GameObject:
   - component: {fileID: 2864001299488099511}
   - component: {fileID: 6064825792356386858}
   m_Layer: 0
-  m_Name: Popup_Shop
+  m_Name: PopupShop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2555,23 +2555,27 @@ MonoBehaviour:
     ConsumedResourceImage: {fileID: 9188698099357950576}
     RollButtonText: {fileID: 7675312256904745239}
     RollCount: 10
-  shopThemes:
-  - {fileID: 389549086787979156}
-  - {fileID: 3648405632360976611}
-  - {fileID: 699012764537065904}
-  - {fileID: 1906987852531493184}
-  - {fileID: 7593127971538878033}
-  switchShopButtons:
-  - ThemeImage: {fileID: 713315219229988860}
-    SwitchButton: {fileID: 9097794178052360053}
-  - ThemeImage: {fileID: 9133377611433506743}
-    SwitchButton: {fileID: 7239417962184721876}
-  - ThemeImage: {fileID: 767663493671467132}
-    SwitchButton: {fileID: 7149101316247527139}
-  - ThemeImage: {fileID: 2539341999103155722}
-    SwitchButton: {fileID: 8188140213930161676}
-  - ThemeImage: {fileID: 3829535566853658033}
-    SwitchButton: {fileID: 8566103076113535456}
+  gachaShopItems:
+  - Theme: {fileID: 3855822479252189226}
+    SwitchShopButton:
+      ThemeImage: {fileID: 713315219229988860}
+      SwitchButton: {fileID: 9097794178052360053}
+  - Theme: {fileID: 4700821247736351512}
+    SwitchShopButton:
+      ThemeImage: {fileID: 9133377611433506743}
+      SwitchButton: {fileID: 7239417962184721876}
+  - Theme: {fileID: 8942870992010813658}
+    SwitchShopButton:
+      ThemeImage: {fileID: 767663493671467132}
+      SwitchButton: {fileID: 7149101316247527139}
+  - Theme: {fileID: 5857061386457417391}
+    SwitchShopButton:
+      ThemeImage: {fileID: 2539341999103155722}
+      SwitchButton: {fileID: 8188140213930161676}
+  - Theme: {fileID: 8341167897640710003}
+    SwitchShopButton:
+      ThemeImage: {fileID: 3829535566853658033}
+      SwitchButton: {fileID: 8566103076113535456}
 --- !u!1 &6916989513279214167
 GameObject:
   m_ObjectHideFlags: 0
@@ -2705,7 +2709,7 @@ GameObject:
   - component: {fileID: 7797588201259432006}
   - component: {fileID: 8341167897640710003}
   m_Layer: 0
-  m_Name: ShopTheme_05
+  m_Name: ShopTheme_04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3640,7 +3644,7 @@ GameObject:
   - component: {fileID: 9133377611433506743}
   - component: {fileID: 7239417962184721876}
   m_Layer: 0
-  m_Name: Switch_Button_02
+  m_Name: Switch_Button_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

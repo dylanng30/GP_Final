@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Dylanng.Core.Base;
 using Dylanng.Core.UI;
+using Game.UIs.Popups.Shop;
 
 namespace Dylanng.Core.Managers
 {
@@ -20,6 +21,8 @@ namespace Dylanng.Core.Managers
         public override void Initialize()
         {
             ServiceLocator.Register<UIManager>(this);
+
+            OpenPopup<PopupShop>();
         }
 
         private void RegisterUI(UIBase uiView)

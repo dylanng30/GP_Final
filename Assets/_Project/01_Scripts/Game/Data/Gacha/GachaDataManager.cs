@@ -37,7 +37,8 @@ namespace GAME.Data.Gacha
             _instance = this;
         }
         #endregion
-        
+
+        public bool FetchSucess = true;
         public void Initialize()
         {
             //Load remote

@@ -112,13 +112,10 @@ namespace GAME.Data.Gacha
     [Serializable]
     public class ShopInstanceRemoteData
     {
-        public string ShopId; 
-        public string ShopCategory;
-        
+        public string ShopId;
         public bool IsOpen;
-        public long StartTimeEpoch;
-        public long EndTimeEpoch;
-        public long NextRefreshTimeEpoch;
+        public string ConsumedResourceId;
+        public int Price;
 
         public ShopUnlockCondition UnlockCondition;
         public ShopDynamicEconomy DynamicEconomy;
@@ -145,10 +142,6 @@ namespace GAME.Data.Gacha
     public class ShopUnlockCondition
     {
         public int RequiredLevel;
-        public int RequiredFame;
-        public string RequiredFaction;
-        public int RequiredKarma;
-        public bool RequiresStealth;
     }
 
     [Serializable]
