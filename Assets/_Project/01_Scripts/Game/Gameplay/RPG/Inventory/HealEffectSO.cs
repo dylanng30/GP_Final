@@ -10,11 +10,11 @@ namespace Dylanng.Gameplay.RPG.Inventory
 
         public override void ExecuteEffect(GameObject target)
         {
-            if (target.TryGetComponent<IDamageable>(out var damageable))
+            /*if (target.TryGetComponent<IDamageable>(out var damageable))
             {
                 damageable.Heal(Amount);
                 Debug.Log($"[HealEffect] Healed {target.name} for {Amount}");
-            }
+            }*/
         }
     }
 }

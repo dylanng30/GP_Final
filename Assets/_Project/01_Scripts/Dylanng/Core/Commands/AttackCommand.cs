@@ -5,7 +5,7 @@ namespace Dylanng.Core.Commands
 {
     public class AttackCommand : CommandBase
     {
-        private IDamageable _attacker;
+        /*private IDamageable _attacker;
         private IDamageable _target;
         private float _damage;
 
@@ -14,24 +14,24 @@ namespace Dylanng.Core.Commands
             _attacker = attacker;
             _target = target;
             _damage = damage;
-        }
+        }*/
 
         public override void Execute()
         {
-            if (_target != null)
+            /*if (_target != null)
             {
                 _target.TakeDamage(_damage);
-                Debug.Log($"{_attacker} attacked {_target} for {_damage} damage.");
-            }
+                //Debug.Log($"{_attacker} attacked {_target} for {_damage} damage.");
+            }*/
         }
 
         public override void Undo()
         {
-            // Trong RPG, Undo sát thương thường là hồi máu, nhưng có thể phức tạp nếu target đã chết.
+            /*// Trong RPG, Undo sát thương thường là hồi máu, nhưng có thể phức tạp nếu target đã chết.
             if (_target != null)
             {
                 _target.Heal(_damage);
-            }
+            }*/
         }
     }
 }

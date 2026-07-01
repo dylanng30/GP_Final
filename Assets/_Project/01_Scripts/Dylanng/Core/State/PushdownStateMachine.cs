@@ -21,7 +21,7 @@ namespace Dylanng.Core.State
             {
                 _stateStack.Peek().Exit();
                 _stateStack.Pop();
-                CurrentState?.Enter(); // Resume previous state
+                CurrentState?.Enter();
             }
         }
 

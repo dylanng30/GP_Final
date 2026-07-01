@@ -15,24 +15,4 @@ namespace Dylanng.Core
     public interface ISystem : IService { }
 
     public interface IEvent { }
-
-    public interface IDamageable
-    {
-        float CurrentHealth { get; }
-        float MaxHealth { get; }
-        void TakeDamage(float amount);
-        void Heal(float amount);
-        void Die();
-    }
-
-    public interface IInteractable
-    {
-        void Interact(GameObject interactor);
-    }
-
-    public interface IEquippable
-    {
-        void Equip();
-        void Unequip();
-    }
 }

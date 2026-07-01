@@ -13,7 +13,7 @@ namespace Dylanng.Gameplay.RPG.Stats
             Debug.Log("[CombatSystem] Initialized.");
         }
 
-        public void ExecuteSkill(IDamageable target, CharacterStats attackerStats, SkillSO skill)
+        /*public void ExecuteSkill(IDamageable target, CharacterStats attackerStats, SkillSO skill)
         {
             var calcService = ServiceLocator.Get<DamageCalculationService>();
             var targetGo = (target as MonoBehaviour)?.gameObject;
@@ -46,6 +46,6 @@ namespace Dylanng.Gameplay.RPG.Stats
             }
 
             Debug.Log($"[CombatSystem] {attacker?.name} dealt {finalDamage} damage to {targetGo?.name}");
-        }
+        }*/
     }
 }

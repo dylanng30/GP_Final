@@ -1,7 +1,10 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Dylanng.Core;
 using Dylanng.Core.Base;
 using Dylanng.Core.Data;
+using Game.Data.Hero;
+using GAME.Utilities;
 using UnityEngine;
 
 namespace Dylanng.Managers
@@ -15,7 +18,7 @@ namespace Dylanng.Managers
         {
             _savePath = Path.Combine(Application.persistentDataPath, "gamesave.json");
             ServiceLocator.Register<SaveLoadManager>(this);
-            Load();
+            //Load();
         }
 
         public void Save()

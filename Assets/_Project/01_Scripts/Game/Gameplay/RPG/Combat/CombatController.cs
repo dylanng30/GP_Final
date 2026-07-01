@@ -24,8 +24,9 @@ namespace Dylanng.Gameplay.RPG.Combat
             }
         }
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             _inputManager = ServiceLocator.Get<InputManager>();
         }
 

@@ -37,10 +37,10 @@ namespace Dylanng.Gameplay.RPG.Combat.Projectiles
             if (other.gameObject == _owner) return;
 
             // Simple damage logic for now
-            if (other.TryGetComponent<Dylanng.Core.IDamageable>(out var damageable))
+            /*if (other.TryGetComponent<IDamageable>(out var damageable))
             {
                 damageable.TakeDamage(_damage);
-            }
+            }*/
 
             ReturnToPool();
         }

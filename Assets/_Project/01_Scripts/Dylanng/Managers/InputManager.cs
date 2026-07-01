@@ -2,6 +2,7 @@ using UnityEngine;
 using Dylanng.Core.Base;
 using Dylanng.Core;
 using Dylanng.Core.Systems.TickSystem;
+using GAME;
 
 namespace Dylanng.Services
 {
@@ -17,12 +18,21 @@ namespace Dylanng.Services
         public bool ComboInput { get; private set; }
         public bool BlockInput { get; private set; }
         public bool RunInput { get; private set; }
+        public bool IsJoystickActive { get; private set; }
 
         public bool UsePCInput { get; set; } = true;
 
         public override void Initialize()
         {
             ServiceLocator.Register<InputManager>(this);
+            ServiceLocator.Get<ITickSystem>().Register(this);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            ServiceLocator.Get<ITickSystem>().Unregister(this);
+            ServiceLocator.Unregister<InputManager>(); 
         }
 
         public void OnUpdate(float deltaTime)
@@ -41,7 +51,12 @@ namespace Dylanng.Services
         {
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
-            MovementInput = Vector2.ClampMagnitude(new Vector2(horizontal, vertical), 1f);
+            Vector2 keyboardMove = Vector2.ClampMagnitude(new Vector2(horizontal, vertical), 1f);
+
+            if (!IsJoystickActive || keyboardMove.sqrMagnitude > 0.01f)
+            {
+                MovementInput = keyboardMove;
+            }
 
             JumpInput = Input.GetButton("Jump");
             SprintInput = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
@@ -75,6 +90,7 @@ namespace Dylanng.Services
 
         //UI Mobile
         public void SetMovementInput(Vector2 input) => MovementInput = input;
+        public void SetJoystickActive(bool isActive) => IsJoystickActive = isActive;
         public void SetRotationInput(Vector2 input) => RotationInput = input;
         public void SetZoomInput(float input) => ZoomInput = input;
 

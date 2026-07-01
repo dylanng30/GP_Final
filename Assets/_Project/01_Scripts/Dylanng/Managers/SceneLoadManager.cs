@@ -31,15 +31,14 @@ namespace Dylanng.Managers
                 yield return null;
             }
 
-            // Hoàn thành load, kích hoạt Scene
+            // Hoàn thành load -> kích hoạt Scene
             asyncLoad.allowSceneActivation = true;
 
             while (!asyncLoad.isDone)
             {
                 yield return null;
             }
-
-            // Bắn sự kiện Scene đã load xong cho các hệ thống khác biết
+            
             //EventBus<SceneLoadedEvent>.Publish(new SceneLoadedEvent { SceneName = sceneName });
         }
     }

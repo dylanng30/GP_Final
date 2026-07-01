@@ -7,8 +7,14 @@ namespace Dylanng.Core.UI
 {
     public abstract class UIBase : MonoBehaviourBase
     {
+        private bool _isInitialized = false;
+        
         public bool IsOpen { get; private set; }
-        public virtual void Initialize() { }
+
+        public virtual void Initialize()
+        {
+            _isInitialized = true;
+        }
         public virtual void Setup(object data = null) { }
         public virtual void Show()
         {
@@ -22,8 +28,7 @@ namespace Dylanng.Core.UI
             OnHide();
             gameObject.SetActive(false);
         }
-
-        // Hook cho animation hoặc reset state
+        
         protected virtual void OnShow() { }
         protected virtual void OnHide() { }
     }

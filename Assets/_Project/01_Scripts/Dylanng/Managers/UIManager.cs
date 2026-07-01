@@ -1,72 +1,142 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Dylanng.Core.Base;
 using Dylanng.Core.UI;
+using Dylanng.Events.SystemEvents;
 using Game.UIs.Popups.Shop;
+using Game.UIs.Screens;
+using Game.UIs.Screens.CombatHUD;
+using Game.UIs.Screens.Explore;
 
 namespace Dylanng.Core.Managers
 {
     public class UIManager : ManagerBase
     {
-        private readonly Stack<UIScreen> _screenStack = new Stack<UIScreen>();
-        private readonly Stack<UIPopup> _popupStack = new Stack<UIPopup>();
-        private readonly Dictionary<Type, UIBase> _registeredUIs = new Dictionary<Type, UIBase>();
+        [Header("--- LAYER MANAGER ----")]
+        [SerializeField] protected Transform screenLayer;
+        [SerializeField] protected Transform popupLayer;
+
+        [Header("--- UI DATABASE ---")]
+        [SerializeField] private UiDatabaseSO uiDB;
         
-        public const string ScreensPath = "UI/Screens/";
-        public const string PopupsPath = "UI/Popups/";
+        [Space (10)]
+        [Header("--- EDITOR SETTINGS ---")]
+        [SerializeField] protected bool enableLog;
+        
+        //------------------------------------------------------------------------------------------------------------//
+        // Screen Stack
+        protected Stack<UIScreen> _screenStack;
+        protected Stack<UIScreen> ScreenStack => _screenStack ??= new Stack<UIScreen>();
 
-        [SerializeField] private Transform[] canvas;
+        // Popup Stack
+        protected Stack<UIPopup> _popupStack;
+        protected Stack<UIPopup> PopupStack => _popupStack ??= new Stack<UIPopup>();
 
+        // Popup Queue
+        protected Queue<Action> _popupQueue;
+        protected Queue<Action> PopupQueue => _popupQueue ??= new Queue<Action>();
+
+        // UI Prefabs
+        protected Dictionary<Type, UIBase> _uiPrefabs;
+        protected Dictionary<Type, UIBase> UIPrefabs => _uiPrefabs ??= BuildPrefabDictionary();
+
+        // UI Instances
+        protected Dictionary<Type, UIBase> _uiInstances;
+        protected Dictionary<Type, UIBase> UIInstances => _uiInstances ??= new Dictionary<Type, UIBase>();
+
+        //------------------------------------------------------------------------------------------------------------//
+        
         public override void Initialize()
         {
             ServiceLocator.Register<UIManager>(this);
-
-            OpenPopup<PopupShop>();
+            EventBus.Subscribe<GameBootedEvent>(OnGameBooted);
         }
 
-        private void RegisterUI(UIBase uiView)
+        protected override void OnDestroy()
         {
-            var type = uiView.GetType();
-            if (!_registeredUIs.ContainsKey(type))
-            {
-                _registeredUIs.Add(type, uiView);
-            }
+            base.OnDestroy();
+            
+            ServiceLocator.Unregister<UIManager>();
+            EventBus.Unsubscribe<GameBootedEvent>(OnGameBooted);
         }
 
-        public T OpenScreen<T>(object data = null) where T : UIScreen
+        private void OnGameBooted(GameBootedEvent evt)
+        {
+            OpenScreen<Screen_ExploreHUD>();
+        }
+        
+        protected Dictionary<Type, UIBase> BuildPrefabDictionary()
+        {
+            var dict = new Dictionary<Type, UIBase>();
+            if (uiDB != null && uiDB.ListUI != null)
+            {
+                foreach (UIBase ui in uiDB.ListUI)
+                {
+                    dict[ui.GetType()] = ui;
+                }
+            }
+            return dict;
+        }
+        
+        protected T GetOrInstantiateUI<T>(Transform parent) where T : UIBase
         {
             var type = typeof(T);
-            if (!_registeredUIs.TryGetValue(type, out var view))
+            if (UIInstances.TryGetValue(type, out var instance))
             {
-                T ui= Resources.Load<T>($"{ScreensPath}{type.Name}");
-                if (ui == null)
+                return instance as T;
+            }
+
+            if (UIPrefabs.TryGetValue(type, out var prefab))
+            {
+                try
                 {
-                    GameLogger.LogError("Could not find screen view for type: " + type.Name);
+                    T newInstance = Instantiate(prefab as T, parent);
+                    newInstance.Initialize();
+                    UIInstances.Add(type, newInstance);
+                    return newInstance;
+                }
+                catch (Exception ex)
+                {
+                    if (enableLog)
+                    {
+                        GameLogger.LogError($"[UIManager] Lỗi khi Instantiate {type.Name}: {ex.Message}");
+                    }                    
                     return null;
                 }
-                
-                view = Instantiate(ui, canvas[0]);
-                view.Initialize();
-                _registeredUIs.Add(type, view);
             }
 
-            if (_screenStack.Count > 0)
+            if (enableLog)
             {
-                _screenStack.Peek().Hide();
+                GameLogger.LogError($"[UIManager] Không tìm thấy Prefab của {type.Name} trong UiDatabaseSO!");
+            }            
+            return null;
+        }
+        
+        // Screen
+        
+        public T OpenScreen<T>(object data = null) where T : UIScreen
+        {
+            T screen = GetOrInstantiateUI<T>(screenLayer);
+            
+            if (screen != null)
+            {
+                if (ScreenStack.Count > 0)
+                {
+                    ScreenStack.Peek().Hide();
+                }
+
+                screen.Setup(data);
+                screen.Show();
+                ScreenStack.Push(screen);
             }
-
-            var screen = view as T;
-            screen.Setup(data);
-            screen.Show();
-            _screenStack.Push(screen);
-
+            
             return screen;
         }
 
         public void CloseCurrentScreen()
         {
-            if (_screenStack.Count > 1)
+            if (_screenStack != null && _screenStack.Count > 1)
             {
                 var screen = _screenStack.Pop();
                 screen.Hide();
@@ -74,71 +144,63 @@ namespace Dylanng.Core.Managers
                 _screenStack.Peek().Show();
             }
         }
-
-        public T OpenPopup<T>(object data = null) where T : UIPopup
+        
+        // Popup
+        
+        public T OpenPopup<T>(object data = null, bool isImmediate = false) where T : UIPopup
         {
-            var type = typeof(T);
-            if (!_registeredUIs.TryGetValue(type, out var view))
+            if (!isImmediate && _popupStack != null && _popupStack.Count > 0)
             {
-                T ui= Resources.Load<T>($"{PopupsPath}{type.Name}");
-                if (ui == null)
-                {
-                    GameLogger.LogError("Could not find popup view for type: " + type.Name);
-                    return null;
-                }
-                
-                view = Instantiate(ui, canvas[1]);
-                view.Initialize();
-                _registeredUIs.Add(type, view);
+                PopupQueue.Enqueue(() => LoadAndShowPopup<T>(data));
+                return null; 
             }
+            
+            return LoadAndShowPopup<T>(data);
+        }
 
-            var popup = view as T;
-            popup.Setup(data);
-            popup.Show();
-            _popupStack.Push(popup);
+        private T LoadAndShowPopup<T>(object data) where T : UIPopup
+        {
+            T popup = GetOrInstantiateUI<T>(popupLayer);
+            
+            if (popup != null)
+            {
+                popup.Setup(data);
+                popup.Show();
+                PopupStack.Push(popup);
+            }
 
             return popup;
         }
-
+        
         public void CloseCurrentPopup()
         {
-            if (_popupStack.Count > 0)
+            if (_popupStack == null || _popupStack.Count == 0) return;
+
+            var popup = _popupStack.Pop();
+            popup.Hide();
+            
+            if (_popupStack.Count == 0 && _popupQueue != null && _popupQueue.Count > 0)
             {
-                var popup = _popupStack.Pop();
-                popup.Hide();
+                var nextPopupAction = _popupQueue.Dequeue();
+                nextPopupAction?.Invoke();
             }
         }
 
         public void CloseAllPopups()
         {
+            if (_popupStack == null) return;
+            
             while (_popupStack.Count > 0)
             {
-                CloseCurrentPopup();
+                var popup = _popupStack.Pop();
+                popup.Hide();
             }
         }
-
-        private void Update()
+        
+        public void ClearPopupQueue()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                HandleBackButton();
-            }
+            _popupQueue?.Clear();
         }
-
-        public void HandleBackButton()
-        {
-            if (_popupStack.Count > 0)
-            {
-                CloseCurrentPopup();
-            }
-            else if (_screenStack.Count > 1)
-            {
-                CloseCurrentScreen();
-            }
-            else
-            {
-                GameLogger.Log("Không còn UI nào để đóng. Có thể hiển thị Popup hỏi 'Bạn có muốn thoát Game không?'");
-            }
-        }
+        
     }
 }

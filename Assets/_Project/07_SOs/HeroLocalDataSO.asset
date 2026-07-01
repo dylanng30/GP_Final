@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02add7aab45b4c949fb4d42616f16a44, type: 3}
+  m_Name: HeroLocalDataSO
+  m_EditorClassIdentifier: 
+  <HeroAssets>k__BackingField:
+  - HeroId: hero_000000
+    HeroPrefab: {fileID: 7216076960585424736, guid: e1385ca20fa8bac4c9781b459cae4892, type: 3}
+    HeroAvatarSprite: {fileID: 21300000, guid: 2461ccc6acb6a784ab1d5773c44f4f44, type: 3}
+  - HeroId: hero_000001
+    HeroPrefab: {fileID: 7216076960585424736, guid: 62b2d9fc217f4ca49897d3ad998009ef, type: 3}
+    HeroAvatarSprite: {fileID: 21300000, guid: f42aa42c6f56af24d91014c9846cdd6d, type: 3}
+  - HeroId: hero_000002
+    HeroPrefab: {fileID: 7216076960585424736, guid: 2f8e5334c9c3a01429dac00db234192f, type: 3}
+    HeroAvatarSprite: {fileID: 21300000, guid: 18ae68affc5be1144a04ee4b625db131, type: 3}
+  - HeroId: hero_000003
+    HeroPrefab: {fileID: 7216076960585424736, guid: f286a577081fc634ea8f29ce71bed85c, type: 3}
+    HeroAvatarSprite: {fileID: 21300000, guid: 3387742a86cc1964d8cb581e32831ca9, type: 3}
+  - HeroId: hero_000004
+    HeroPrefab: {fileID: 7216076960585424736, guid: a8188f8355432c443bd1fa4cd97dabb1, type: 3}
+    HeroAvatarSprite: {fileID: 21300000, guid: 67a104575bb1fce4b9e7aa57fa220afa, type: 3}
+  <HeroData>k__BackingField:
+  - HeroId: hero_000000
+    HeroName: 
+    HeroStarLevel: 1
+    BaseRarity: 0
+    Faction: 0
+    Role: 0
+    BaseHp: 0
+    BaseAtk: 0
+    BaseDef: 0
+    BaseSpeed: 0
+    BaseCritRate: 0
+    BaseCritDamage: 0
+    MaxEnergy: 0
+    HpGrowthPerLevel: 0
+    AtkGrowthPerLevel: 0
+    DefGrowthPerLevel: 0
+    StarUpMultiplier: 0
+  - HeroId: hero_000001
+    HeroName: 
+    HeroStarLevel: 1
+    BaseRarity: 0
+    Faction: 0
+    Role: 0
+    BaseHp: 0
+    BaseAtk: 0
+    BaseDef: 0
+    BaseSpeed: 0
+    BaseCritRate: 0
+    BaseCritDamage: 0
+    MaxEnergy: 0
+    HpGrowthPerLevel: 0
+    AtkGrowthPerLevel: 0
+    DefGrowthPerLevel: 0
+    StarUpMultiplier: 0
+  - HeroId: hero_000002
+    HeroName: 
+    HeroStarLevel: 2
+    BaseRarity: 0
+    Faction: 0
+    Role: 0
+    BaseHp: 0
+    BaseAtk: 0
+    BaseDef: 0
+    BaseSpeed: 0
+    BaseCritRate: 0
+    BaseCritDamage: 0
+    MaxEnergy: 0
+    HpGrowthPerLevel: 0
+    AtkGrowthPerLevel: 0
+    DefGrowthPerLevel: 0
+    StarUpMultiplier: 0
+  - HeroId: hero_000003
+    HeroName: 
+    HeroStarLevel: 2
+    BaseRarity: 0
+    Faction: 0
+    Role: 0
+    BaseHp: 0
+    BaseAtk: 0
+    BaseDef: 0
+    BaseSpeed: 0
+    BaseCritRate: 0
+    BaseCritDamage: 0
+    MaxEnergy: 0
+    HpGrowthPerLevel: 0
+    AtkGrowthPerLevel: 0
+    DefGrowthPerLevel: 0
+    StarUpMultiplier: 0
+  - HeroId: hero_000004
+    HeroName: 
+    HeroStarLevel: 3
+    BaseRarity: 0
+    Faction: 0
+    Role: 0
+    BaseHp: 0
+    BaseAtk: 0
+    BaseDef: 0
+    BaseSpeed: 0
+    BaseCritRate: 0
+    BaseCritDamage: 0
+    MaxEnergy: 0
+    HpGrowthPerLevel: 0
+    AtkGrowthPerLevel: 0
+    DefGrowthPerLevel: 0
+    StarUpMultiplier: 0
