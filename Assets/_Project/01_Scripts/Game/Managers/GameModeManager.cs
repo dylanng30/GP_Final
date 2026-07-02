@@ -1,6 +1,7 @@
 using Dylanng.Core;
 using Dylanng.Core.Base;
 using Dylanng.Core.State;
+using Game.Data.GameMode;
 using Game.Events;
 using Game.Gameplay.GameModeStates;
 
@@ -49,6 +50,21 @@ namespace Game.Managers
             _stateMachine?.Update();
         }
 
+        private void OnSwitchGameMode(SwitchGameModeEvent evt)
+        {
+            switch (evt.Mode)
+            {
+                case GameModeType.Combat: _currentGPState = _combatState;
+                    break;
+                case GameModeType.Explore: _currentGPState = _exploreState;
+                    break;
+                default: break;
+            }
+            
+            _stateMachine.ChangeState(_currentGPState);
+        }
+
+        #region --- CHEAT METHODS ---
         public void ToggleMode()
         {
             if (_currentGPState == _exploreState) _currentGPState = _combatState;
@@ -56,19 +72,6 @@ namespace Game.Managers
             
             _stateMachine.ChangeState(_currentGPState);
         }
-
-        private void OnSwitchGameMode(SwitchGameModeEvent evt)
-        {
-            if (evt.Mode == "Explore")
-            {
-                _currentGPState = _exploreState;
-                _stateMachine.ChangeState(_exploreState);
-            }
-            else if (evt.Mode == "Combat")
-            {
-                _currentGPState = _combatState;
-                _stateMachine.ChangeState(_combatState);
-            }
-        }
+        #endregion
     }
 }

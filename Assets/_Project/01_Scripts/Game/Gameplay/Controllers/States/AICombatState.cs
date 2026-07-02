@@ -19,6 +19,7 @@ namespace Game.Gameplay.Controllers.States
         public override void Enter()
         {
             base.Enter();
+            
             // Find nearest enemy logic
         }
 

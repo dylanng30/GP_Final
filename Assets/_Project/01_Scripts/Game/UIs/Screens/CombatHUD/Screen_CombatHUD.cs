@@ -3,14 +3,22 @@ using Dylanng.Core.UI;
 using Game.Events;
 using Game.Managers.Party;
 using Game.Managers.Hero;
+using GAME.Utilities;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Game.UIs.Screens.CombatHUD
 {
     public class Screen_CombatHUD : UIScreen
     {
-        [SerializeField] private HorizontalLayoutGroup heroAvaterWidgetGrid;
+        [Header("--- FOLLOW TOGGLE ---")]
+        [SerializeField] private CustomToggle followActiveHeroToggle;
+        
+        [FormerlySerializedAs("heroAvaterWidgetGrid")]
+        [Space(10)]
+        [Header("--- HERO AVATAR WIDGETS SETTINGS ---")]
+        [SerializeField] private HorizontalLayoutGroup heroAvatarWidgetGrid;
         [SerializeField] private HeroAvatarWidget[] characterAvatarWidgets;
 
         private int _selectedWidgetId = 0;
@@ -22,6 +30,16 @@ namespace Game.UIs.Screens.CombatHUD
         {
             base.Initialize();
 
+            // Setup Toggle
+
+            if (followActiveHeroToggle != null)
+            {
+                followActiveHeroToggle.SetIsOn(true);
+                followActiveHeroToggle.SetAction(OnFollowActiveHeroToggleClicked);
+            }
+            
+            
+            // Setup HeroAvatarWidgets
             for (int i = 0; i < characterAvatarWidgets.Length; i++)
             {
                 int widgetId = i;
@@ -90,15 +108,20 @@ namespace Game.UIs.Screens.CombatHUD
 
         private void OnAvatarClicked(int widgetId)
         {
-            Debug.Log("OnAvatarClicked");
-            PartyCombatManager.SwitchActiveHero(widgetId);
+            PartyCombatManager?.SwitchActiveHero(widgetId);
         }
 
+        private void OnFollowActiveHeroToggleClicked(bool isOn)
+        {
+            
+        }
+
+        #region --- GAMEPLAY EVENT ---
         private void OnActiveHeroChanged(ActiveHeroChangedEvent evt)
         {
             if (_selectedWidgetId >= 0 && _selectedWidgetId < characterAvatarWidgets.Length)
             {
-                heroAvaterWidgetGrid.enabled = false;
+                heroAvatarWidgetGrid.enabled = false;
                 characterAvatarWidgets[_selectedWidgetId].SetSelected(false);
             }
 
@@ -107,7 +130,7 @@ namespace Game.UIs.Screens.CombatHUD
             if (_selectedWidgetId >= 0 && _selectedWidgetId < characterAvatarWidgets.Length)
             {
                 characterAvatarWidgets[_selectedWidgetId].SetSelected(true);
-                heroAvaterWidgetGrid.enabled = true;
+                heroAvatarWidgetGrid.enabled = true;
             }
         }
 
@@ -122,6 +145,9 @@ namespace Game.UIs.Screens.CombatHUD
                 }
             }
         }
+        #endregion
+
+        
     }
 }
 

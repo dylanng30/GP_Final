@@ -1,5 +1,8 @@
+using Dylanng.Core;
 using Dylanng.Core.State;
+using Game.Events;
 using Game.Gameplay.Entities;
+using Game.Managers.Party;
 using UnityEngine;
 
 namespace Game.Gameplay.Controllers.States
@@ -19,15 +22,21 @@ namespace Game.Gameplay.Controllers.States
         public override void Enter()
         {
             base.Enter();
-            // TODO: Get active hero transform from PartyCombatManager to set as _targetToFollow
-            // _targetToFollow = ServiceLocator.Get<PartyCombatManager>().GetActiveHero()?.transform;
+            
+            EventBus.Subscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
+
+            RefreshTargetToFollow();
+        }
+
+        public override void Exit()
+        {
+            EventBus.Unsubscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
         }
 
         public override void Update()
         {
             base.Update();
             
-            // Dummy follow logic
             if (_targetToFollow != null)
             {
                 float distance = Vector3.Distance(_heroInstance.transform.position, _targetToFollow.position);
@@ -41,6 +50,16 @@ namespace Game.Gameplay.Controllers.States
                     _entityController.StopMove();
                 }
             }
+        }
+
+        private void OnActiveHeroChanged(ActiveHeroChangedEvent evt)
+        {
+            RefreshTargetToFollow();
+        }
+
+        private void RefreshTargetToFollow()
+        {
+            _targetToFollow = ServiceLocator.Get<PartyCombatManager>().GetActiveHero()?.transform;
         }
     }
 }

@@ -1,12 +1,13 @@
 using Dylanng.Core;
+using Game.Data.GameMode;
 
 namespace Game.Events
 {
     public struct SwitchGameModeEvent : IEvent
     {
-        public string Mode;
+        public GameModeType Mode;
         
-        public SwitchGameModeEvent(string mode)
+        public SwitchGameModeEvent(GameModeType mode)
         {
             Mode = mode;
         }

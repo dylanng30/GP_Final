@@ -69,7 +69,7 @@ namespace Game.Gameplay.Entities
 
         private void ApplyMovementAndGravity()
         {
-            // 1. Calculate Camera-relative direction
+            // Calculate Camera-relative direction
             Vector3 moveDirection = Vector3.zero;
             
             if (_currentMoveInput.sqrMagnitude > 0.01f)
@@ -93,7 +93,7 @@ namespace Game.Gameplay.Entities
                     moveDirection = new Vector3(_currentMoveInput.x, 0f, _currentMoveInput.y);
                 }
 
-                // 2. Handle Rotation
+                // Handle Rotation
                 if (moveDirection != Vector3.zero)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
@@ -101,7 +101,7 @@ namespace Game.Gameplay.Entities
                 }
             }
 
-            // 3. Apply Gravity
+            // Apply Gravity
             if (_characterController.isGrounded && _velocityY < 0)
             {
                 _velocityY = -2f; // Small downward force to keep grounded
@@ -109,11 +109,11 @@ namespace Game.Gameplay.Entities
 
             _velocityY += _gravity * Time.deltaTime;
 
-            // 4. Final Velocity calculation
+            // Final Velocity calculation
             Vector3 finalVelocity = moveDirection * _moveSpeed;
             finalVelocity.y = _velocityY;
 
-            // 5. Move CharacterController
+            // Move CharacterController
             _characterController.Move(finalVelocity * Time.deltaTime);
         }
 

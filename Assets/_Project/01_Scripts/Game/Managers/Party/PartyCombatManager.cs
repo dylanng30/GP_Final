@@ -106,7 +106,6 @@ namespace Game.Managers.Party
 
         public void SwitchActiveHero(int index)
         {
-            Debug.Log($"SwitchActiveHero {index}");
             if (index < 0 || index >= _activeHeroes.Count) return;
             if (_activeHeroes.Count == 0) return;
 
