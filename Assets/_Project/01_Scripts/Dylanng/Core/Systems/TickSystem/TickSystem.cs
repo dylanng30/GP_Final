@@ -15,7 +15,7 @@ namespace Dylanng.Core.Systems.TickSystem
 
         public override void Initialize()
         {
-            ServiceLocator.Register<ITickSystem>(this);
+            ServiceLocator.Register<ITickSystem>(this, ServiceScope.Global);
         }
 
         public void Register(object tickable)

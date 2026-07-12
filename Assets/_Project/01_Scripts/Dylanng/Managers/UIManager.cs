@@ -56,8 +56,6 @@ namespace Dylanng.Core.Managers
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            
-            ServiceLocator.Unregister<UIManager>();
             EventBus.Unsubscribe<GameBootedEvent>(OnGameBooted);
         }
 

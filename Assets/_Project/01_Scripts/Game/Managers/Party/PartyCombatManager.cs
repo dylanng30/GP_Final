@@ -8,10 +8,17 @@ using UnityEngine;
 
 namespace Game.Managers.Party
 {
+    /// <summary>
+    /// Manages Hero entities during combat and exploration modes.
+    /// Instantiates hero prefabs based on the PartyManager list, and manages the active controlled hero.
+    /// </summary>
     public class PartyCombatManager : ManagerBase
     {
         private List<HeroInstance> _activeHeroes = new List<HeroInstance>();
         private int _currentActiveHeroIndex = 0;
+
+        public bool IsFollowModeEnabled { get; private set; } = true;
+        public IReadOnlyList<HeroInstance> ActiveHeroes => _activeHeroes;
 
         public override void Initialize()
         {
@@ -24,6 +31,8 @@ namespace Game.Managers.Party
                 SyncHeroes(partyManager.HeroIds);
             }
 
+            EventBus.Subscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
+
             InitializeCombat();
         }
 
@@ -34,6 +43,8 @@ namespace Game.Managers.Party
             {
                 partyManager.OnPartyChanged -= OnPartyChanged;
             }
+
+            EventBus.Unsubscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
 
             ClearHeroes();
 
@@ -50,6 +61,11 @@ namespace Game.Managers.Party
                 SyncHeroes(partyManager.HeroIds);
                 InitializeCombat();
             }
+        }
+
+        private void OnToggleFollowMode(ToggleFollowModeEvent evt)
+        {
+            IsFollowModeEnabled = evt.IsFollowModeEnabled;
         }
 
         private void ClearHeroes()

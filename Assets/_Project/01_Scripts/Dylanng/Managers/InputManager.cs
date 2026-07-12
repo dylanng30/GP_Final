@@ -24,7 +24,7 @@ namespace Dylanng.Services
 
         public override void Initialize()
         {
-            ServiceLocator.Register<InputManager>(this);
+            ServiceLocator.Register<InputManager>(this, ServiceScope.Global);
             ServiceLocator.Get<ITickSystem>().Register(this);
         }
 
@@ -32,7 +32,6 @@ namespace Dylanng.Services
         {
             base.OnDestroy();
             ServiceLocator.Get<ITickSystem>().Unregister(this);
-            ServiceLocator.Unregister<InputManager>(); 
         }
 
         public void OnUpdate(float deltaTime)

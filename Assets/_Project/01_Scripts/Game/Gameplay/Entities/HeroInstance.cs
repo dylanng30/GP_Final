@@ -11,6 +11,9 @@ namespace Game.Gameplay.Entities
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _rotationSpeed = 15f;
         [SerializeField] private float _gravity = -15f;
+        
+        [Header("--- UX ---")]
+        [SerializeField] private GameObject controlledCircleSign;
 
         private CharacterController _characterController;
         private Transform _mainCameraTransform;
@@ -23,8 +26,9 @@ namespace Game.Gameplay.Entities
         private PlayerInputController _playerController;
         private HeroAIController _aiController;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _playerController = gameObject.AddComponent<PlayerInputController>();
             _aiController = gameObject.AddComponent<HeroAIController>();
             _characterController = GetComponent<CharacterController>();
@@ -51,9 +55,11 @@ namespace Game.Gameplay.Entities
             {
                 _playerController.enabled = true;
                 _aiController.enabled = false;
+                controlledCircleSign.SetActive(true);
             }
             else
             {
+                controlledCircleSign.SetActive(false);
                 _playerController.enabled = false;
                 _aiController.enabled = true;
                 _aiController.FollowActiveHero();

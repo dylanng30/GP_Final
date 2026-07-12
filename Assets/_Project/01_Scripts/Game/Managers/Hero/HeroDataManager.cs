@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace Game.Managers.Hero
 {
+    using Dylanng.Core.Data;
+    using Dylanng.Data.Repositories;
+
     public class HeroDataManager : ManagerBase
     {
         [SerializeField] private HeroLocalDataSO localData;
@@ -41,6 +44,14 @@ namespace Game.Managers.Hero
             {
                 GameLogger.LogError("[HeroDataManager] Remote hero data failed to load or is empty!");
                 return;
+            }
+
+            var storageService = ServiceLocator.Get<IDataStorageService>();
+            if (storageService == null)
+            {
+                storageService = new DataStorageService();
+                storageService.Initialize();
+                ServiceLocator.Register<IDataStorageService>(storageService);
             }
 
             _remoteHeroDataDic = new Dictionary<string, BaseHeroData>();
@@ -80,10 +91,11 @@ namespace Game.Managers.Hero
 
         private void LoadLocalData()
         {
-            if (PlayerPrefs.HasKey(Constants.HERO_KEY))
+            var storageService = ServiceLocator.Get<IDataStorageService>();
+            
+            if (storageService.HasKey(Constants.HERO_KEY, StorageType.PlayerPrefs))
             {
-                string json = PlayerPrefs.GetString(Constants.HERO_KEY);
-                SaveData = JsonUtility.FromJson<HeroSaveData>(json);
+                SaveData = storageService.Load<HeroSaveData>(Constants.HERO_KEY, StorageType.PlayerPrefs);
             }
             else
             {
@@ -98,9 +110,18 @@ namespace Game.Managers.Hero
             bool hasChanged = false;
             if (remoteData != null && remoteData.HeroData != null)
             {
+                // Clear the current heroes list during testing so that changing testPartySize is reflected immediately on restart
+                SaveData.Heros.Clear();
+
+                int testPartySize = 5; // <--- THAY ĐỔI SỐ LƯỢNG HERO MUỐN TEST TẠI ĐÂY (Ví dụ: 2, 3, 4)
+                int addedCount = 0;
+
                 foreach (var baseHero in remoteData.HeroData)
                 {
-                    /*if (!SaveData.Heros.Exists(x => x.HeroId == baseHero.HeroId))
+                    /*
+                    // =================================================================================
+                    // --- BỎ COMMENT ĐOẠN NÀY VÀ XOÁ ĐOẠN TEST PHÍA DƯỚI ĐỂ QUAY VỀ LOGIC GAME THỰC TẾ (CHỈ ADD DEFAULT HERO) ---
+                    if (!SaveData.Heros.Exists(x => x.HeroId == baseHero.HeroId))
                     {
                         bool isDefault = baseHero.HeroId == Constants.HERO_ID_DEFAULT;
                         HeroDataInstance heroInstance = new HeroDataInstance()
@@ -113,22 +134,27 @@ namespace Game.Managers.Hero
                         };
                         SaveData.Heros.Add(heroInstance);
                         hasChanged = true;
-                    }*/
-                    
+                    }
+                    // =================================================================================
+                    */
+
+                    // --- LOGIC PHỤC VỤ TEST: Cho phép điền số lượng hero bất kỳ vào Party để kiểm tra đội hình ---
+                    bool isMember = addedCount < testPartySize;
                     HeroDataInstance heroInstance = new HeroDataInstance()
                     {
                         HeroId = baseHero.HeroId,
                         IsUnlocked = true,
-                        IsPartyMemeber = true,
+                        IsPartyMemeber = isMember,
                         HeroLevel = 1,
                         HeroStarLevel = baseHero.HeroStarLevel
                     };
                     SaveData.Heros.Add(heroInstance);
+                    addedCount++;
                     hasChanged = true;
                 }
             }
 
-            if (hasChanged || !PlayerPrefs.HasKey(Constants.HERO_KEY))
+            if (hasChanged || !storageService.HasKey(Constants.HERO_KEY, StorageType.PlayerPrefs))
             {
                 SaveLocalData();
             }
@@ -138,8 +164,8 @@ namespace Game.Managers.Hero
         {
             if (SaveData != null)
             {
-                string json = JsonUtility.ToJson(SaveData);  
-                PlayerPrefs.SetString(Constants.HERO_KEY, json);
+                var storageService = ServiceLocator.Get<IDataStorageService>();
+                storageService.Save(Constants.HERO_KEY, SaveData, StorageType.PlayerPrefs);
             }
         }
 

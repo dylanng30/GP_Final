@@ -7,13 +7,13 @@ namespace Dylanng.Core.UI
 {
     public abstract class UIBase : MonoBehaviourBase
     {
-        private bool _isInitialized = false;
+        public bool IsInitialized { get; protected set; }
         
         public bool IsOpen { get; private set; }
 
         public virtual void Initialize()
         {
-            _isInitialized = true;
+            IsInitialized = true;
         }
         public virtual void Setup(object data = null) { }
         public virtual void Show()

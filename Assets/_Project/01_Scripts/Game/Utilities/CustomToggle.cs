@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Dylanng.Core.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -39,7 +39,7 @@ namespace GAME.Utilities
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _isOn = !_isOn;
+            SetIsOn(!_isOn);
             _switchAction?.Invoke(_isOn);
         }
     }

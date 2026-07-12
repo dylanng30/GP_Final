@@ -224,8 +224,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3295982379578253412}
-  - {fileID: 1047565427943827033}
   - {fileID: 5991797815334804884}
+  - {fileID: 1047565427943827033}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fe1adb0bf78477ab3ebb5c8904ccf4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  followActiveHeroToggle: {fileID: 0}
+  followActiveHeroToggle: {fileID: 2729093703858123398}
   heroAvatarWidgetGrid: {fileID: 1926257133609468748}
   characterAvatarWidgets:
   - {fileID: 1151943368573835598}

@@ -13,13 +13,7 @@ namespace Dylanng.Managers
 
         public override void Initialize()
         {
-            ServiceLocator.Register<AudioManager>(this);
-
-            var saveData = ServiceLocator.Get<SaveLoadManager>()?.CurrentData;
-            if (saveData != null)
-            {
-                SetMasterVolume(saveData.MasterVolume);
-            }
+            ServiceLocator.Register<AudioManager>(this, ServiceScope.Global);
         }
 
         public void PlayMusic(AudioClip clip, bool loop = true)

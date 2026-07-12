@@ -26,10 +26,10 @@ namespace Game.Gameplay.Controllers
             EventBus.Unsubscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
         }
         
-        private void Start()
+        /*private void Start()
         {
             UpdateTarget();
-        }
+        }*/
 
         private void OnActiveHeroChanged(ActiveHeroChangedEvent evt)
         {

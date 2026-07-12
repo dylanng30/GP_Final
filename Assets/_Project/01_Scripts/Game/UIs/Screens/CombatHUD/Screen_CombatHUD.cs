@@ -113,7 +113,7 @@ namespace Game.UIs.Screens.CombatHUD
 
         private void OnFollowActiveHeroToggleClicked(bool isOn)
         {
-            
+            EventBus.Publish(new ToggleFollowModeEvent(isOn));
         }
 
         #region --- GAMEPLAY EVENT ---

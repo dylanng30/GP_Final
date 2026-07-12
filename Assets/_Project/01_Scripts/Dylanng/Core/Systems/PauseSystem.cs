@@ -9,7 +9,7 @@ namespace Dylanng.Core.Systems
 
         public override void Initialize()
         {
-            ServiceLocator.Register<PauseSystem>(this);
+            ServiceLocator.Register<PauseSystem>(this, ServiceScope.Global);
             IsPaused = false;
         }
 

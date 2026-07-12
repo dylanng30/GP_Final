@@ -17,16 +17,16 @@ MonoBehaviour:
     HeroPrefab: {fileID: 7216076960585424736, guid: e1385ca20fa8bac4c9781b459cae4892, type: 3}
     HeroAvatarSprite: {fileID: 21300000, guid: 2461ccc6acb6a784ab1d5773c44f4f44, type: 3}
   - HeroId: hero_000001
-    HeroPrefab: {fileID: 7216076960585424736, guid: 62b2d9fc217f4ca49897d3ad998009ef, type: 3}
+    HeroPrefab: {fileID: 7216076960585424736, guid: b6f2503e3be732b46b331d9919879089, type: 3}
     HeroAvatarSprite: {fileID: 21300000, guid: f42aa42c6f56af24d91014c9846cdd6d, type: 3}
   - HeroId: hero_000002
-    HeroPrefab: {fileID: 7216076960585424736, guid: 2f8e5334c9c3a01429dac00db234192f, type: 3}
+    HeroPrefab: {fileID: 7216076960585424736, guid: f6fa68bec811b7245baee6533bb2aa03, type: 3}
     HeroAvatarSprite: {fileID: 21300000, guid: 18ae68affc5be1144a04ee4b625db131, type: 3}
   - HeroId: hero_000003
-    HeroPrefab: {fileID: 7216076960585424736, guid: f286a577081fc634ea8f29ce71bed85c, type: 3}
+    HeroPrefab: {fileID: 7216076960585424736, guid: 47628033705b32b4e9e2aa52faee15cb, type: 3}
     HeroAvatarSprite: {fileID: 21300000, guid: 3387742a86cc1964d8cb581e32831ca9, type: 3}
   - HeroId: hero_000004
-    HeroPrefab: {fileID: 7216076960585424736, guid: a8188f8355432c443bd1fa4cd97dabb1, type: 3}
+    HeroPrefab: {fileID: 7216076960585424736, guid: 56a9b5928128dab40b54dfb33224c2e0, type: 3}
     HeroAvatarSprite: {fileID: 21300000, guid: 67a104575bb1fce4b9e7aa57fa220afa, type: 3}
   <HeroData>k__BackingField:
   - HeroId: hero_000000

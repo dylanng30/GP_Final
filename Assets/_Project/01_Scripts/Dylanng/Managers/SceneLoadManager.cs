@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Dylanng.Core;
 using Dylanng.Core.Base;
+using Dylanng.Events.SystemEvents;
 
 namespace Dylanng.Managers
 {
@@ -10,7 +11,7 @@ namespace Dylanng.Managers
     {
         public override void Initialize()
         {
-            ServiceLocator.Register<SceneLoadManager>(this);
+            ServiceLocator.Register<SceneLoadManager>(this, ServiceScope.Global);
             GameLogger.Log("SceneLoadManager Initialized");
         }
 
@@ -30,8 +31,7 @@ namespace Dylanng.Managers
             {
                 yield return null;
             }
-
-            // Hoàn thành load -> kích hoạt Scene
+            
             asyncLoad.allowSceneActivation = true;
 
             while (!asyncLoad.isDone)
@@ -39,7 +39,7 @@ namespace Dylanng.Managers
                 yield return null;
             }
             
-            //EventBus<SceneLoadedEvent>.Publish(new SceneLoadedEvent { SceneName = sceneName });
+            EventBus.Publish<SceneLoadedEvent>(new SceneLoadedEvent { SceneName = sceneName });
         }
     }
 }

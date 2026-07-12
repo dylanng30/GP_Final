@@ -9,6 +9,10 @@ using UnityEngine;
 
 namespace Game.Managers.Party
 {
+    /// <summary>
+    /// Manages the party roster members up to a maximum limit (PartySize = 5).
+    /// Synchronizes the selected party heroes from the HeroDataManager.
+    /// </summary>
     public class PartyManager : ManagerBase
     {
         [SerializeField] private HeroLocalDataSO hero;
@@ -18,13 +22,13 @@ namespace Game.Managers.Party
         public string[] HeroIds;
         public Action OnPartyChanged;
         
-        
         public override void Initialize()
         {
             ServiceLocator.Register<PartyManager>(this);
             
             HeroIds = new string[PartySize];
             
+            // Load the party roster members from HeroDataManager's SaveData
             var heroDataManager = ServiceLocator.Get<HeroDataManager>();
             if (heroDataManager != null && heroDataManager.SaveData != null && heroDataManager.SaveData.Heros != null)
             {
@@ -40,6 +44,9 @@ namespace Game.Managers.Party
             }
         }
 
+        /// <summary>
+        /// Attempts to add a Hero into the first empty slot in the party.
+        /// </summary>
         public bool TryAddHero(string addedHeroId)
         {
             for (int i = 0; i < PartySize; i++)
@@ -54,9 +61,12 @@ namespace Game.Managers.Party
             return false;
         }
         
+        /// <summary>
+        /// Swaps an existing hero in the party roster with a new hero.
+        /// </summary>
         public bool TrySwapHero(string oldHeroId, string newHeroId)
         {
-            for(int i = 0; i < PartySize; i++)
+            for (int i = 0; i < PartySize; i++)
             {
                 if (HeroIds[i] == oldHeroId)
                 {

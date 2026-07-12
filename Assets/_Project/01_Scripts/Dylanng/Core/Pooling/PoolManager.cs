@@ -14,7 +14,7 @@ namespace Dylanng.Core.Pooling
         {
             _poolRoot = new GameObject("[Pool]").transform;
             DontDestroyOnLoad(_poolRoot.gameObject);
-            ServiceLocator.Register<PoolManager>(this);
+            ServiceLocator.Register<PoolManager>(this, ServiceScope.Global);
         }
 
         public void CreatePool(string poolKey, PoolableObject prefab, int initialSize)
