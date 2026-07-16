@@ -1,4 +1,4 @@
-using Dylanng.Core;
+using Dylanng.Dylanng_EventBus;
 using UnityEngine;
 
 namespace Dylanng.Events

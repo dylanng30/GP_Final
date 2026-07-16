@@ -1,4 +1,4 @@
-using Dylanng.Core;
+using Dylanng.Dylanng_EventBus;
 
 namespace Dylanng.Events
 {

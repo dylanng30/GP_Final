@@ -14,5 +14,5 @@ namespace Dylanng.Core
 
     public interface ISystem : IService { }
 
-    public interface IEvent { }
+    
 }

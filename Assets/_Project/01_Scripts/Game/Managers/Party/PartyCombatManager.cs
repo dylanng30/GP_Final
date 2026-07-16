@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Dylanng.Core;
 using Dylanng.Core.Base;
+using Dylanng.Dylanng_EventBus;
 using Game.Events;
 using Game.Gameplay.Entities;
 using Game.Managers.Hero;

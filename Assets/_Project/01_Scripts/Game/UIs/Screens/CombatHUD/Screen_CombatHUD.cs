@@ -1,5 +1,6 @@
 using Dylanng.Core;
 using Dylanng.Core.UI;
+using Dylanng.Dylanng_EventBus;
 using Game.Events;
 using Game.Managers.Party;
 using Game.Managers.Hero;

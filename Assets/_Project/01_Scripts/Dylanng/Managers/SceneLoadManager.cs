@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Dylanng.Core;
 using Dylanng.Core.Base;
+using Dylanng.Dylanng_EventBus;
 using Dylanng.Events.SystemEvents;
 
 namespace Dylanng.Managers

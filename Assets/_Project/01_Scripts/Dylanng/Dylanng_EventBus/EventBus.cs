@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace Dylanng.Core
+namespace Dylanng.Dylanng_EventBus
 {
+    public interface IEvent { }
+    
     public static class EventBus
     {
         private static readonly Dictionary<Type, List<Delegate>> subs = new ();
