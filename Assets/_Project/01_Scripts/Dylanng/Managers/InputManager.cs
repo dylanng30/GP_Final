@@ -2,7 +2,6 @@ using UnityEngine;
 using Dylanng.Core.Base;
 using Dylanng.Core;
 using Dylanng.Core.Systems.TickSystem;
-using GAME;
 
 namespace Dylanng.Services
 {

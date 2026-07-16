@@ -19,8 +19,16 @@ namespace Game.UIs.Screens.CombatHUD
         [FormerlySerializedAs("heroAvaterWidgetGrid")]
         [Space(10)]
         [Header("--- HERO AVATAR WIDGETS SETTINGS ---")]
-        [SerializeField] private HorizontalLayoutGroup heroAvatarWidgetGrid;
+        [SerializeField] private VerticalLayoutGroup heroAvatarWidgetGrid;
         [SerializeField] private HeroAvatarWidget[] characterAvatarWidgets;
+
+        [Space(10)]
+        [Header("--- MANUAL ACTION BUTTONS ---")]
+        [SerializeField] private GameObject actionButtonsContainer;
+        [SerializeField] private Button attackBtn;
+        [SerializeField] private Button skill1Btn;
+        [SerializeField] private Button skill2Btn;
+        [SerializeField] private Button dashBtn;
 
         private int _selectedWidgetId = 0;
         
@@ -39,6 +47,13 @@ namespace Game.UIs.Screens.CombatHUD
                 followActiveHeroToggle.SetAction(OnFollowActiveHeroToggleClicked);
             }
             
+            // Setup Action Buttons
+            if (attackBtn != null) attackBtn.onClick.AddListener(OnAttackClicked);
+            if (skill1Btn != null) skill1Btn.onClick.AddListener(() => OnSkillClicked(0));
+            if (skill2Btn != null) skill2Btn.onClick.AddListener(() => OnSkillClicked(1));
+            if (dashBtn != null) dashBtn.onClick.AddListener(OnDashClicked);
+
+            UpdateActionButtonsVisibility(true); // Default to Auto mode (Toggle is ON)
             
             // Setup HeroAvatarWidgets
             for (int i = 0; i < characterAvatarWidgets.Length; i++)
@@ -98,6 +113,13 @@ namespace Game.UIs.Screens.CombatHUD
             base.Hide();
             EventBus.Unsubscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Unsubscribe<EntityDamagedEvent>(OnEntityDamaged);
+
+            // Tự động reset về trạng thái Auto Follow (TopDown) khi chuyển sang Explore hoặc ẩn HUD
+            if (followActiveHeroToggle != null)
+            {
+                followActiveHeroToggle.SetIsOn(true);
+            }
+            OnFollowActiveHeroToggleClicked(true);
         }
 
         public override void Setup(object data = null)
@@ -115,6 +137,37 @@ namespace Game.UIs.Screens.CombatHUD
         private void OnFollowActiveHeroToggleClicked(bool isOn)
         {
             EventBus.Publish(new ToggleFollowModeEvent(isOn));
+            UpdateActionButtonsVisibility(isOn);
+        }
+
+        private void UpdateActionButtonsVisibility(bool isAutoMode)
+        {
+            if (actionButtonsContainer != null)
+            {
+                actionButtonsContainer.SetActive(!isAutoMode);
+            }
+            else
+            {
+                if (attackBtn != null) attackBtn.gameObject.SetActive(!isAutoMode);
+                if (skill1Btn != null) skill1Btn.gameObject.SetActive(!isAutoMode);
+                if (skill2Btn != null) skill2Btn.gameObject.SetActive(!isAutoMode);
+                if (dashBtn != null) dashBtn.gameObject.SetActive(!isAutoMode);
+            }
+        }
+
+        private void OnAttackClicked()
+        {
+            PartyCombatManager?.GetActiveHero()?.Attack();
+        }
+
+        private void OnSkillClicked(int skillIndex)
+        {
+            PartyCombatManager?.GetActiveHero()?.UseSkill(skillIndex);
+        }
+
+        private void OnDashClicked()
+        {
+            PartyCombatManager?.GetActiveHero()?.Dash();
         }
 
         #region --- GAMEPLAY EVENT ---

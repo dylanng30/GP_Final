@@ -5,9 +5,6 @@ using Dylanng.Core.Base;
 using Dylanng.Core.UI;
 using Dylanng.Dylanng_EventBus;
 using Dylanng.Events.SystemEvents;
-using Game.UIs.Popups.Shop;
-using Game.UIs.Screens;
-using Game.UIs.Screens.CombatHUD;
 using Game.UIs.Screens.Explore;
 
 namespace Dylanng.Core.Managers

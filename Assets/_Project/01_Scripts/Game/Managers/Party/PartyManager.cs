@@ -17,7 +17,7 @@ namespace Game.Managers.Party
     {
         [SerializeField] private HeroLocalDataSO hero;
         
-        public const int PartySize = 5;
+        public const int PartySize = 3;
         
         public string[] HeroIds;
         public Action OnPartyChanged;
