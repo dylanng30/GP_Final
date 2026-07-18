@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f21d2b0f09a0db049b66cd41f9b1db7b, type: 3}
+  m_Name: SOStatRepository (Temp)
+  m_EditorClassIdentifier: 
+  _heroStats:
+  - HeroId: hero_000000
+    BaseHp: 1200
+    BaseAtk: 120
+    BaseDef: 60
+    BaseSpeed: 100
+    BaseCritRate: 0.1
+    BaseCritDamage: 1.5
+    MaxEnergy: 200
+    HpGrowthPerLevel: 65
+    AtkGrowthPerLevel: 12
+    DefGrowthPerLevel: 6
+    StarUpMultiplier: 1.15
+  - HeroId: hero_000001
+    BaseHp: 950
+    BaseAtk: 150
+    BaseDef: 45
+    BaseSpeed: 120
+    BaseCritRate: 0.25
+    BaseCritDamage: 1.8
+    MaxEnergy: 200
+    HpGrowthPerLevel: 50
+    AtkGrowthPerLevel: 16
+    DefGrowthPerLevel: 4
+    StarUpMultiplier: 1.18
+  - HeroId: hero_000002
+    BaseHp: 1800
+    BaseAtk: 90
+    BaseDef: 100
+    BaseSpeed: 90
+    BaseCritRate: 0.05
+    BaseCritDamage: 1.5
+    MaxEnergy: 200
+    HpGrowthPerLevel: 95
+    AtkGrowthPerLevel: 9
+    DefGrowthPerLevel: 10
+    StarUpMultiplier: 1.2
+  - HeroId: hero_000003
+    BaseHp: 1000
+    BaseAtk: 140
+    BaseDef: 50
+    BaseSpeed: 100
+    BaseCritRate: 0.15
+    BaseCritDamage: 1.6
+    MaxEnergy: 200
+    HpGrowthPerLevel: 55
+    AtkGrowthPerLevel: 15
+    DefGrowthPerLevel: 5
+    StarUpMultiplier: 1.16
+  - HeroId: hero_000004
+    BaseHp: 1100
+    BaseAtk: 105
+    BaseDef: 55
+    BaseSpeed: 110
+    BaseCritRate: 0.1
+    BaseCritDamage: 1.5
+    MaxEnergy: 200
+    HpGrowthPerLevel: 60
+    AtkGrowthPerLevel: 11
+    DefGrowthPerLevel: 5.5
+    StarUpMultiplier: 1.15

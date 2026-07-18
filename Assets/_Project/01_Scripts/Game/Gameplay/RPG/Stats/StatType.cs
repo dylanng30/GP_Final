@@ -1,0 +1,28 @@
+namespace Dylanng.Gameplay.RPG.Stats
+{
+    public enum StatType
+    {
+        // Core Combat Stats
+        MaxHP = 0,
+        ATK = 1,
+        DEF = 2,
+        Speed = 3,
+        
+        // Advanced Combat Stats
+        CritRate = 4,
+        CritDamage = 5,
+        Lifesteal = 6,
+        ArmorPenetration = 7,
+        EnergyRegen = 8,
+        MaxEnergy = 9
+    }
+
+    // Retained for compatibility with older code referencing StatField
+    public enum StatField
+    {
+        HP = StatType.MaxHP,
+        ATK = StatType.ATK,
+        DEF = StatType.DEF,
+        Speed = StatType.Speed
+    }
+}

@@ -11,6 +11,10 @@ GameObject:
   - component: {fileID: 236240745363072472}
   - component: {fileID: 7216076960585424736}
   - component: {fileID: 4477347401851001304}
+  - component: {fileID: -3218366766519301810}
+  - component: {fileID: 7273599786248273960}
+  - component: {fileID: 191414891996014265}
+  - component: {fileID: -6991526039249038416}
   m_Layer: 0
   m_Name: Hero_000003
   m_TagString: Untagged
@@ -51,6 +55,8 @@ MonoBehaviour:
   _rotationSpeed: 15
   _gravity: -15
   controlledCircleSign: {fileID: 9189025695610123440}
+  maxEnergyLimit: 200
+  abilities: []
 --- !u!143 &4477347401851001304
 CharacterController:
   m_ObjectHideFlags: 0
@@ -77,6 +83,61 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &-3218366766519301810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64bc14edea897004a96d288e0e57808b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7273599786248273960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bef5d363358e9a243b8273171dcb1fb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &191414891996014265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec32245e6a9cacd49985b94507f75146, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 10
+  attackRange: 7
+  loseTargetRadius: 15
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  scanInterval: 0.5
+--- !u!114 &-6991526039249038416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4594cef3cba953243bc21303e648fac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4601690124869856080
 GameObject:
   m_ObjectHideFlags: 0

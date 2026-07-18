@@ -26,7 +26,11 @@ namespace Game.Gameplay.Controllers
             }
             else
             {
-                _entityController.StopMove();
+                var aiController = GetComponent<HeroAIController>();
+                if (aiController == null || !aiController.IsInCombatState)
+                {
+                    _entityController.StopMove();
+                }
             }
 
             // Handle Attack

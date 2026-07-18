@@ -30,22 +30,6 @@ namespace Game.Data.Hero
         public HeroRarity BaseRarity;
         public ElementalFaction Faction;
         public HeroRole Role;
-        
-        [Space(10)]
-        [Header("---BASE COMBAT STATS")]
-        public float BaseHp = 1000f;
-        public float BaseAtk = 100f;
-        public float BaseDef = 50f;
-        public float BaseSpeed = 100f;
-        public float BaseCritRate = 0.05f;
-        public float BaseCritDamage = 1.5f;
-        public float MaxEnergy = 100f;
-        
-        [Header("---GROWTH MODIFIERS---")]
-        public float HpGrowthPerLevel = 50f;
-        public float AtkGrowthPerLevel = 10f;
-        public float DefGrowthPerLevel = 5f;
-        public float StarUpMultiplier = 1.15f;
     }
     
     

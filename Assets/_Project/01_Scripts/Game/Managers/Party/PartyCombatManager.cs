@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using Dylanng.Core;
 using Dylanng.Core.Base;
 using Dylanng.Dylanng_EventBus;
+using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Events;
+using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Managers.Hero;
 using UnityEngine;
@@ -33,6 +35,7 @@ namespace Game.Managers.Party
             }
 
             EventBus.Subscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
+            EventBus.Subscribe<DamageDealtEvent>(OnDamageDealt);
 
             InitializeCombat();
         }
@@ -46,6 +49,7 @@ namespace Game.Managers.Party
             }
 
             EventBus.Unsubscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
+            EventBus.Unsubscribe<DamageDealtEvent>(OnDamageDealt);
 
             ClearHeroes();
 
@@ -161,6 +165,36 @@ namespace Game.Managers.Party
                 return _activeHeroes[_currentActiveHeroIndex];
             }
             return null;
+        }
+
+        public void BroadcastTargetToParty(ITargetable target, HeroInstance sourceHero)
+        {
+            if (target == null || target.IsDead) return;
+
+            for (int i = 0; i < _activeHeroes.Count; i++)
+            {
+                var hero = _activeHeroes[i];
+                if (hero != null && hero != sourceHero)
+                {
+                    var aiController = hero.GetComponent<HeroAIController>();
+                    if (aiController != null && aiController.enabled)
+                    {
+                        aiController.SetTargetEnemy(target, broadcast: false);
+                    }
+                }
+            }
+        }
+
+        private void OnDamageDealt(DamageDealtEvent evt)
+        {
+            if (evt.Target != null && evt.Target.TryGetComponent<ITargetable>(out var targetable) && !targetable.IsDead)
+            {
+                var casterHero = evt.Caster != null ? evt.Caster.GetComponent<HeroInstance>() : null;
+                if (casterHero != null && _activeHeroes.Contains(casterHero))
+                {
+                    BroadcastTargetToParty(targetable, casterHero);
+                }
+            }
         }
     }
 }

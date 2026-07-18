@@ -53,9 +53,14 @@ namespace Game.Gameplay.Controllers.States
         {
             base.Update();
             
+            var partyManager = ServiceLocator.Get<PartyCombatManager>();
+            if (_heroInstance == partyManager?.GetActiveHero())
+            {
+                return;
+            }
+
             if (_targetToFollow != null)
             {
-                var partyManager = ServiceLocator.Get<PartyCombatManager>();
                 bool isFollowEnabled = partyManager != null && partyManager.IsFollowModeEnabled;
 
                 if (!isFollowEnabled)

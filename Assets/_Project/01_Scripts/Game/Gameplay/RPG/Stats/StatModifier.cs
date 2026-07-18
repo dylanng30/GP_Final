@@ -2,9 +2,10 @@ namespace Dylanng.Gameplay.RPG.Stats
 {
     public enum StatModType
     {
-        Flat,
-        PercentAdd,
-        PercentMult
+        Flat = 100,
+        PercentAdd = 200,
+        PercentMult = 300,
+        Override = 400
     }
 
     public class StatModifier

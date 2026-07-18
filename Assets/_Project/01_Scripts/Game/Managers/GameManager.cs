@@ -31,6 +31,7 @@ namespace GAME
         [Header("--- DATA MANAGERS ---")]
         [SerializeField] private HeroDataManager heroDataManager;
         [SerializeField] private ItemDataManager itemDataManager;
+        [SerializeField] private StatDataManager statDataManager;
         
         [Header("--- CORE MANAGERS ---")]
         [SerializeField] private PoolManager poolManager;
@@ -50,15 +51,13 @@ namespace GAME
             base.Awake();
             StartCoroutine(InitializeFramework());
         }
-
-        /// <summary>
-        /// Coroutine sequence initializing the game architecture based on dependencies:
-        /// 1. Core Systems (PauseSystem, TickSystem, StorageService)
-        /// 2. User Interface (UIManager)
-        /// 3. Static & Dynamic Data (HeroDataManager, ItemDataManager)
-        /// 4. Platform Managers (PoolManager, InputManager)
-        /// 5. Gameplay Managers (PartyManager, GameModeManager, PartyCombatManager)
-        /// </summary>
+        
+        // Coroutine sequence initializing the game architecture based on dependencies:
+        // 1. Core Systems (PauseSystem, TickSystem, StorageService)
+        // 2. User Interface (UIManager)
+        // 3. Static & Dynamic Data (HeroDataManager, ItemDataManager)
+        // 4. Platform Managers (PoolManager, InputManager)
+        // 5. Gameplay Managers (PartyManager, GameModeManager, PartyCombatManager)
         private IEnumerator InitializeFramework()
         {
             // 1. Initialize Core Systems
@@ -81,9 +80,10 @@ namespace GAME
             
             yield return null;
 
-            // 3. Initialize Hero and Item managers
+            // 3. Initialize Hero, Item and Stat managers
             heroDataManager.Initialize();
             itemDataManager.Initialize();
+            statDataManager.Initialize();
 
             yield return null;
 

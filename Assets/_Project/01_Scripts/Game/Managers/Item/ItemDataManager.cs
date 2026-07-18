@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Dylanng.Core;
 using Dylanng.Core.Base;
 using Game.Data.Hero;
 using Game.Data.Item;
@@ -36,6 +37,8 @@ namespace Game.Managers.Item
             {
                 _localItemDataDic[luckyBoxItem.ItemId] = luckyBoxItem;
             }
+
+            ServiceLocator.Register<ItemDataManager>(this);
         }
 
         #region ---Assets---
@@ -49,7 +52,7 @@ namespace Game.Managers.Item
         #region ---Item Data---
         public BaseItemData GetItemData(string itemId)
         {
-            if (_remoteItemDataDic.TryGetValue(itemId, out var remoteItemData))
+            if (_remoteItemDataDic != null && _remoteItemDataDic.TryGetValue(itemId, out var remoteItemData))
             {
                 Debug.Log($"Get remote item data for {itemId}");
                 return remoteItemData;
