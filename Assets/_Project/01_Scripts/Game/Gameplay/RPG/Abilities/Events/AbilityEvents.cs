@@ -39,14 +39,16 @@ namespace Dylanng.Gameplay.RPG.Abilities.Events
         public float Damage;
         public ElementType Element;
         public Vector3 HitPoint;
+        public bool IsCritical;
 
-        public DamageDealtEvent(GameObject caster, GameObject target, float damage, ElementType element, Vector3 hitPoint)
+        public DamageDealtEvent(GameObject caster, GameObject target, float damage, ElementType element, Vector3 hitPoint, bool isCritical = false)
         {
             Caster = caster;
             Target = target;
             Damage = damage;
             Element = element;
             HitPoint = hitPoint;
+            IsCritical = isCritical;
         }
     }
 

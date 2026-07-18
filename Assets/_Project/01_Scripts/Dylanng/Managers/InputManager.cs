@@ -58,7 +58,22 @@ namespace Dylanng.Services
 
             JumpInput = Input.GetButton("Jump");
             SprintInput = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            AttackInput = Input.GetButton("Fire1");
+
+            // Kiểm tra click xuyên qua UI (UI click-through) khi nhấn Joystick hoặc các bảng điều khiển UI
+            bool isPointerOverUI = false;
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                {
+                    isPointerOverUI = true;
+                }
+                else if (Input.touchCount > 0 && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                {
+                    isPointerOverUI = true;
+                }
+            }
+
+            AttackInput = !isPointerOverUI && Input.GetButtonDown("Fire1");
             BlockInput = Input.GetButton("Fire2");
 
             RotationInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));

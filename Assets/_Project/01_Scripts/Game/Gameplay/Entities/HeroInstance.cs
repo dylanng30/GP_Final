@@ -41,6 +41,7 @@ namespace Game.Gameplay.Entities
         private Vector2 _currentMoveInput;
         private float _velocityY;
         private float _lastAttackTime = -999f;
+        private Dictionary<int, float> _skillLastUseTimes = new Dictionary<int, float>();
 
         public bool CanAttack()
         {
@@ -241,7 +242,31 @@ namespace Game.Gameplay.Entities
         {
             AbilitySO skill = GetAbility(skillIndex);
             if (skill == null) return false;
+
+            // Kiểm tra Cooldown
+            if (_skillLastUseTimes.TryGetValue(skillIndex, out float lastUseTime))
+            {
+                if (Time.time - lastUseTime < skill.Cooldown)
+                {
+                    return false;
+                }
+            }
+
+            // Kiểm tra Nộ
             return CurrentEnergy >= skill.EnergyCost;
+        }
+
+        public float GetSkillRemainingCooldown(int skillIndex = 0)
+        {
+            AbilitySO skill = GetAbility(skillIndex);
+            if (skill == null) return 0f;
+
+            if (_skillLastUseTimes.TryGetValue(skillIndex, out float lastUseTime))
+            {
+                float elapsed = Time.time - lastUseTime;
+                return Mathf.Max(0f, skill.Cooldown - elapsed);
+            }
+            return 0f;
         }
 
         public float GetSkillCastDuration(int skillIndex = 0)
@@ -257,7 +282,7 @@ namespace Game.Gameplay.Entities
                 target = _aiController != null ? _aiController.CurrentTarget : null;
             }
 
-            if (target == null || target.IsDead || target.Transform == null)
+            if (target != null && (target.IsDead || target.Transform == null))
             {
                 return;
             }
@@ -305,7 +330,8 @@ namespace Game.Gameplay.Entities
             {
                 if (target != null && target.Transform != null)
                 {
-                    EventBus.Publish(new DamageDealtEvent(gameObject, target.Transform.gameObject, finalDamage, basicAttackConfig != null ? basicAttackConfig.Element : ElementType.Physical, target.Transform.position));
+                    bool isCrit = UnityEngine.Random.value <= 0.2f;
+                    EventBus.Publish(new DamageDealtEvent(gameObject, target.Transform.gameObject, finalDamage, basicAttackConfig != null ? basicAttackConfig.Element : ElementType.Physical, target.Transform.position, isCrit));
                 }
             }
         }
@@ -319,13 +345,16 @@ namespace Game.Gameplay.Entities
                 return;
             }
 
-            if (CurrentEnergy < skill.EnergyCost)
+            if (!CanUseSkill(skillIndex))
             {
-                Debug.LogWarning($"[HeroInstance] {HeroId} chưa đủ Nộ để dùng {skill.AbilityName} ({CurrentEnergy}/{skill.EnergyCost})");
+                Debug.LogWarning($"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
                 return;
             }
 
+            // Tiêu hao nộ và ghi nhận thời gian hồi chiêu
             CurrentEnergy = Mathf.Max(0f, CurrentEnergy - skill.EnergyCost);
+            _skillLastUseTimes[skillIndex] = Time.time;
+
             Debug.Log($"[HeroInstance] {HeroId} tiêu hao {skill.EnergyCost} Nộ thi triển {skill.AbilityName}. Nộ còn lại: {CurrentEnergy}/{maxEnergyLimit}");
 
             var castCommand = new CastAbilityCommand(

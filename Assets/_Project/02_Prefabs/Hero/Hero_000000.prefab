@@ -57,7 +57,8 @@ MonoBehaviour:
   controlledCircleSign: {fileID: 9189025695610123440}
   maxEnergyLimit: 200
   basicAttackConfig: {fileID: 11400000, guid: 9e675124711b1404bbdad22899b2f010, type: 2}
-  abilities: []
+  abilities:
+  - {fileID: 11400000, guid: 36d355c49ea39e14f9aadef08d7bf82b, type: 2}
 --- !u!143 &4477347401851001304
 CharacterController:
   m_ObjectHideFlags: 0

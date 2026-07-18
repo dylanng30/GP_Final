@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Dylanng.Core;
 using Dylanng.Core.Pooling;
 using Dylanng.Dylanng_EventBus;
@@ -5,10 +6,11 @@ using Dylanng.Gameplay.RPG.Abilities.Effects;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Stats;
 using UnityEngine;
+using Dylanng.Core.Systems.TickSystem;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
 {
-    public class FireballProjectile : PoolableObject, IAbilityProjectile
+    public class FireballProjectile : PoolableObject, IAbilityProjectile, IUpdatable
     {
         [SerializeField] private float speed = 15f;
         [SerializeField] private float explosionRadius = 3f;
@@ -16,15 +18,18 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
         [SerializeField] private LayerMask enemyLayer;
 
         private GameObject _caster;
+        private List<IAbilityEffect> _collisionEffects;
         private DamageEffect _damageEffect;
         private StatusEffect _stunEffect;
         private float _timer;
 
-        public void InitializeProjectile(GameObject caster)
+        public void InitializeProjectile(GameObject caster, List<IAbilityEffect> collisionEffects = null)
         {
             _caster = caster;
             _timer = 0f;
+            _collisionEffects = collisionEffects;
 
+            // Set default values in case dynamic effects are not passed from outside
             _damageEffect = new DamageEffect
             {
                 Element = ElementType.Pyro,
@@ -46,12 +51,27 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
         {
             base.OnSpawn();
             _timer = 0f;
+            var tickSystem = ServiceLocator.Get<ITickSystem>();
+            if (tickSystem != null)
+            {
+                tickSystem.Register(this);
+            }
         }
 
-        private void Update()
+        public override void OnDespawn()
         {
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-            _timer += Time.deltaTime;
+            var tickSystem = ServiceLocator.Get<ITickSystem>();
+            if (tickSystem != null)
+            {
+                tickSystem.Unregister(this);
+            }
+            base.OnDespawn();
+        }
+
+        public void OnUpdate(float deltaTime)
+        {
+            transform.Translate(Vector3.forward * speed * deltaTime);
+            _timer += deltaTime;
 
             if (_timer >= maxLifetime)
             {
@@ -70,8 +90,18 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
             {
                 if (hit.gameObject != gameObject && (_caster == null || hit.gameObject != _caster))
                 {
-                    _damageEffect?.Execute(_caster, hit.gameObject, hitPoint);
-                    _stunEffect?.Execute(_caster, hit.gameObject, hitPoint);
+                    if (_collisionEffects != null && _collisionEffects.Count > 0)
+                    {
+                        foreach (var effect in _collisionEffects)
+                        {
+                            effect?.Execute(_caster, hit.gameObject, hitPoint);
+                        }
+                    }
+                    else
+                    {
+                        _damageEffect?.Execute(_caster, hit.gameObject, hitPoint);
+                        _stunEffect?.Execute(_caster, hit.gameObject, hitPoint);
+                    }
                 }
             }
 
@@ -91,6 +121,14 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
             else
             {
                 gameObject.SetActive(false);
+            }
+        }
+        private void OnDestroy()
+        {
+            var tickSystem = ServiceLocator.Get<ITickSystem>();
+            if (tickSystem != null)
+            {
+                tickSystem.Unregister(this);
             }
         }
     }

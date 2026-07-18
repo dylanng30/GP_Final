@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae3868b9d7c63f4b880c7250a4d2574, type: 3}
+  m_Name: Skill_FireBall
+  m_EditorClassIdentifier: 
+  AbilityID: 
+  AbilityName: 
+  Description: 
+  Icon: {fileID: 0}
+  Type: 0
+  Element: 0
+  Cooldown: 3
+  EnergyCost: 0
+  StaminaCost: 0
+  AnimationTriggerHash: 0
+  TotalCastDuration: 0.5
+  Effects:
+  - rid: 1273186508660539396
+  references:
+    version: 2
+    RefIds:
+    - rid: 1273186508660539396
+      type: {class: ProjectileEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        ProjectilePoolKey: Fireball_Projectile
+        ProjectilePrefab: {fileID: 8683257774760217751, guid: c78ef86e0831cb4418f292e34f192d9e, type: 3}
+        SpawnOffset: {x: 0, y: 1.5, z: 1}
+        CollisionEffects:
+        - rid: 1273186508660539398
+    - rid: 1273186508660539398
+      type: {class: BurnEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Duration: 5
+        DamagePerTick: 20
+        TickInterval: 1
+        Element: 1

@@ -74,6 +74,19 @@ namespace Game.Gameplay.Controllers
                 }
             }
 
+            // Ở chế độ độc lập (isFollowEnabled == false), Active Hero không chạy AI combat hay tự động bắn
+            var myHeroInstance = GetComponent<HeroInstance>();
+            bool isActiveHero = partyManager != null && partyManager.GetActiveHero() == myHeroInstance;
+            if (isActiveHero && !isFollowEnabled)
+            {
+                if (_stateMachine != null && _stateMachine.CurrentState != _followState)
+                {
+                    FollowActiveHero();
+                }
+                _stateMachine?.Update();
+                return;
+            }
+
             // 1. Khi user đang di chuyển bằng joystick trong chế độ follow -> không tấn công (quay về FollowState ngay lập tức)
             if (isUserMoving && isFollowEnabled)
             {
@@ -139,6 +152,16 @@ namespace Game.Gameplay.Controllers
 
         public void SetTargetEnemy(ITargetable target, bool broadcast = true)
         {
+            var partyManager = ServiceLocator.Get<PartyCombatManager>();
+            var myHeroInstance = GetComponent<HeroInstance>();
+            bool isActiveHero = partyManager != null && partyManager.GetActiveHero() == myHeroInstance;
+            bool isFollowEnabled = partyManager != null && partyManager.IsFollowModeEnabled;
+
+            if (isActiveHero && !isFollowEnabled)
+            {
+                return;
+            }
+
             if (target != null && !target.IsDead)
             {
                 if (_currentTarget == target && _stateMachine.CurrentState == _combatState) return;
@@ -150,8 +173,6 @@ namespace Game.Gameplay.Controllers
 
                 if (broadcast)
                 {
-                    var partyManager = ServiceLocator.Get<PartyCombatManager>();
-                    var myHeroInstance = GetComponent<HeroInstance>();
                     partyManager?.BroadcastTargetToParty(target, myHeroInstance);
                 }
             }

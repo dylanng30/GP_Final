@@ -24,7 +24,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             }
 
             // Phát sự kiện sát thương qua EventBus để cập nhật UI và hiển thị số nhảy
-            EventBus.Publish(new DamageDealtEvent(caster, target, finalDamage, Element, point));
+            bool isCrit = UnityEngine.Random.value <= 0.2f;
+            EventBus.Publish(new DamageDealtEvent(caster, target, finalDamage, Element, point, isCrit));
             
             Debug.Log($"[DamageEffect] Gây {finalDamage} sát thương hệ {Element} lên {target.name} tại {point}");
         }

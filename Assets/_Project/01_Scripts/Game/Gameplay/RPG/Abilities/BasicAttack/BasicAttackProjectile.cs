@@ -100,38 +100,48 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
 
         public void OnUpdate(float deltaTime)
         {
-            Vector3 targetAimPos;
-            if (_target != null && !_target.IsDead && _target.Transform != null)
+            // Kiểm tra xem viên đạn có mục tiêu để đuổi theo hay không
+            bool hasTarget = _target != null && !_target.IsDead && _target.Transform != null;
+
+            // Nếu ban đầu có mục tiêu nhưng giờ mục tiêu đã chết/biến mất -> tự hủy đạn
+            if (_target != null && (_target.IsDead || _target.Transform == null))
             {
-                targetAimPos = _target.Transform.position + Vector3.up * 1f;
-            }
-            else
-            {
-                // Nếu mục tiêu đã chết hoặc biến mất -> tự động thu hồi đạn ngay lập tức
                 ReturnToPool();
                 return;
             }
 
-            Vector3 dirToTarget = (targetAimPos - transform.position).normalized;
-            if (dirToTarget != Vector3.zero)
+            if (hasTarget)
             {
-                transform.forward = dirToTarget;
-            }
+                Vector3 targetAimPos = _target.Transform.position + Vector3.up * 1f;
+                Vector3 dirToTarget = (targetAimPos - transform.position).normalized;
+                if (dirToTarget != Vector3.zero)
+                {
+                    transform.forward = dirToTarget;
+                }
 
-            float moveStep = _speed * deltaTime;
-            float distanceToTarget = Vector3.Distance(transform.position, targetAimPos);
+                float moveStep = _speed * deltaTime;
+                float distanceToTarget = Vector3.Distance(transform.position, targetAimPos);
 
-            if (moveStep >= distanceToTarget)
-            {
-                transform.position = targetAimPos;
-                HandleHitTarget();
+                if (moveStep >= distanceToTarget)
+                {
+                    transform.position = targetAimPos;
+                    HandleHitTarget();
+                }
+                else
+                {
+                    transform.position += dirToTarget * moveStep;
+                }
+
+                _distanceTraveled += moveStep;
             }
             else
             {
-                transform.position += dirToTarget * moveStep;
+                // Bay thẳng tự do (cho đòn đánh thường thủ công không khóa mục tiêu)
+                float moveStep = _speed * deltaTime;
+                transform.Translate(Vector3.forward * moveStep, Space.Self);
+                _distanceTraveled += moveStep;
             }
 
-            _distanceTraveled += moveStep;
             _timer += deltaTime;
 
             if (_distanceTraveled >= _maxRange || _timer >= _maxLifetime)
@@ -145,7 +155,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
             if (_target != null && !_target.IsDead)
             {
                 GameObject casterGo = _caster != null ? _caster.gameObject : null;
-                EventBus.Publish(new DamageDealtEvent(casterGo, _target.Transform.gameObject, _damage, _element, transform.position));
+                bool isCrit = UnityEngine.Random.value <= 0.2f;
+                EventBus.Publish(new DamageDealtEvent(casterGo, _target.Transform.gameObject, _damage, _element, transform.position, isCrit));
             }
             ReturnToPool();
         }
@@ -160,7 +171,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 if (targetable.IsDead || (_caster != null && targetable == (ITargetable)_caster)) return;
 
                 GameObject casterGo = _caster != null ? _caster.gameObject : null;
-                EventBus.Publish(new DamageDealtEvent(casterGo, other.gameObject, _damage, _element, transform.position));
+                bool isCrit = UnityEngine.Random.value <= 0.2f;
+                EventBus.Publish(new DamageDealtEvent(casterGo, other.gameObject, _damage, _element, transform.position, isCrit));
 
                 ReturnToPool();
             }

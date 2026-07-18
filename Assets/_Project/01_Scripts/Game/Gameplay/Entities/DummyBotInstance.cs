@@ -56,7 +56,7 @@ namespace Game.Gameplay.Entities
                 float newHp = Mathf.Max(0f, currentHp - evt.Damage);
                 Stats.InitializeStat(StatType.MaxHP, newHp);
 
-                Debug.Log($"[DummyBot] Nhận {evt.Damage} sát thương hệ {evt.Element} từ {evt.Caster?.name}. HP còn lại: {newHp}/{initialMaxHp}");
+                //Debug.Log($"[DummyBot] Nhận {evt.Damage} sát thương hệ {evt.Element} từ {evt.Caster?.name}. HP còn lại: {newHp}/{initialMaxHp}");
 
                 if (newHp <= 0f && !IsDead)
                 {
