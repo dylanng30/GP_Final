@@ -14,7 +14,10 @@ namespace Dylanng.Gameplay.RPG.Stats
         Lifesteal = 6,
         ArmorPenetration = 7,
         EnergyRegen = 8,
-        MaxEnergy = 9
+        MaxEnergy = 9,
+        
+        // Defensive Buffs
+        Shield = 10
     }
 
     // Retained for compatibility with older code referencing StatField
