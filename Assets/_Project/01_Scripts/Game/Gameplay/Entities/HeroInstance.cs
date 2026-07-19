@@ -279,7 +279,14 @@ namespace Game.Gameplay.Entities
         {
             if (target == null)
             {
-                target = _aiController != null ? _aiController.CurrentTarget : null;
+                if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null && !pts.CurrentTarget.IsDead)
+                {
+                    target = pts.CurrentTarget;
+                }
+                else
+                {
+                    target = _aiController != null ? _aiController.CurrentTarget : null;
+                }
             }
 
             if (target != null && (target.IsDead || target.Transform == null))
@@ -289,6 +296,18 @@ namespace Game.Gameplay.Entities
 
             if (!CanAttack()) return;
             _lastAttackTime = Time.time;
+
+            // Rotate towards target
+            if (target != null && target.Transform != null)
+            {
+                Vector3 lookDirection = target.Transform.position;
+                lookDirection.y = transform.position.y;
+                Vector3 dir = (lookDirection - transform.position).normalized;
+                if (dir != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(dir);
+                }
+            }
 
             if (TryGetComponent<Animator>(out var animator))
             {
@@ -338,6 +357,14 @@ namespace Game.Gameplay.Entities
 
         public void UseSkill(int skillIndex, GameObject target = null)
         {
+            if (target == null)
+            {
+                if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null && !pts.CurrentTarget.IsDead)
+                {
+                    target = pts.CurrentTarget.Transform.gameObject;
+                }
+            }
+
             AbilitySO skill = GetAbility(skillIndex);
             if (skill == null)
             {
@@ -349,6 +376,18 @@ namespace Game.Gameplay.Entities
             {
                 Debug.LogWarning($"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
                 return;
+            }
+
+            // Rotate towards target
+            if (target != null)
+            {
+                Vector3 lookDirection = target.transform.position;
+                lookDirection.y = transform.position.y;
+                Vector3 dir = (lookDirection - transform.position).normalized;
+                if (dir != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(dir);
+                }
             }
 
             // Tiêu hao nộ và ghi nhận thời gian hồi chiêu
@@ -363,6 +402,46 @@ namespace Game.Gameplay.Entities
                 stateMachine: _skillStateMachine,
                 target: target,
                 targetPoint: target != null ? target.transform.position : transform.position + transform.forward * 2f
+            );
+
+            castCommand.Execute();
+        }
+
+        public void UseSkill(int skillIndex, GameObject target, Vector3 targetPoint)
+        {
+            AbilitySO skill = GetAbility(skillIndex);
+            if (skill == null)
+            {
+                Debug.LogWarning($"[HeroInstance] {HeroId} không có kỹ năng ở slot {skillIndex}!");
+                return;
+            }
+
+            if (!CanUseSkill(skillIndex))
+            {
+                Debug.LogWarning($"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
+                return;
+            }
+
+            // Rotate towards targetPoint or target
+            Vector3 lookDirection = target != null ? target.transform.position : targetPoint;
+            lookDirection.y = transform.position.y;
+            Vector3 dir = (lookDirection - transform.position).normalized;
+            if (dir != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(dir);
+            }
+
+            CurrentEnergy = Mathf.Max(0f, CurrentEnergy - skill.EnergyCost);
+            _skillLastUseTimes[skillIndex] = Time.time;
+
+            Debug.Log($"[HeroInstance] {HeroId} tiêu hao {skill.EnergyCost} Nộ thi triển {skill.AbilityName}. Nộ còn lại: {CurrentEnergy}/{maxEnergyLimit}");
+
+            var castCommand = new CastAbilityCommand(
+                caster: this,
+                abilitySO: skill,
+                stateMachine: _skillStateMachine,
+                target: target,
+                targetPoint: targetPoint
             );
 
             castCommand.Execute();

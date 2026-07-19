@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2113921048941486310}
   - component: {fileID: 2189391441016483731}
   - component: {fileID: 788545740105168432}
+  - component: {fileID: -8410865880975977887}
   m_Layer: 0
   m_Name: Hero_000000
   m_TagString: Untagged
@@ -59,6 +60,7 @@ MonoBehaviour:
   basicAttackConfig: {fileID: 11400000, guid: 9e675124711b1404bbdad22899b2f010, type: 2}
   abilities:
   - {fileID: 11400000, guid: 36d355c49ea39e14f9aadef08d7bf82b, type: 2}
+  - {fileID: 11400000, guid: d2dd5133d2d8a7a4d8f36076826de0be, type: 2}
 --- !u!143 &4477347401851001304
 CharacterController:
   m_ObjectHideFlags: 0
@@ -140,6 +142,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4594cef3cba953243bc21303e648fac5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8410865880975977887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd541d75eb6feb74ea869352b2b53373, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scanRadius: 10
+  loseTargetRadius: 13
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  scanInterval: 0.3
 --- !u!1 &4601690124869856080
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,7 +26,7 @@ namespace Dylanng.Gameplay.RPG.Inventory
         {
             base.Awake();
             _statController = GetComponent<StatController>();
-            if (_statController == null) _statController = gameObject.AddComponent<StatController>();
+            if (_statController == null) _statController = GetComponent<StatController>();
         }
 
         public bool EquipItem(EquipmentItemData itemData, int itemLevel)

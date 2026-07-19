@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1511437115604847646}
   - component: {fileID: -7659630247077651416}
   - component: {fileID: -5332247174405931196}
+  - component: {fileID: -8980605658343715311}
   m_Layer: 0
   m_Name: Hero_000001
   m_TagString: Untagged
@@ -139,6 +140,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4594cef3cba953243bc21303e648fac5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8980605658343715311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd541d75eb6feb74ea869352b2b53373, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scanRadius: 10
+  loseTargetRadius: 13
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  scanInterval: 0.3
 --- !u!1 &4601690124869856080
 GameObject:
   m_ObjectHideFlags: 0

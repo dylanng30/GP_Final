@@ -5,6 +5,7 @@ using Game.Events;
 using Game.Managers.Party;
 using Game.Managers.Hero;
 using GAME.Utilities;
+using Game.UIs.Widgets;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -25,9 +26,9 @@ namespace Game.UIs.Screens.CombatHUD
         [Space(10)]
         [Header("--- MANUAL ACTION BUTTONS ---")]
         [SerializeField] private GameObject actionButtonsContainer;
-        [SerializeField] private Button attackBtn;
-        [SerializeField] private Button skill1Btn;
-        [SerializeField] private Button skill2Btn;
+        [SerializeField] private AttackCastButton attackBtn;
+        [SerializeField] private SkillCastButton skill1Btn;
+        [SerializeField] private SkillCastButton skill2Btn;
         [SerializeField] private Button dashBtn;
 
         private int _selectedWidgetId = 0;
@@ -48,9 +49,6 @@ namespace Game.UIs.Screens.CombatHUD
             }
             
             // Setup Action Buttons
-            if (attackBtn != null) attackBtn.onClick.AddListener(OnAttackClicked);
-            if (skill1Btn != null) skill1Btn.onClick.AddListener(() => OnSkillClicked(0));
-            if (skill2Btn != null) skill2Btn.onClick.AddListener(() => OnSkillClicked(1));
             if (dashBtn != null) dashBtn.onClick.AddListener(OnDashClicked);
 
             UpdateActionButtonsVisibility(true); // Default to Auto mode (Toggle is ON)
@@ -66,6 +64,7 @@ namespace Game.UIs.Screens.CombatHUD
             }
 
             RefreshWidgets();
+            UpdateSkillButtonsForActiveHero();
         }
 
         public override void Show()
@@ -74,6 +73,7 @@ namespace Game.UIs.Screens.CombatHUD
             EventBus.Subscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged);
             RefreshWidgets();
+            UpdateSkillButtonsForActiveHero();
         }
 
         public void RefreshWidgets()
@@ -155,10 +155,7 @@ namespace Game.UIs.Screens.CombatHUD
             }
         }
 
-        private void OnAttackClicked()
-        {
-            PartyCombatManager?.GetActiveHero()?.Attack();
-        }
+
 
         private void OnSkillClicked(int skillIndex)
         {
@@ -186,6 +183,15 @@ namespace Game.UIs.Screens.CombatHUD
                 characterAvatarWidgets[_selectedWidgetId].SetSelected(true);
                 heroAvatarWidgetGrid.enabled = true;
             }
+
+            UpdateSkillButtonsForActiveHero();
+        }
+
+        private void UpdateSkillButtonsForActiveHero()
+        {
+            var activeHero = PartyCombatManager?.GetActiveHero();
+            if (skill1Btn != null) skill1Btn.SetupSkill(activeHero);
+            if (skill2Btn != null) skill2Btn.SetupSkill(activeHero);
         }
 
         private void OnEntityDamaged(EntityDamagedEvent evt)

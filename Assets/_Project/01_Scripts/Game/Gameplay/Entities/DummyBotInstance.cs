@@ -30,7 +30,7 @@ namespace Game.Gameplay.Entities
             Stats = GetComponent<StatController>();
             if (Stats == null)
             {
-                Stats = gameObject.AddComponent<StatController>();
+                Stats = gameObject.GetComponent<StatController>();
             }
 
             Stats.InitializeStat(StatType.MaxHP, initialMaxHp);

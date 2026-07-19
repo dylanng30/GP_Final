@@ -24,6 +24,12 @@ namespace Dylanng.Gameplay.RPG.Abilities
         public int AnimationTriggerHash;
         public float TotalCastDuration = 1.2f;
 
+        [Header("--- Aiming Config ---")]
+        public float Range = 8.0f;
+        public float IndicatorRadius = 2.0f;
+        public SkillIndicatorType IndicatorType = SkillIndicatorType.AreaTarget;
+        public bool RequiresTarget = false;
+
         [Header("--- Strategy Effects (Polymorphic) ---")]
         [SerializeReference] 
         public List<IAbilityEffect> Effects = new List<IAbilityEffect>();

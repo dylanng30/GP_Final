@@ -19,7 +19,7 @@ namespace Dylanng.Services
         public bool RunInput { get; private set; }
         public bool IsJoystickActive { get; private set; }
 
-        public bool UsePCInput { get; set; } = true;
+        public bool UsePCInput = true;
 
         public override void Initialize()
         {
@@ -73,7 +73,8 @@ namespace Dylanng.Services
                 }
             }
 
-            AttackInput = !isPointerOverUI && Input.GetButtonDown("Fire1");
+            // Disable Fire1 mapping to AttackInput to prevent unintended attacks on screen taps
+            // AttackInput = !isPointerOverUI && Input.GetButtonDown("Fire1");
             BlockInput = Input.GetButton("Fire2");
 
             RotationInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));

@@ -8,4 +8,11 @@ namespace Dylanng.Gameplay.RPG.Abilities
         Passive,
         Dash
     }
+
+    public enum SkillIndicatorType
+    {
+        None,
+        Directional,
+        AreaTarget
+    }
 }

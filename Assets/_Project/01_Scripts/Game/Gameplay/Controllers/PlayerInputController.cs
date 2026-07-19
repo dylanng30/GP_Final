@@ -8,11 +8,35 @@ namespace Game.Gameplay.Controllers
     {
         private IEntityController _entityController;
         private InputManager _inputManager;
+        private PlayerTargetingSystem _targetingSystem;
 
         public void Initialize(IEntityController entityController)
         {
             _entityController = entityController;
             _inputManager = ServiceLocator.Get<InputManager>();
+
+            _targetingSystem = GetComponent<PlayerTargetingSystem>();
+        }
+
+        private void OnEnable()
+        {
+            if (_targetingSystem == null)
+            {
+                _targetingSystem = GetComponent<PlayerTargetingSystem>();
+            }
+            if (_targetingSystem != null)
+            {
+                _targetingSystem.enabled = true;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_targetingSystem != null)
+            {
+                _targetingSystem.ClearTarget();
+                _targetingSystem.enabled = false;
+            }
         }
 
         private void Update()
