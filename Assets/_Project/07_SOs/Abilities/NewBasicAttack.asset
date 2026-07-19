@@ -18,7 +18,7 @@ MonoBehaviour:
   ProjectileSpeed: 5
   MaxRange: 8
   MaxLifetime: 3
-  DamageMultiplier: 1
+  DamageMultiplier: 0
   Element: 0
   AttackCooldown: 1
   SpawnOffset: {x: 0, y: 1.2, z: 0.8}

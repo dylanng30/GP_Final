@@ -10,13 +10,15 @@ namespace Dylanng.Gameplay.RPG.Abilities.Events
         public Vector3 Position;
         public Quaternion Rotation;
         public float AutoDespawnTime;
+        public float Radius;
 
-        public SpawnVFXEvent(string vfxKey, Vector3 position, Quaternion rotation, float autoDespawnTime = 3f)
+        public SpawnVFXEvent(string vfxKey, Vector3 position, Quaternion rotation, float autoDespawnTime = 3f, float radius = 0f)
         {
             VFXKey = vfxKey;
             Position = position;
             Rotation = rotation;
             AutoDespawnTime = autoDespawnTime;
+            Radius = radius;
         }
     }
 

@@ -113,7 +113,7 @@ namespace Game.Managers.Hero
                 // Clear the current heroes list during testing so that changing testPartySize is reflected immediately on restart
                 SaveData.Heros.Clear();
 
-                int testPartySize = 3; // <--- THAY ĐỔI SỐ LƯỢNG HERO MUỐN TEST TẠI ĐÂY (Ví dụ: 2, 3, 4)
+                int testPartySize = 1; // <--- THAY ĐỔI SỐ LƯỢNG HERO MUỐN TEST TẠI ĐÂY (Ví dụ: 2, 3, 4)
                 int addedCount = 0;
 
                 foreach (var baseHero in remoteData.HeroData)

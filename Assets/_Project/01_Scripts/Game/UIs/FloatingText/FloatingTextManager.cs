@@ -47,8 +47,8 @@ namespace Game.UIs.FloatingText
         {
             if (evt.Target == null || evt.Damage <= 0) return;
 
-            // Randomize spawn position of damageText around hitPoint (offset upward slightly for better visibility)
-            Vector3 spawnPos = evt.HitPoint + Random.insideUnitSphere * 0.5f + Vector3.up * 0.5f;
+            // Randomize spawn position of damageText around target's position (offset upward slightly for better visibility)
+            Vector3 spawnPos = evt.Target.transform.position + Random.insideUnitSphere * 0.3f + Vector3.up * 1.5f;
 
             // Determine color
             Color textColor = normalColor;

@@ -4,6 +4,7 @@ using Dylanng.Core.Base;
 using Dylanng.Core.Pooling;
 using Dylanng.Dylanng_EventBus;
 using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.VFXs;
 using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Managers
@@ -23,9 +24,28 @@ namespace Dylanng.Gameplay.RPG.Abilities.Managers
             if (poolManager != null)
             {
                 var vfxObj = poolManager.Spawn<PoolableObject>(evt.VFXKey, evt.Position, evt.Rotation);
-                if (vfxObj != null && evt.AutoDespawnTime > 0)
+                if (vfxObj != null)
                 {
-                    StartCoroutine(AutoDespawnVFXCoroutine(evt.VFXKey, vfxObj, evt.AutoDespawnTime));
+                    if (evt.Radius > 0f)
+                    {
+                        vfxObj.transform.localScale = Vector3.one * evt.Radius;
+                    }
+                    else
+                    {
+                        vfxObj.transform.localScale = Vector3.one;
+                    }
+
+                    if (vfxObj.TryGetComponent<BaseVFXView>(out var vfxView))
+                    {
+                        vfxView.Play(evt.Position, (view) =>
+                        {
+                            poolManager.Despawn(evt.VFXKey, view);
+                        });
+                    }
+                    else if (evt.AutoDespawnTime > 0)
+                    {
+                        StartCoroutine(AutoDespawnVFXCoroutine(evt.VFXKey, vfxObj, evt.AutoDespawnTime));
+                    }
                 }
             }
         }

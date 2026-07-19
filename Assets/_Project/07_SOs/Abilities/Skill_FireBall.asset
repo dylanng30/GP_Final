@@ -36,6 +36,7 @@ MonoBehaviour:
         SpawnOffset: {x: 0, y: 1.5, z: 1}
         CollisionEffects:
         - rid: 1273186508660539398
+        - rid: 1273186520412979201
     - rid: 1273186508660539398
       type: {class: BurnEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
@@ -43,3 +44,12 @@ MonoBehaviour:
         DamagePerTick: 20
         TickInterval: 1
         Element: 1
+    - rid: 1273186520412979201
+      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 1
+        BaseDamage: 100
+        AtkMultiplier: 1.5
+        UseFalloff: 1
+        FalloffRadius: 3
+        MinDamagePercent: 0.3

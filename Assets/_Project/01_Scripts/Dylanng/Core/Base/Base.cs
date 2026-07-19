@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Dylanng.Core.Pooling;
+using UnityEngine;
 
 namespace Dylanng.Core.Base
 {
@@ -133,4 +134,6 @@ namespace Dylanng.Core.Base
         public abstract T Create();
     }
     public abstract class ScriptableData : ScriptableObject { }
+    
+    
 }

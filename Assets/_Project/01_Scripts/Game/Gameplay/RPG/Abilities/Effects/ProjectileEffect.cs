@@ -59,7 +59,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             var projectileObj = poolManager.Spawn<PoolableObject>(ProjectilePoolKey, spawnPos, spawnRot);
             if (projectileObj != null && projectileObj is IAbilityProjectile abilityProjectile)
             {
-                abilityProjectile.InitializeProjectile(caster, CollisionEffects);
+                abilityProjectile.InitializeProjectile(caster, target, point, CollisionEffects);
             }
         }
     }

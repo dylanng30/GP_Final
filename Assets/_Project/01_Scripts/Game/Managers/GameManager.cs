@@ -8,12 +8,11 @@ using Dylanng.Core.Systems.TickSystem;
 using Dylanng.Dylanng_EventBus;
 using Dylanng.Events.SystemEvents;
 using Dylanng.Services;
-using Game.Data.Hero;
 using Game.Managers;
 using Game.Managers.Hero;
 using Game.Managers.Item;
 using Game.Managers.Party;
-using Game.UIs.Screens.Hero;
+using Dylanng.Gameplay.RPG.Abilities.Managers;
 using UnityEngine;
 
 namespace GAME
@@ -41,6 +40,7 @@ namespace GAME
         [SerializeField] private PartyManager partyManager;
         [SerializeField] private PartyCombatManager partyCombatManager;
         [SerializeField] private GameModeManager gameModeManager;
+        [SerializeField] private AbilityVFXManager abilityVFXManager;
         
         private TickSystem _tickSystem;
         private PauseSystem _pauseSystem;
@@ -105,6 +105,9 @@ namespace GAME
 
             yield return null;
             partyCombatManager.Initialize();
+
+            yield return null;
+            abilityVFXManager.Initialize();
 
             yield return null;
 
