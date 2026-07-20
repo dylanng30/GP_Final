@@ -10,7 +10,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     public class BlinkEffect : IAbilityEffect
     {
         public float MaxDistance = 10f;
-        public GameObject BlinkVFXPrefab;
+        public PoolableObject BlinkVFXPrefab;
         public bool BlinkToTarget = false;
 
         public void Execute(GameObject caster, GameObject target, Vector3 point)

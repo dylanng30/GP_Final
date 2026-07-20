@@ -60,7 +60,7 @@ MonoBehaviour:
   basicAttackConfig: {fileID: 11400000, guid: 9e675124711b1404bbdad22899b2f010, type: 2}
   abilities:
   - {fileID: 11400000, guid: 36d355c49ea39e14f9aadef08d7bf82b, type: 2}
-  - {fileID: 11400000, guid: d2dd5133d2d8a7a4d8f36076826de0be, type: 2}
+  - {fileID: 11400000, guid: 858628484599e6d4e831f859134a4a90, type: 2}
 --- !u!143 &4477347401851001304
 CharacterController:
   m_ObjectHideFlags: 0

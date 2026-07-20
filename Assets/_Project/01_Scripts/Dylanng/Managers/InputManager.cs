@@ -2,6 +2,7 @@ using UnityEngine;
 using Dylanng.Core.Base;
 using Dylanng.Core;
 using Dylanng.Core.Systems.TickSystem;
+using UnityEngine.EventSystems;
 
 namespace Dylanng.Services
 {
@@ -60,18 +61,18 @@ namespace Dylanng.Services
             SprintInput = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
             // Kiểm tra click xuyên qua UI (UI click-through) khi nhấn Joystick hoặc các bảng điều khiển UI
-            bool isPointerOverUI = false;
-            if (UnityEngine.EventSystems.EventSystem.current != null)
+            /*bool isPointerOverUI = false;
+            if (EventSystem.current != null)
             {
-                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                if (EventSystem.current.IsPointerOverGameObject())
                 {
                     isPointerOverUI = true;
                 }
-                else if (Input.touchCount > 0 && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                else if (Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
                 {
                     isPointerOverUI = true;
                 }
-            }
+            }*/
 
             // Disable Fire1 mapping to AttackInput to prevent unintended attacks on screen taps
             // AttackInput = !isPointerOverUI && Input.GetButtonDown("Fire1");

@@ -93,8 +93,10 @@ namespace Game.UIs.FloatingText
             }
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             transform.DOKill();
             var tickSystem = ServiceLocator.Get<ITickSystem>();
             if (tickSystem != null)

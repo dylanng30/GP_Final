@@ -17,7 +17,8 @@ namespace Dylanng.Gameplay.RPG.Stats
         MaxEnergy = 9,
         
         // Defensive Buffs
-        Shield = 10
+        Shield = 10,
+        DamageImmunity = 11
     }
 
     // Retained for compatibility with older code referencing StatField

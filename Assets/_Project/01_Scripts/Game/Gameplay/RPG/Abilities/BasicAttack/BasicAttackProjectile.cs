@@ -3,13 +3,14 @@ using Dylanng.Core.Pooling;
 using Dylanng.Core.Systems.TickSystem;
 using Dylanng.Dylanng_EventBus;
 using Dylanng.Gameplay.RPG.Abilities.Events;
+using Dylanng.Gameplay.RPG.Abilities.Projectiles;
 using Game.Gameplay.Entities;
 using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
 {
     [RequireComponent(typeof(Collider))]
-    public class BasicAttackProjectile : PoolableObject, IUpdatable
+    public class BasicAttackProjectile : PoolableObject, IUpdatable, IBlockableProjectile
     {
         private HeroInstance _caster;
         private ITargetable _target;
@@ -24,7 +25,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
 
         private float _timer;
         private float _distanceTraveled;
-        private Vector3 _startPos;
+
+        public GameObject Caster => _caster != null ? _caster.gameObject : null;
 
         public void Setup(HeroInstance caster, ITargetable target, float damage, BasicAttackSO config)
         {
@@ -53,7 +55,6 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
 
             _timer = 0f;
             _distanceTraveled = 0f;
-            _startPos = transform.position;
 
             ApplyVisualVisibility(!_isInvisibleVisual);
 
@@ -158,6 +159,12 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 bool isCrit = UnityEngine.Random.value <= 0.2f;
                 EventBus.Publish(new DamageDealtEvent(casterGo, _target.Transform.gameObject, _damage, _element, transform.position, isCrit));
             }
+            ReturnToPool();
+        }
+
+        public void Block()
+        {
+            // Optional: Spawn a block VFX here if needed
             ReturnToPool();
         }
 

@@ -49,7 +49,7 @@ namespace Dylanng.Core.Base
         {
             TransformCache.SetParent(parent);
             Parent = parent;
-            RootParent = parent.root;
+            RootParent = parent == null ? null : parent.root;
 
             if (isPosRotReseted)
             {

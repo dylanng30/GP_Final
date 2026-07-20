@@ -1,4 +1,5 @@
 using System;
+using Dylanng.Core;
 using UnityEngine;
 using Dylanng.Gameplay.RPG.Abilities;
 using Game.Gameplay.RPG.Abilities.Effects;
@@ -13,7 +14,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float Duration = 5f;
         public float TickInterval = 1f;
         public float DamagePerTickMultiplier = 0.5f; // e.g. 50% of ATK per tick
-        public ElementType Element = ElementType.Magic;
+        public ElementType Element;
         public ZoneDamageInstance ZoneVFXPrefab;
         public bool IsAura = false; // If true, it follows the caster. If false, it spawns at 'point'.
 
@@ -40,7 +41,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             ZoneDamageInstance zoneInstance = null;
             if (ZoneVFXPrefab != null)
             {
-                var poolManager = Dylanng.Services.ServiceLocator.Get<Dylanng.Core.Pooling.PoolManager>();
+                var poolManager = ServiceLocator.Get<Dylanng.Core.Pooling.PoolManager>();
                 string poolKey = ZoneVFXPrefab.name;
                 
                 if (poolManager != null)

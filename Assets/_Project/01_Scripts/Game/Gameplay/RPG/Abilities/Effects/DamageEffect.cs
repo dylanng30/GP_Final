@@ -9,7 +9,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     [Serializable]
     public class DamageEffect : IAbilityEffect
     {
-        public ElementType Element = ElementType.Pyro;
+        public ElementType Element;
         public float BaseDamage = 100f;
         public float AtkMultiplier = 1.5f;
 

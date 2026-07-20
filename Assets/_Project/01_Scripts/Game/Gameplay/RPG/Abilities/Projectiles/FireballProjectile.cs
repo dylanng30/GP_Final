@@ -10,7 +10,7 @@ using Dylanng.Core.Systems.TickSystem;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
 {
-    public class FireballProjectile : PoolableObject, IAbilityProjectile, IUpdatable
+    public class FireballProjectile : PoolableObject, IAbilityProjectile, IUpdatable, IBlockableProjectile
     {
         [SerializeField] private float speed = 15f;
         [SerializeField] private float explosionRadius = 3f;
@@ -31,6 +31,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
         private float _travelDuration;
         private float _timeElapsed;
         private bool _isExploded;
+
+        public GameObject Caster => _caster;
 
         public void InitializeProjectile(GameObject caster, GameObject target, Vector3 targetPoint, List<IAbilityEffect> collisionEffects = null)
         {
@@ -119,6 +121,11 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
             Explode();
         }
 
+        public void Block()
+        {
+            Explode();
+        }
+
         private void Explode()
         {
             if (_isExploded) return;
@@ -164,8 +171,10 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
             }
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             var tickSystem = ServiceLocator.Get<ITickSystem>();
             if (tickSystem != null)
             {

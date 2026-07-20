@@ -1,4 +1,5 @@
 using System;
+using Dylanng.Core;
 using UnityEngine;
 using Dylanng.Gameplay.RPG.Stats;
 using Dylanng.Core.Pooling;

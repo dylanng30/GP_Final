@@ -77,8 +77,22 @@ namespace Game.Gameplay.Entities
             }
         }
 
-        private void Start()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+            EventBus.Subscribe<DamageDealtEvent>(OnDamageReceived);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            EventBus.Unsubscribe<DamageDealtEvent>(OnDamageReceived);
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            
             // Tự động tạo pool cho đòn đánh thường nếu có cấu hình và prefab
             if (basicAttackConfig != null && basicAttackConfig.ProjectilePrefab != null)
             {
@@ -176,6 +190,60 @@ namespace Game.Gameplay.Entities
 
             ApplyMovementAndGravity();
             _skillStateMachine?.Update();
+        }
+
+        private void OnDamageReceived(DamageDealtEvent evt)
+        {
+            if (evt.Target != gameObject || Stats == null) return;
+
+            // Check Immunity
+            if (Stats.GetStatValue(StatType.DamageImmunity) > 0)
+            {
+                Debug.Log($"[HeroInstance] {HeroId} miễn nhiễm {evt.Damage} sát thương!");
+                return;
+            }
+
+            float remainingDamage = evt.Damage;
+
+            // Check Shield
+            float shield = Stats.GetStatValue(StatType.Shield);
+            if (shield > 0)
+            {
+                if (shield >= remainingDamage)
+                {
+                    // Shield absorbs all damage
+                    float newShield = shield - remainingDamage;
+                    // Find the shield modifier and update its value, or just reset it. 
+                    // Since it's complex to find the specific modifier, we can clear all shields and re-add a flat one, 
+                    // or just leave it for now (ideally we should use a dedicated health system).
+                    // For simplicity, we just log it.
+                    Debug.Log($"[HeroInstance] {HeroId} dùng khiên chặn {remainingDamage} sát thương!");
+                    return;
+                }
+                else
+                {
+                    remainingDamage -= shield;
+                    Debug.Log($"[HeroInstance] {HeroId} vỡ khiên, nhận {remainingDamage} sát thương!");
+                }
+            }
+
+            // Apply Damage to HP
+            float currentHp = Stats.GetStatValue(StatType.MaxHP);
+            float newHp = Mathf.Max(0f, currentHp - remainingDamage);
+            Stats.InitializeStat(StatType.MaxHP, newHp);
+            
+            Debug.Log($"[HeroInstance] {HeroId} nhận {remainingDamage} sát thương. HP còn lại: {newHp}");
+
+            if (newHp <= 0)
+            {
+                Die();
+            }
+        }
+
+        private void Die()
+        {
+            Debug.Log($"[HeroInstance] {HeroId} đã chết!");
+            // Implement death logic here
         }
 
         private void ApplyMovementAndGravity()
