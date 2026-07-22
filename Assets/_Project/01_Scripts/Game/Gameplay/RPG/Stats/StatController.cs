@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Dylanng.Core;
 using Dylanng.Core.Base;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ namespace Dylanng.Gameplay.RPG.Stats
 
         public void Initialize(string characterId, int level, int starLevel)
         {
-            var statRepo = Dylanng.Core.ServiceLocator.Get<IStatRepository>();
+            var statRepo = ServiceLocator.Get<IStatRepository>();
             if (statRepo == null)
             {
                 Debug.LogError("[StatController] IStatRepository not found!");

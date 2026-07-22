@@ -74,25 +74,7 @@ namespace Game.Gameplay.Controllers.States
             {
                 Vector3 direction = (targetPos - heroPos).normalized;
                 
-                // Chuyển hướng sang tọa độ camera hoặc XZ để tương thích IEntityController.Move
-                if (Camera.main != null)
-                {
-                    Transform camTransform = Camera.main.transform;
-                    Vector3 cameraForward = camTransform.forward;
-                    Vector3 cameraRight = camTransform.right;
-                    cameraForward.y = 0f;
-                    cameraRight.y = 0f;
-                    cameraForward.Normalize();
-                    cameraRight.Normalize();
-
-                    float moveX = Vector3.Dot(direction, cameraRight);
-                    float moveY = Vector3.Dot(direction, cameraForward);
-                    _entityController.Move(new Vector2(moveX, moveY));
-                }
-                else
-                {
-                    _entityController.Move(new Vector2(direction.x, direction.z));
-                }
+                _entityController.MoveInWorldSpace(direction);
             }
             else
             {

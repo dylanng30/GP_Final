@@ -5,6 +5,7 @@ using Dylanng.Dylanng_EventBus;
 using Dylanng.Gameplay.RPG.Abilities.Effects;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Stats;
+using Game.Gameplay.Entities;
 using UnityEngine;
 using Dylanng.Core.Systems.TickSystem;
 
@@ -43,6 +44,15 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
             _startPosition = transform.position;
             _timeElapsed = 0f;
             _isExploded = false;
+
+            if (enemyLayer.value == 0 && caster != null && caster.TryGetComponent<HeroInstance>(out var heroInst))
+            {
+                LayerMask casterMask = heroInst.GetTargetLayerMask();
+                if (casterMask.value != 0)
+                {
+                    enemyLayer = casterMask;
+                }
+            }
 
             Vector3 endPos = GetTargetPosition();
             float distance = Vector3.Distance(_startPosition, endPos);
@@ -118,6 +128,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
         private void OnTriggerEnter(Collider other)
         {
             if (_caster != null && other.gameObject == _caster) return;
+            if (enemyLayer.value != 0 && ((1 << other.gameObject.layer) & enemyLayer.value) == 0) return;
             Explode();
         }
 
@@ -133,7 +144,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
 
             Vector3 hitPoint = transform.position;
 
-            Collider[] hits = Physics.OverlapSphere(hitPoint, explosionRadius, enemyLayer);
+            Collider[] hits = Physics.OverlapSphere(hitPoint, explosionRadius, enemyLayer.value != 0 ? enemyLayer : (LayerMask)(-1));
             foreach (var hit in hits)
             {
                 if (hit.gameObject != gameObject && (_caster == null || hit.gameObject != _caster))

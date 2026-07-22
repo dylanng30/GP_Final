@@ -12,6 +12,7 @@ using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Data.Item;
 using Game.Gameplay.Controllers;
 using System.Collections.Generic;
+using Game.Gameplay.AI.Controllers;
 using Game.Managers.Hero;
 using Game.Managers.Item;
 using UnityEngine;
@@ -19,7 +20,7 @@ using UnityEngine;
 namespace Game.Gameplay.Entities
 {
     [RequireComponent(typeof(CharacterController))]
-    public class HeroInstance : MonoBehaviourBase, IEntityController
+    public class HeroInstance : MonoBehaviourBase, IEntityController, ITargetable
     {
         [Header("--- MOVEMENT SETTINGS ---")]
         [SerializeField] private float _moveSpeed = 5f;
@@ -57,6 +58,8 @@ namespace Game.Gameplay.Entities
         public string HeroId { get; private set; }
         public StatController Stats { get; private set; }
         public EquipmentController Equipments { get; private set; }
+        public Transform Transform => TransformCache;
+        public bool IsDead { get; private set; }
         public float CurrentEnergy { get; private set; }
         public float MaxEnergyLimit => maxEnergyLimit;
 
@@ -93,6 +96,15 @@ namespace Game.Gameplay.Entities
         {
             base.Start();
             
+            if (Stats == null) Stats = GetComponent<StatController>();
+            if (Stats != null && Stats.GetStatValue(StatType.MaxHP) <= 0)
+            {
+                Stats.InitializeStat(StatType.MaxHP, 1000f);
+                Stats.InitializeStat(StatType.ATK, 100f);
+                Stats.InitializeStat(StatType.DEF, 50f);
+                Stats.InitializeStat(StatType.Speed, 100f);
+            }
+
             // Tự động tạo pool cho đòn đánh thường nếu có cấu hình và prefab
             if (basicAttackConfig != null && basicAttackConfig.ProjectilePrefab != null)
             {
@@ -242,8 +254,17 @@ namespace Game.Gameplay.Entities
 
         private void Die()
         {
+            IsDead = true;
             Debug.Log($"[HeroInstance] {HeroId} đã chết!");
             // Implement death logic here
+        }
+
+        public void OnTargeted(bool isTargeted)
+        {
+            if (controlledCircleSign != null)
+            {
+                controlledCircleSign.SetActive(isTargeted);
+            }
         }
 
         private void ApplyMovementAndGravity()
@@ -289,8 +310,7 @@ namespace Game.Gameplay.Entities
 
             _characterController.Move(finalVelocity * Time.deltaTime);
         }
-
-        #region --- COMBAT & ABILITIES API ---
+        
         public void GainEnergy(float amount)
         {
             CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, maxEnergyLimit);
@@ -350,6 +370,10 @@ namespace Game.Gameplay.Entities
                 if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null && !pts.CurrentTarget.IsDead)
                 {
                     target = pts.CurrentTarget;
+                }
+                else if (TryGetComponent<EnemyBotController>(out var enemyCtrl) && enemyCtrl.CurrentTarget != null && !enemyCtrl.CurrentTarget.IsDead)
+                {
+                    target = enemyCtrl.CurrentTarget;
                 }
                 else
                 {
@@ -514,7 +538,22 @@ namespace Game.Gameplay.Entities
 
             castCommand.Execute();
         }
-        #endregion
+        public LayerMask GetTargetLayerMask()
+        {
+            if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.EnemyLayerMask.value != 0)
+            {
+                return pts.EnemyLayerMask;
+            }
+            if (TryGetComponent<HeroAIController>(out var aiCtrl) && aiCtrl.EnemyLayerMask.value != 0)
+            {
+                return aiCtrl.EnemyLayerMask;
+            }
+            if (TryGetComponent<EnemyBotController>(out var botCtrl) && botCtrl.TargetLayerMask.value != 0)
+            {
+                return botCtrl.TargetLayerMask;
+            }
+            return (LayerMask)0;
+        }
 
         #region --- IEntityController ---
         public void Move(Vector2 direction)

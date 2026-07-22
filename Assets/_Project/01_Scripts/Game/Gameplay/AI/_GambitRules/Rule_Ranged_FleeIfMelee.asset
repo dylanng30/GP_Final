@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84024499d420ef645bfb21acbc78bbc6, type: 3}
+  m_Name: Rule_Ranged_FleeIfMelee
+  m_EditorClassIdentifier: 
+  ruleName: "Ph\u1EA3n X\u1EA1 B\u1ECB \xC1p S\xE1t (Ranged Defense)"
+  priority: 90
+  conditions:
+  - rid: 1273186576651255812
+  action:
+    rid: 1273186576651255813
+  references:
+    version: 2
+    RefIds:
+    - rid: 1273186576651255812
+      type: {class: TargetInMeleeRangeCondition, ns: Game.Gameplay.AI.Gambit.Conditions, asm: Assembly-CSharp}
+      data:
+        meleeRange: 2.5
+    - rid: 1273186576651255813
+      type: {class: SelfDefenseImmunityAction, ns: Game.Gameplay.AI.Gambit.Actions, asm: Assembly-CSharp}
+      data:
+        defensiveSkillIndex: 0

@@ -37,5 +37,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
 
         [Tooltip("Offset vị trí xuất hiện viên đạn tính từ tâm Hero")]
         public Vector3 SpawnOffset = new Vector3(0f, 1.2f, 0.8f);
+
+        [Tooltip("LayerMask mục tiêu (Nếu để Nothing sẽ tự động lấy từ Hero/Bot bắn ra)")]
+        public LayerMask TargetLayerMask;
     }
 }

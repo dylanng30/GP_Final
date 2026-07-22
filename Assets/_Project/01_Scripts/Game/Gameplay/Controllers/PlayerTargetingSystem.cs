@@ -15,6 +15,7 @@ namespace Game.Gameplay.Controllers
         private float _scanTimer;
 
         public ITargetable CurrentTarget => _currentTarget;
+        public LayerMask EnemyLayerMask => enemyLayerMask;
 
         private void Update()
         {

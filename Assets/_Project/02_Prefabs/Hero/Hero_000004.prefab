@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -385789539404061306}
   - component: {fileID: 8995366364610131793}
   - component: {fileID: 8747982850096134082}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hero_000004
   m_TagString: Untagged
   m_Icon: {fileID: 0}

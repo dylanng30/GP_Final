@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: 
   Icon: {fileID: 21300000, guid: 2461ccc6acb6a784ab1d5773c44f4f44, type: 3}
   Type: 0
-  Element: 0
+  Element: 1
   Cooldown: 3
   EnergyCost: 0
   StaminaCost: 0
@@ -26,6 +26,7 @@ MonoBehaviour:
   Range: 8
   IndicatorRadius: 2
   IndicatorType: 2
+  RequiresTarget: 0
   Effects:
   - rid: 1273186508660539396
   references:

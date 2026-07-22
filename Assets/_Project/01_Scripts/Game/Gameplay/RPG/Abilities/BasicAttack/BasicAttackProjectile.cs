@@ -22,6 +22,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
         private float _maxRange;
         private float _maxLifetime;
         private bool _isInvisibleVisual;
+        [SerializeField] private LayerMask targetLayerMask;
 
         private float _timer;
         private float _distanceTraveled;
@@ -51,6 +52,19 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 _maxLifetime = 2f;
                 _isInvisibleVisual = false;
                 _element = ElementType.Physical;
+            }
+
+            if (config != null && config.TargetLayerMask.value != 0)
+            {
+                targetLayerMask = config.TargetLayerMask;
+            }
+            else if (caster != null)
+            {
+                LayerMask casterMask = caster.GetTargetLayerMask();
+                if (casterMask.value != 0)
+                {
+                    targetLayerMask = casterMask;
+                }
             }
 
             _timer = 0f;
@@ -171,6 +185,11 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
         private void OnTriggerEnter(Collider other)
         {
             if (_caster != null && other.gameObject == _caster.gameObject) return;
+
+            if (targetLayerMask.value != 0 && ((1 << other.gameObject.layer) & targetLayerMask.value) == 0)
+            {
+                return;
+            }
 
             // Check collision with targetable entities
             if (other.TryGetComponent<ITargetable>(out var targetable))
