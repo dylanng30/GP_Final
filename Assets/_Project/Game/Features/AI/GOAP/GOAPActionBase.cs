@@ -108,7 +108,7 @@ namespace Game.Gameplay.AI.GOAP
 
         public virtual void Enter(IAIContext context) { }
         
-        public abstract ActionStatus Update(IAIContext context, float deltaTime);
+        public abstract ActionStatus OnUpdate(IAIContext context, float deltaTime);
         
         public virtual void Exit(IAIContext context) { }
     }

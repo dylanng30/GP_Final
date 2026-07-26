@@ -16,6 +16,10 @@ GameObject:
   - component: {fileID: 2189391441016483731}
   - component: {fileID: 788545740105168432}
   - component: {fileID: -8410865880975977887}
+  - component: {fileID: 3957211061811005432}
+  - component: {fileID: 4349960626498541715}
+  - component: {fileID: 7591088646605549107}
+  - component: {fileID: 4306244689036329812}
   m_Layer: 7
   m_Name: Hero_000000
   m_TagString: Untagged
@@ -160,6 +164,63 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   scanInterval: 0.3
+--- !u!114 &3957211061811005432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c30f9e69a8e82943b37c590844ac20d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hexGrid: {fileID: 0}
+  moveSpeed: 5
+  stopDistance: 0.1
+--- !u!114 &4349960626498541715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3033b5150a79320409f569769aec9d8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldGraph: {fileID: 11400000, guid: c4198b48304157a41b5f76d9b94587c3, type: 2}
+--- !u!114 &7591088646605549107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcab23c789377464ea8ed5bef0e8cd3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4306244689036329812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918246929312317307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 295d76a0a19418c47b00deb9dc601025, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetNavigator: {fileID: 4349960626498541715}
+  testTargetScene: Scene_C
+  testTargetPosition: {x: 10, y: 0, z: 15}
+  multiSceneTestKey: 109
+  localMoveKey: 324
 --- !u!1 &4601690124869856080
 GameObject:
   m_ObjectHideFlags: 0

@@ -39,7 +39,7 @@ namespace Game.Gameplay.AI.GOAP.Actions
             }
         }
 
-        public override ActionStatus Update(IAIContext context, float deltaTime)
+        public override ActionStatus OnUpdate(IAIContext context, float deltaTime)
         {
             if (context == null) return ActionStatus.Failure;
 

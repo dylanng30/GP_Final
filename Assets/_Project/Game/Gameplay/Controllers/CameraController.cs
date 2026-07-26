@@ -50,6 +50,13 @@ namespace Game.Gameplay.Controllers
         {
             EventBus.Subscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Subscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
+
+            UpdateTarget(); // Tìm Hero mỗi khi Camera được bật (bao gồm cả khi Scene được active)
+            if (_target != null)
+            {
+                _currentYaw = _target.eulerAngles.y;
+                SnapToTarget();
+            }
         }
 
         private void OnDisable()
@@ -62,9 +69,31 @@ namespace Game.Gameplay.Controllers
         {
             // Snap to initial mode
             _currentMode = CameraMode.TopDown;
-            if (_target != null)
+        }
+
+        private void SnapToTarget()
+        {
+            if (_target == null) return;
+
+            if (_currentMode == CameraMode.TopDown)
             {
-                _currentYaw = _target.eulerAngles.y;
+                transform.position = _target.position + topDownOffset;
+                Vector3 directionToTarget = (_target.position + topDownLookOffset) - transform.position;
+                if (directionToTarget != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(directionToTarget);
+                }
+            }
+            else
+            {
+                Quaternion orbitRotation = Quaternion.Euler(_currentPitch, _currentYaw, 0f);
+                Vector3 orbitDirection = orbitRotation * Vector3.back;
+                transform.position = _target.position + Vector3.up * thirdPersonHeight + orbitDirection * thirdPersonDistance;
+                Vector3 directionToTarget = (_target.position + thirdPersonLookOffset) - transform.position;
+                if (directionToTarget != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(directionToTarget);
+                }
             }
         }
 

@@ -45,19 +45,29 @@ namespace Dylanng
         {
             ServiceLocator.Register<UIManager>(this);
             EventBus.Subscribe<GameBootedEvent>(OnGameBooted);
+            EventBus.Subscribe<SceneLoadedEvent>(OnSceneLoaded);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
             EventBus.Unsubscribe<GameBootedEvent>(OnGameBooted);
+            EventBus.Unsubscribe<SceneLoadedEvent>(OnSceneLoaded);
         }
 
         private void OnGameBooted(GameBootedEvent evt)
         {
-            OpenScreen<Screen_ExploreHUD>();
+            // Do not open UI here, wait for SceneLoadedEvent
+            // OpenScreen<Screen_ExploreHUD>();
         }
-        
+
+        private void OnSceneLoaded(SceneLoadedEvent evt)
+        {
+            if (ScreenStack.Count == 0)
+            {
+                OpenScreen<Screen_ExploreHUD>();
+            }
+        }
         protected Dictionary<Type, UIBase> BuildPrefabDictionary()
         {
             var dict = new Dictionary<Type, UIBase>();

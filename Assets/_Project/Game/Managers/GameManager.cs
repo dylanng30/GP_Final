@@ -5,7 +5,9 @@ using Game.Managers.Hero;
 using Game.Managers.Item;
 using Game.Managers.Party;
 using Dylanng.Gameplay.RPG.Abilities.Managers;
+using TCO_CustomSceneController;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GAME
 {
@@ -28,6 +30,9 @@ namespace GAME
         [SerializeField] private PartyCombatManager partyCombatManager;
         [SerializeField] private GameModeManager gameModeManager;
         [SerializeField] private AbilityVFXManager abilityVFXManager;
+        
+        [Header("--- SCENE SETTINGS ---")]
+        [SerializeField] private SceneNavigationSO bootstrapSceneNavigationSO;
         
         private TickSystem _tickSystem;
         private PauseSystem _pauseSystem;
@@ -86,6 +91,12 @@ namespace GAME
 
             // 5. Initialize Party & GameMode managers
             partyManager.Initialize();
+            
+            // Tự động gán NavigationSceneAdapter vào GameManager (khỏi lo bị huỷ hoặc quên kéo)
+            if (gameObject.GetComponent<GP_Final.Navigation.Components.NavigationSceneAdapter>() == null)
+            {
+                gameObject.AddComponent<GP_Final.Navigation.Components.NavigationSceneAdapter>();
+            }
 
             yield return null;
             gameModeManager.Initialize();
@@ -107,12 +118,51 @@ namespace GAME
 
             // Publish event indicating successful game boot
             EventBus.Publish(new GameBootedEvent());
+            
+            // Tạm thời load sang Scene A sau khi boot xong
+            if (SceneController.Instance != null)
+            {
+                SceneController.SceneTransitionPlan plan;
+                string loadedSceneName = "Scene_A";
+
+                if (bootstrapSceneNavigationSO != null)
+                {
+                    plan = SceneController.Instance.GetSceneTransitionPlan(bootstrapSceneNavigationSO);
+                    loadedSceneName = bootstrapSceneNavigationSO.ActiveScene.SceneName;
+                }
+                else
+                {
+                    plan = new SceneController.SceneTransitionPlan()
+                        .Load("Main", "Scene_A", setActive: true)
+                        .WithOverlay()
+                        .WithClearUnusedAssets();
+                }
+                
+                yield return plan.Perform();
+                EventBus.Publish(new SceneLoadedEvent { SceneName = loadedSceneName });
+
+                // Hủy Scene Bootstrapper đi để giải phóng Camera và các Object thừa
+                // Các Manager có DontDestroyOnLoad sẽ tự động tách ra nên không sợ mất
+                var bootScene = SceneManager.GetSceneByName("Bootstrapper");
+                if (bootScene.isLoaded)
+                {
+                    SceneManager.UnloadSceneAsync(bootScene);
+                }
+            }
+            else
+            {
+                GameLogger.LogError("[GameManager] SceneController is missing!");
+            }
         }
 
         private void OnDestroy()
         {
-            // Clear all registered services when GameManager is destroyed
-            ServiceLocator.ClearAllServices();
+            // Only clear services if THIS instance is the active singleton.
+            // (If this is a duplicate being destroyed, we shouldn't wipe the global services)
+            if (Instance == this)
+            {
+                ServiceLocator.ClearAllServices();
+            }
         }
     }
 }

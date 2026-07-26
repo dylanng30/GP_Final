@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11fdce818533dfe44821f9447adeb632, type: 3}
+  m_Name: MainWorldMapGraph
+  m_EditorClassIdentifier: 
+  interSceneConnections:
+  - fromSceneName: Scene_A
+    fromPortalId: Portal_A_Out
+    toSceneName: Scene_B
+    toPortalId: Portal_B_In_A
+    transitionCost: 1
+  - fromSceneName: Scene_B
+    fromPortalId: Portal_B_Out_C
+    toSceneName: Scene_C
+    toPortalId: Portal_C_In_B
+    transitionCost: 1
+  intraScenePaths:
+  - portalId1: Portal_B_In_A
+    portalId2: Portal_B_Out_C
+    distanceCost: 10

@@ -13,6 +13,7 @@ namespace Game.Managers.Party
     {
         private List<HeroInstance> _activeHeroes = new List<HeroInstance>();
         private int _currentActiveHeroIndex = 0;
+        private bool _hasSpawnedHeroes = false;
 
         public bool IsFollowModeEnabled { get; private set; } = true;
         public IReadOnlyList<HeroInstance> ActiveHeroes => _activeHeroes;
@@ -25,13 +26,12 @@ namespace Game.Managers.Party
             if (partyManager != null)
             {
                 partyManager.OnPartyChanged += OnPartyChanged;
-                SyncHeroes(partyManager.HeroIds);
+                // Delay SyncHeroes until the first scene is loaded
             }
 
             EventBus.Subscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
             EventBus.Subscribe<DamageDealtEvent>(OnDamageDealt);
-
-            InitializeCombat();
+            EventBus.Subscribe<SceneLoadedEvent>(OnSceneLoaded);
         }
 
         protected override void OnDestroy()
@@ -44,6 +44,7 @@ namespace Game.Managers.Party
 
             EventBus.Unsubscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
             EventBus.Unsubscribe<DamageDealtEvent>(OnDamageDealt);
+            EventBus.Unsubscribe<SceneLoadedEvent>(OnSceneLoaded);
 
             ClearHeroes();
 
@@ -55,10 +56,24 @@ namespace Game.Managers.Party
         private void OnPartyChanged()
         {
             var partyManager = ServiceLocator.Get<PartyManager>();
-            if (partyManager != null)
+            if (partyManager != null && _hasSpawnedHeroes)
             {
                 SyncHeroes(partyManager.HeroIds);
                 InitializeCombat();
+            }
+        }
+
+        private void OnSceneLoaded(SceneLoadedEvent evt)
+        {
+            if (!_hasSpawnedHeroes)
+            {
+                _hasSpawnedHeroes = true;
+                var partyManager = ServiceLocator.Get<PartyManager>();
+                if (partyManager != null)
+                {
+                    SyncHeroes(partyManager.HeroIds);
+                    InitializeCombat();
+                }
             }
         }
 

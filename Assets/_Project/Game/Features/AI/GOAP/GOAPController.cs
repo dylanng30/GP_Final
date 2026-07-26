@@ -50,7 +50,7 @@ namespace Game.Gameplay.AI.GOAP
             }
 
             // Nếu đây là frame đầu tiên thực hiện action (hoặc vừa chuyển action)
-            ActionStatus status = action.Update(context, deltaTime);
+            ActionStatus status = action.OnUpdate(context, deltaTime);
 
             if (status == ActionStatus.Success)
             {

@@ -24,7 +24,7 @@ namespace Game.Gameplay.AI.GOAP
         float CalculateDynamicCost(IAIContext context);
 
         void Enter(IAIContext context);
-        ActionStatus Update(IAIContext context, float deltaTime);
+        ActionStatus OnUpdate(IAIContext context, float deltaTime);
         void Exit(IAIContext context);
     }
 }

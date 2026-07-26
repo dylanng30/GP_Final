@@ -31,7 +31,8 @@ namespace TCO_CustomSceneController
         private bool _isBusy = false;
         
         // API
-        public SceneTransitionPlan Perform(SceneNavigationSO navigationData)
+        
+        public SceneTransitionPlan GetSceneTransitionPlan(SceneNavigationSO navigationData)
         {
             var plan = new SceneTransitionPlan();
             
@@ -96,12 +97,34 @@ namespace TCO_CustomSceneController
 
             foreach (var kvp in plan.ScenesToLoad)
             {
-                if (loadedSceneBySlot.ContainsKey(kvp.Key))
+                string slotKey = kvp.Key;
+                string sceneName = kvp.Value;
+                bool isTargetActive = (plan.ActiveSceneName == sceneName);
+
+                if (loadedSceneBySlot.TryGetValue(slotKey, out string currentSceneInSlot))
                 {
-                    yield return UnloadSceneCoroutine(kvp.Key);
+                    if (currentSceneInSlot == sceneName)
+                    {
+                        // Scene is already loaded in this slot! Just update its visibility and activation.
+                        Scene existingScene = SceneManager.GetSceneByName(sceneName);
+                        if (isTargetActive)
+                        {
+                            if (existingScene.IsValid() && existingScene.isLoaded)
+                            {
+                                SceneManager.SetActiveScene(existingScene);
+                                DynamicGI.UpdateEnvironment(); // Cập nhật lại ánh sáng môi trường
+                            }
+                        }
+                        SetSceneVisibility(existingScene, isTargetActive);
+                        continue; // Bỏ qua việc load lại vì đã load rồi
+                    }
+                    else
+                    {
+                        yield return UnloadSceneCoroutine(slotKey);
+                    }
                 }
 
-                yield return LoadAdditiveCoroutine(kvp.Key, kvp.Value, plan.ActiveSceneName == kvp.Value);
+                yield return LoadAdditiveCoroutine(slotKey, sceneName, isTargetActive);
             }
 
             if (plan.Overlay)
@@ -114,6 +137,8 @@ namespace TCO_CustomSceneController
 
         private IEnumerator LoadAdditiveCoroutine(string slotKey, string sceneName, bool setActive)
         {
+            if (string.IsNullOrWhiteSpace(sceneName)) yield break;
+            
             AsyncOperation loadOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
             if (loadOp == null) yield break;
             
@@ -133,16 +158,33 @@ namespace TCO_CustomSceneController
                 yield return null;
             }
 
+            Scene newScene = SceneManager.GetSceneByName(sceneName);
+
             if (setActive)
             {
-                Scene newScene = SceneManager.GetSceneByName(sceneName);
                 if (newScene.IsValid() && newScene.isLoaded)
                 {
                     SceneManager.SetActiveScene(newScene);
+                    DynamicGI.UpdateEnvironment(); // Cập nhật lại ánh sáng môi trường
                 }
+                SetSceneVisibility(newScene, true);
+            }
+            else
+            {
+                // Nếu load ngầm (Additive preloading), lập tức giấu toàn bộ các Object của Scene đi
+                SetSceneVisibility(newScene, false);
             }
             
             loadedSceneBySlot[slotKey] = sceneName;
+        }
+
+        private void SetSceneVisibility(Scene scene, bool isVisible)
+        {
+            if (!scene.IsValid() || !scene.isLoaded) return;
+            foreach (var rootObj in scene.GetRootGameObjects())
+            {
+                rootObj.SetActive(isVisible);
+            }
         }
 
         private IEnumerator UnloadSceneCoroutine(string slotKey)
@@ -181,6 +223,8 @@ namespace TCO_CustomSceneController
 
             public SceneTransitionPlan Load(string slotKey, string sceneName, bool setActive = false)
             {
+                if (string.IsNullOrWhiteSpace(slotKey) || string.IsNullOrWhiteSpace(sceneName)) return this;
+                
                 ScenesToLoad[slotKey] = sceneName;
                 if (setActive) ActiveSceneName = sceneName;
                 return this;
@@ -188,6 +232,8 @@ namespace TCO_CustomSceneController
 
             public SceneTransitionPlan Unload(string slotKey)
             {
+                if (string.IsNullOrWhiteSpace(slotKey)) return this;
+                
                 SceneToUnload.Add(slotKey);
                 return this;
             }

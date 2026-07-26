@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc317f58f6bd46d3be14d725019ccac4, type: 3}
+  m_Name: SceneA_to_SceneB_SO
+  m_EditorClassIdentifier: 
+  ActiveScene:
+    SlotKey: Sub1
+    SceneName: Scene_B
+  AdditiveScenes:
+  - SlotKey: Main
+    SceneName: Scene_A
+  - SlotKey: Sub2
+    SceneName: Scene_C
+  UnloadSceneSlots: []
+  ClearUnusedAssets: 0
+  HasOverlay: 0
