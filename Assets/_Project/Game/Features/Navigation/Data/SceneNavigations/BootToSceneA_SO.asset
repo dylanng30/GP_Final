@@ -15,9 +15,7 @@ MonoBehaviour:
   ActiveScene:
     SlotKey: Main
     SceneName: Scene_A
-  AdditiveScenes:
-  - SlotKey: Sub1
-    SceneName: Scene_B
+  AdditiveScenes: []
   UnloadSceneSlots:
   - Bootstrapper
   ClearUnusedAssets: 1

@@ -269,6 +269,20 @@ namespace Game.Gameplay.Entities
             
             if (_currentMoveInput.sqrMagnitude > 0.01f)
             {
+                // Always ensure we have the current active CameraController's Camera
+                if (CameraController.Instance != null)
+                {
+                    _mainCameraTransform = CameraController.Instance.transform;
+                }
+                else if (Camera.main != null)
+                {
+                    _mainCameraTransform = Camera.main.transform;
+                }
+                else
+                {
+                    _mainCameraTransform = null;
+                }
+
                 if (_mainCameraTransform != null)
                 {
                     Vector3 cameraForward = _mainCameraTransform.forward;
@@ -277,8 +291,15 @@ namespace Game.Gameplay.Entities
                     cameraForward.y = 0f;
                     cameraRight.y = 0f;
 
-                    cameraForward.Normalize();
-                    cameraRight.Normalize();
+                    if (cameraForward.sqrMagnitude > 0.001f)
+                        cameraForward.Normalize();
+                    else
+                        cameraForward = Vector3.forward;
+
+                    if (cameraRight.sqrMagnitude > 0.001f)
+                        cameraRight.Normalize();
+                    else
+                        cameraRight = Vector3.right;
 
                     moveDirection = cameraForward * _currentMoveInput.y + cameraRight * _currentMoveInput.x;
                 }

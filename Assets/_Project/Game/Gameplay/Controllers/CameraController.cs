@@ -14,7 +14,7 @@ namespace Game.Gameplay.Controllers
         ThirdPerson
     }
 
-    public class CameraController : MonoBehaviour
+    public class CameraController : PersistentSingleton<CameraController>
     {
         [Header("--- TOP DOWN SETTINGS ---")]
         [SerializeField] private Vector3 topDownOffset = new Vector3(0f, 10f, -10f);
@@ -39,22 +39,32 @@ namespace Game.Gameplay.Controllers
         private Transform _target;
         private CameraMode _currentMode = CameraMode.TopDown;
         private bool _isTransitioning = false;
-
-        // Third person rotation state
+        
         private float _currentYaw = 0f;
         private float _currentPitch = 15f;
+        private bool _isRotationInitialized = false;
         
         private Coroutine _transitionCoroutine;
+        protected override void Awake()
+        {
+            // Tách khỏi GameObject cha (nếu có) để lệnh DontDestroyOnLoad có thể hoạt động hợp lệ
+            transform.SetParent(null);
+            base.Awake();
+        }
 
         private void OnEnable()
         {
             EventBus.Subscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Subscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
 
-            UpdateTarget(); // Tìm Hero mỗi khi Camera được bật (bao gồm cả khi Scene được active)
+            UpdateTarget();
             if (_target != null)
             {
-                _currentYaw = _target.eulerAngles.y;
+                if (!_isRotationInitialized)
+                {
+                    _currentYaw = _target.eulerAngles.y;
+                    _isRotationInitialized = true;
+                }
                 SnapToTarget();
             }
         }
@@ -100,10 +110,8 @@ namespace Game.Gameplay.Controllers
         private void OnActiveHeroChanged(ActiveHeroChangedEvent evt)
         {
             UpdateTarget();
-            if (_target != null && _currentMode == CameraMode.ThirdPerson)
-            {
-                _currentYaw = _target.eulerAngles.y;
-            }
+            // We intentionally do not reset _currentYaw here so that the camera 
+            // maintains its angle across scene transitions and hero swaps.
         }
 
         private void OnToggleFollowMode(ToggleFollowModeEvent evt)
@@ -128,6 +136,7 @@ namespace Game.Gameplay.Controllers
 
         private void Update()
         {
+            if (Instance != this) return;
             HandleSwipeInput();
         }
 
@@ -174,6 +183,7 @@ namespace Game.Gameplay.Controllers
 
         private void LateUpdate()
         {
+            if (Instance != this) return;
             if (_target == null || _isTransitioning) return;
 
             Vector3 desiredPosition;
