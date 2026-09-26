@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d6dfb4c18915494c82028ee14968f06, type: 3}
+  m_Name: hero_000004_AnimConfig
+  m_EditorClassIdentifier: 
+  SpeedParam: Speed
+  IsGroundedParam: IsGrounded
+  IsFallingParam: IsFalling
+  JumpAnim: Jump
+  LandAnim: Land
+  RollAnim: Roll
+  BasicAttackAnim: Attack
+  DeathAnim: Death
+  SkillAnims:
+  - Skill_0
+  - Skill_1
+  WalkThreshold: 0.1
+  RunThreshold: 0.6
+  SpeedHash: 0
+  IsGroundedHash: 0
+  IsFallingHash: 0
+  JumpHash: 0
+  LandHash: 0
+  RollHash: 0
+  BasicAttackHash: 0
+  DeathHash: 0
+  SkillHashes: 

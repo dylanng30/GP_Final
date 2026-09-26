@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using UnityEngine;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Gameplay.Entities;
@@ -15,13 +16,13 @@ namespace Game.Gameplay.RPG.Abilities.Effects
         private float _duration;
         private float _tickInterval;
         private float _damage;
-        private ElementType _element;
+        private GameElement _element;
         private bool _isAura;
 
         private float _elapsedTime;
         private float _tickTimer;
 
-        public void Initialize(GameObject caster, float radius, float duration, float tickInterval, float damage, ElementType element, bool isAura)
+        public void Initialize(GameObject caster, float radius, float duration, float tickInterval, float damage, GameElement element, bool isAura)
         {
             _caster = caster;
             _radius = radius;

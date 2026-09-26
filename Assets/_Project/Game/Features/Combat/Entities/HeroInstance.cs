@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using Dylanng;
 using Dylanng.Gameplay.RPG.Stats;
 using Dylanng.Gameplay.RPG.Inventory;
@@ -7,6 +8,8 @@ using Dylanng.Gameplay.RPG.Abilities.Commands;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Data.Item;
 using Game.Gameplay.Controllers;
+using Game.Animation.Hero;
+using System.Collections;
 using System.Collections.Generic;
 using Game.Gameplay.AI.Controllers;
 using Game.Managers.Hero;
@@ -18,27 +21,48 @@ namespace Game.Gameplay.Entities
     [RequireComponent(typeof(CharacterController))]
     public class HeroInstance : MonoBehaviourBase, IEntityController, ITargetable
     {
-        [Header("--- MOVEMENT SETTINGS ---")]
-        [SerializeField] private float _moveSpeed = 5f;
+        [Header("--- MOVEMENT SETTINGS ---")] [SerializeField]
+        private float _moveSpeed = 5f;
+
         [SerializeField] private float _rotationSpeed = 15f;
         [SerializeField] private float _gravity = -15f;
-        
-        [Header("--- UX ---")]
-        [SerializeField] private GameObject controlledCircleSign;
 
-        [Header("--- COMBAT & ABILITIES ---")]
-        [SerializeField] private float maxEnergyLimit = 200f; // Giới hạn tối đa không được vượt quá 200 Nộ
+        [Header("--- UX ---")] [SerializeField]
+        private GameObject controlledCircleSign;
+
+        [Header("--- COMBAT & ABILITIES ---")] [SerializeField]
+        private float maxEnergyLimit = 200f; // Giới hạn tối đa không được vượt quá 200 Nộ
+
         [SerializeField] private BasicAttackSO basicAttackConfig;
         [SerializeField] private List<AbilitySO> abilities = new List<AbilitySO>();
 
-        private CharacterController _characterController;
+        [Header("--- JUMP CONFIG ---")] [SerializeField]
+        private float jumpForce = 8f;
+
+        [Header("--- DASH CONFIG ---")] [SerializeField]
+        private float dashDistance = 5f;
+
+        [SerializeField] private float dashDuration = 0.25f;
+        [SerializeField] private float dashInvincibilityDuration = 0.2f;
+
+        [SerializeField] private CharacterController characterController;
         private Transform _mainCameraTransform;
         private StateMachine _skillStateMachine;
+        [SerializeField] private HeroAnimatorController animatorController;
 
         private Vector2 _currentMoveInput;
         private float _velocityY;
         private float _lastAttackTime = -999f;
         private Dictionary<int, float> _skillLastUseTimes = new Dictionary<int, float>();
+
+        // Jump / Dash state
+        private bool _isJumping;
+        private bool _isDashing;
+        private bool _isDashInvincible;
+
+        // ─── Exposed state (dùng bởi HeroAnimatorController) ─────────────────────
+        public Vector2 CurrentMoveInput => _currentMoveInput;
+        public bool IsGrounded => characterController != null && characterController.isGrounded;
 
         public bool CanAttack()
         {
@@ -58,16 +82,14 @@ namespace Game.Gameplay.Entities
         public bool IsDead { get; private set; }
         public float CurrentEnergy { get; private set; }
         public float MaxEnergyLimit => maxEnergyLimit;
+        public GameElement HeroElement { get; private set; }
 
-        private PlayerInputController _playerController;
-        private HeroAIController _aiController;
+        [SerializeField] private PlayerInputController playerController;
+        [SerializeField] private HeroAIController aiController;
 
         protected override void Awake()
         {
             base.Awake();
-            _playerController = GetComponent<PlayerInputController>();
-            _aiController = GetComponent<HeroAIController>();
-            _characterController = GetComponent<CharacterController>();
             _skillStateMachine = new StateMachine();
 
             if (Camera.main != null)
@@ -91,7 +113,7 @@ namespace Game.Gameplay.Entities
         protected override void Start()
         {
             base.Start();
-            
+
             if (Stats == null) Stats = GetComponent<StatController>();
             if (Stats != null && Stats.GetStatValue(StatType.MaxHP) <= 0)
             {
@@ -111,7 +133,6 @@ namespace Game.Gameplay.Entities
                 }
             }
         }
-
 
         public void Setup(string heroId)
         {
@@ -167,8 +188,27 @@ namespace Game.Gameplay.Entities
                 }
             }
 
-            _playerController.Initialize(this);
-            _aiController.Initialize(this, this);
+            playerController.Initialize(this);
+            aiController.Initialize(this, this);
+
+            // Setup HeroAnimatorController với AnimationConfig tương ứng hero này
+            if (animatorController != null)
+            {
+                var hdm = ServiceLocator.Get<HeroDataManager>();
+                if (hdm != null)
+                {
+                    var heroAsset = hdm.GetHeroAsset(heroId);
+                    if (heroAsset?.AnimationConfig != null)
+                    {
+                        animatorController.Setup(heroAsset.AnimationConfig);
+                    }
+                    else
+                    {
+                        Debug.LogWarning(
+                            $"[HeroInstance] {heroId}: Không tìm thấy AnimationConfig trong HeroLocalDataSO. Animation sẽ không hoạt động.");
+                    }
+                }
+            }
 
             // Default to AI
             SetAsActive(false);
@@ -179,22 +219,22 @@ namespace Game.Gameplay.Entities
         {
             if (isActive)
             {
-                _playerController.enabled = true;
-                _aiController.enabled = true;
+                playerController.enabled = true;
+                aiController.enabled = true;
                 if (controlledCircleSign != null) controlledCircleSign.SetActive(true);
             }
             else
             {
                 if (controlledCircleSign != null) controlledCircleSign.SetActive(false);
-                _playerController.enabled = false;
-                _aiController.enabled = true;
-                _aiController.FollowActiveHero();
+                playerController.enabled = false;
+                aiController.enabled = true;
+                aiController.FollowActiveHero();
             }
         }
 
         private void Update()
         {
-            if (_characterController == null) return;
+            if (characterController == null) return;
 
             ApplyMovementAndGravity();
             _skillStateMachine?.Update();
@@ -203,6 +243,13 @@ namespace Game.Gameplay.Entities
         private void OnDamageReceived(DamageDealtEvent evt)
         {
             if (evt.Target != gameObject || Stats == null) return;
+
+            // Nếu đang Dash invincible → miễn sát thương
+            if (_isDashInvincible)
+            {
+                Debug.Log($"[HeroInstance] {HeroId} miễn sát thương do đang Dash!");
+                return;
+            }
 
             // Check Immunity
             if (Stats.GetStatValue(StatType.DamageImmunity) > 0)
@@ -213,18 +260,16 @@ namespace Game.Gameplay.Entities
 
             float remainingDamage = evt.Damage;
 
+            float multiplier = Game.Gameplay.Combat.ElementalDamageCalculator.GetMultiplier(evt.Element, HeroElement);
+            remainingDamage *= multiplier;
+
             // Check Shield
             float shield = Stats.GetStatValue(StatType.Shield);
             if (shield > 0)
             {
                 if (shield >= remainingDamage)
                 {
-                    // Shield absorbs all damage
                     float newShield = shield - remainingDamage;
-                    // Find the shield modifier and update its value, or just reset it. 
-                    // Since it's complex to find the specific modifier, we can clear all shields and re-add a flat one, 
-                    // or just leave it for now (ideally we should use a dedicated health system).
-                    // For simplicity, we just log it.
                     Debug.Log($"[HeroInstance] {HeroId} dùng khiên chặn {remainingDamage} sát thương!");
                     return;
                 }
@@ -239,7 +284,7 @@ namespace Game.Gameplay.Entities
             float currentHp = Stats.GetStatValue(StatType.MaxHP);
             float newHp = Mathf.Max(0f, currentHp - remainingDamage);
             Stats.InitializeStat(StatType.MaxHP, newHp);
-            
+
             Debug.Log($"[HeroInstance] {HeroId} nhận {remainingDamage} sát thương. HP còn lại: {newHp}");
 
             if (newHp <= 0)
@@ -251,6 +296,7 @@ namespace Game.Gameplay.Entities
         private void Die()
         {
             IsDead = true;
+            animatorController?.PlayDeath();
             Debug.Log($"[HeroInstance] {HeroId} đã chết!");
             // Implement death logic here
         }
@@ -266,7 +312,7 @@ namespace Game.Gameplay.Entities
         private void ApplyMovementAndGravity()
         {
             Vector3 moveDirection = Vector3.zero;
-            
+
             if (_currentMoveInput.sqrMagnitude > 0.01f)
             {
                 // Always ensure we have the current active CameraController's Camera
@@ -311,23 +357,32 @@ namespace Game.Gameplay.Entities
                 if (moveDirection != Vector3.zero)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
+                        _rotationSpeed * Time.deltaTime);
                 }
             }
 
-            if (_characterController.isGrounded && _velocityY < 0)
+            if (characterController.isGrounded && _velocityY < 0)
             {
                 _velocityY = -2f;
+                _isJumping = false; // Landing: reset jump state
             }
 
             _velocityY += _gravity * Time.deltaTime;
 
+            // Drive animation movement speed (0 = Idle, ~0.5 = Walk, 1 = Run)
+            float moveMagnitude = _isDashing ? 0f : _currentMoveInput.magnitude;
+            animatorController?.SetMovementSpeed(moveMagnitude);
+
+            // Khi đang Dash, DashCoroutine tự xử lý di chuyển — bỏ qua movement thông thường
+            if (_isDashing) return;
+
             Vector3 finalVelocity = moveDirection * _moveSpeed;
             finalVelocity.y = _velocityY;
 
-            _characterController.Move(finalVelocity * Time.deltaTime);
+            characterController.Move(finalVelocity * Time.deltaTime);
         }
-        
+
         public void GainEnergy(float amount)
         {
             CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, maxEnergyLimit);
@@ -340,6 +395,7 @@ namespace Game.Gameplay.Entities
             {
                 return abilities[index];
             }
+
             return null;
         }
 
@@ -371,6 +427,7 @@ namespace Game.Gameplay.Entities
                 float elapsed = Time.time - lastUseTime;
                 return Mathf.Max(0f, skill.Cooldown - elapsed);
             }
+
             return 0f;
         }
 
@@ -384,17 +441,19 @@ namespace Game.Gameplay.Entities
         {
             if (target == null)
             {
-                if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null && !pts.CurrentTarget.IsDead)
+                if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null &&
+                    !pts.CurrentTarget.IsDead)
                 {
                     target = pts.CurrentTarget;
                 }
-                else if (TryGetComponent<EnemyBotController>(out var enemyCtrl) && enemyCtrl.CurrentTarget != null && !enemyCtrl.CurrentTarget.IsDead)
+                else if (TryGetComponent<EnemyBotController>(out var enemyCtrl) && enemyCtrl.CurrentTarget != null &&
+                         !enemyCtrl.CurrentTarget.IsDead)
                 {
                     target = enemyCtrl.CurrentTarget;
                 }
                 else
                 {
-                    target = _aiController != null ? _aiController.CurrentTarget : null;
+                    target = aiController != null ? aiController.CurrentTarget : null;
                 }
             }
 
@@ -418,16 +477,15 @@ namespace Game.Gameplay.Entities
                 }
             }
 
-            if (TryGetComponent<Animator>(out var animator))
-            {
-                animator.SetTrigger("Attack");
-            }
+            // Delegate animation qua HeroAnimatorController (không gọi Animator trực tiếp)
+            animatorController?.PlayAttack();
 
             float atkDamage = Stats != null ? Stats.ATK : 50f;
             float damageMultiplier = basicAttackConfig != null ? basicAttackConfig.DamageMultiplier : 1.0f;
             float finalDamage = atkDamage * damageMultiplier;
 
-            Vector3 spawnOffset = basicAttackConfig != null ? basicAttackConfig.SpawnOffset : new Vector3(0f, 1.2f, 0.8f);
+            Vector3 spawnOffset =
+                basicAttackConfig != null ? basicAttackConfig.SpawnOffset : new Vector3(0f, 1.2f, 0.8f);
             Vector3 spawnPos = transform.TransformPoint(spawnOffset);
 
             Quaternion spawnRot = transform.rotation;
@@ -440,7 +498,9 @@ namespace Game.Gameplay.Entities
                 }
             }
 
-            string poolKey = basicAttackConfig != null ? basicAttackConfig.ProjectilePoolKey : "BasicAttack_Melee_Invisible";
+            string poolKey = basicAttackConfig != null
+                ? basicAttackConfig.ProjectilePoolKey
+                : "BasicAttack_Melee_Invisible";
 
             var poolManager = ServiceLocator.Get<PoolManager>();
             BasicAttackProjectile projectileObj = null;
@@ -459,7 +519,9 @@ namespace Game.Gameplay.Entities
                 if (target != null && target.Transform != null)
                 {
                     bool isCrit = UnityEngine.Random.value <= 0.2f;
-                    EventBus.Publish(new DamageDealtEvent(gameObject, target.Transform.gameObject, finalDamage, basicAttackConfig != null ? basicAttackConfig.Element : ElementType.Physical, target.Transform.position, isCrit));
+                    EventBus.Publish(new DamageDealtEvent(gameObject, target.Transform.gameObject, finalDamage,
+                        basicAttackConfig != null ? basicAttackConfig.Element : GameElement.Physical,
+                        target.Transform.position, isCrit));
                 }
             }
         }
@@ -468,7 +530,8 @@ namespace Game.Gameplay.Entities
         {
             if (target == null)
             {
-                if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null && !pts.CurrentTarget.IsDead)
+                if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.CurrentTarget != null &&
+                    !pts.CurrentTarget.IsDead)
                 {
                     target = pts.CurrentTarget.Transform.gameObject;
                 }
@@ -477,13 +540,15 @@ namespace Game.Gameplay.Entities
             AbilitySO skill = GetAbility(skillIndex);
             if (skill == null)
             {
-                Debug.LogWarning($"[HeroInstance] {HeroId} không có kỹ năng ở slot {skillIndex} (chưa gán vào danh sách Abilities)!");
+                Debug.LogWarning(
+                    $"[HeroInstance] {HeroId} không có kỹ năng ở slot {skillIndex} (chưa gán vào danh sách Abilities)!");
                 return;
             }
 
             if (!CanUseSkill(skillIndex))
             {
-                Debug.LogWarning($"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
+                Debug.LogWarning(
+                    $"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
                 return;
             }
 
@@ -503,7 +568,8 @@ namespace Game.Gameplay.Entities
             CurrentEnergy = Mathf.Max(0f, CurrentEnergy - skill.EnergyCost);
             _skillLastUseTimes[skillIndex] = Time.time;
 
-            Debug.Log($"[HeroInstance] {HeroId} tiêu hao {skill.EnergyCost} Nộ thi triển {skill.AbilityName}. Nộ còn lại: {CurrentEnergy}/{maxEnergyLimit}");
+            Debug.Log(
+                $"[HeroInstance] {HeroId} tiêu hao {skill.EnergyCost} Nộ thi triển {skill.AbilityName}. Nộ còn lại: {CurrentEnergy}/{maxEnergyLimit}");
 
             var castCommand = new CastAbilityCommand(
                 caster: this,
@@ -527,7 +593,8 @@ namespace Game.Gameplay.Entities
 
             if (!CanUseSkill(skillIndex))
             {
-                Debug.LogWarning($"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
+                Debug.LogWarning(
+                    $"[HeroInstance] {HeroId} không thể dùng {skill.AbilityName} (Chưa đủ Nộ hoặc đang Cooldown: {GetSkillRemainingCooldown(skillIndex):F1}s)");
                 return;
             }
 
@@ -543,7 +610,8 @@ namespace Game.Gameplay.Entities
             CurrentEnergy = Mathf.Max(0f, CurrentEnergy - skill.EnergyCost);
             _skillLastUseTimes[skillIndex] = Time.time;
 
-            Debug.Log($"[HeroInstance] {HeroId} tiêu hao {skill.EnergyCost} Nộ thi triển {skill.AbilityName}. Nộ còn lại: {CurrentEnergy}/{maxEnergyLimit}");
+            Debug.Log(
+                $"[HeroInstance] {HeroId} tiêu hao {skill.EnergyCost} Nộ thi triển {skill.AbilityName}. Nộ còn lại: {CurrentEnergy}/{maxEnergyLimit}");
 
             var castCommand = new CastAbilityCommand(
                 caster: this,
@@ -555,24 +623,29 @@ namespace Game.Gameplay.Entities
 
             castCommand.Execute();
         }
+
         public LayerMask GetTargetLayerMask()
         {
             if (TryGetComponent<PlayerTargetingSystem>(out var pts) && pts.EnemyLayerMask.value != 0)
             {
                 return pts.EnemyLayerMask;
             }
+
             if (TryGetComponent<HeroAIController>(out var aiCtrl) && aiCtrl.EnemyLayerMask.value != 0)
             {
                 return aiCtrl.EnemyLayerMask;
             }
+
             if (TryGetComponent<EnemyBotController>(out var botCtrl) && botCtrl.TargetLayerMask.value != 0)
             {
                 return botCtrl.TargetLayerMask;
             }
+
             return (LayerMask)0;
         }
 
         #region --- IEntityController ---
+
         public void Move(Vector2 direction)
         {
             _currentMoveInput = direction;
@@ -595,11 +668,87 @@ namespace Game.Gameplay.Entities
 
         public void Jump()
         {
+            if (characterController == null || !characterController.isGrounded || _isJumping || _isDashing) return;
+
+            _isJumping = true;
+            _velocityY = jumpForce;
+            animatorController?.PlayJump();
         }
 
         public void Dash()
         {
+            if (_isDashing || IsDead) return;
+
+            // Hướng dash: theo input nếu có, nếu không thì theo forward
+            Vector3 dashDir = Vector3.zero;
+            if (_currentMoveInput.sqrMagnitude > 0.01f && _mainCameraTransform != null)
+            {
+                Vector3 camFwd = _mainCameraTransform.forward;
+                camFwd.y = 0f;
+                camFwd.Normalize();
+                Vector3 camRight = _mainCameraTransform.right;
+                camRight.y = 0f;
+                camRight.Normalize();
+                dashDir = (camFwd * _currentMoveInput.y + camRight * _currentMoveInput.x).normalized;
+            }
+            else
+            {
+                dashDir = transform.forward;
+            }
+
+            animatorController?.PlayRoll();
+            StartCoroutine(DashCoroutine(dashDir));
         }
+
+        private IEnumerator DashCoroutine(Vector3 dashDir)
+        {
+            _isDashing = true;
+            _isDashInvincible = true;
+
+            // Tạm thời vô hiệu input thường
+            var savedInput = _currentMoveInput;
+            _currentMoveInput = Vector2.zero;
+
+            Vector3 startPos = transform.position;
+            Vector3 previousPos = startPos;
+            float elapsed = 0f;
+
+            while (elapsed < dashDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / dashDuration;
+                // Ease-out curve: bắt đầu nhanh, dần chậm
+                float curveT = 1f - (1f - t) * (1f - t);
+                Vector3 dest = startPos + dashDir * (dashDistance * curveT);
+                Vector3 delta = dest - previousPos;
+                characterController?.Move(delta);
+                previousPos = transform.position;
+                yield return null;
+            }
+
+            // Hết thời gian invincibility còn lại sau khi kết thúc dash movement
+            float invincRemaining = dashInvincibilityDuration - dashDuration;
+            if (invincRemaining > 0f)
+                yield return new WaitForSeconds(invincRemaining);
+
+            _isDashInvincible = false;
+            _isDashing = false;
+            _currentMoveInput = savedInput;
+        }
+
+        #endregion
+
+        #region --- Animation Event Callbacks ---
+
+        /// <summary>Được gọi bởi HeroAnimatorController khi AnimationEvent 'Transition' kích hoạt.</summary>
+        public void NotifyAnimationTransition() => _skillStateMachine?.OnAnimationTransitionEvent();
+
+        /// <summary>Được gọi bởi HeroAnimatorController khi AnimationEvent 'Enter' kích hoạt.</summary>
+        public void NotifyAnimationEnter() => _skillStateMachine?.OnAnimationEnterEvent();
+
+        /// <summary>Được gọi bởi HeroAnimatorController khi AnimationEvent 'Exit' kích hoạt.</summary>
+        public void NotifyAnimationExit() => _skillStateMachine?.OnAnimationExitEvent();
+
         #endregion
     }
 }

@@ -10,16 +10,14 @@ namespace GP_Final.Navigation.Components
     {
         [Header("Portal Settings")]
         public string portalId;
-        public string targetScene; // Dự phòng nếu chưa gán SO
-        public TCO_CustomSceneController.SceneNavigationSO targetSceneSO; // Kéo thả file ScriptableObject vào đây!
+        public string targetScene;
+        public TCO_CustomSceneController.SceneNavigationSO targetSceneSO;
         public string targetPortalId;
 
         [Header("Spawn Settings")]
-        [Tooltip("Điểm nhân vật sẽ đứng khi dịch chuyển TỚI portal này. Nếu để trống sẽ dùng vị trí của Portal.")]
         public Transform SpawnPoint;
 
         [Header("Safety")]
-        [Tooltip("Thời gian chờ trước khi Portal có thể được kích hoạt lại (chống kẹt)")]
         public float TeleportCooldown = 1f;
         private float lastTeleportTime = -999f;
 

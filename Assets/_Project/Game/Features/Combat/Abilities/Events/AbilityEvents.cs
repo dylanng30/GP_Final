@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Events
@@ -37,11 +38,11 @@ namespace Dylanng.Gameplay.RPG.Abilities.Events
         public GameObject Caster;
         public GameObject Target;
         public float Damage;
-        public ElementType Element;
+        public GameElement Element;
         public Vector3 HitPoint;
         public bool IsCritical;
 
-        public DamageDealtEvent(GameObject caster, GameObject target, float damage, ElementType element, Vector3 hitPoint, bool isCritical = false)
+        public DamageDealtEvent(GameObject caster, GameObject target, float damage, GameElement element, Vector3 hitPoint, bool isCritical = false)
         {
             Caster = caster;
             Target = target;

@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
@@ -29,7 +30,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
         public float DamageMultiplier = 1.0f;
 
         [Tooltip("Hệ thuộc tính của đòn đánh thường")]
-        public ElementType Element = ElementType.Physical;
+        public GameElement Element = GameElement.Physical;
 
         [Tooltip("Thời gian giãn cách giữa các đòn đánh thường (giây)")]
         public float AttackCooldown = 1.0f;

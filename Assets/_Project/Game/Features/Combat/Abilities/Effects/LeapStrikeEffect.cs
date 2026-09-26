@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public AnimationCurve JumpCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         public float DamageMultiplier = 1.5f;
         public float StopDistance = 1.5f;
-        public ElementType Element = ElementType.Physical;
+        public GameElement Element = GameElement.Physical;
 
         public void Execute(GameObject caster, GameObject target, Vector3 point)
         {

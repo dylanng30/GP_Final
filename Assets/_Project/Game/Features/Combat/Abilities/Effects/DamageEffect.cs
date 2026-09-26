@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Stats;
@@ -8,7 +9,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     [Serializable]
     public class DamageEffect : IAbilityEffect
     {
-        public ElementType Element;
+        public GameElement Element;
         public float BaseDamage = 100f;
         public float AtkMultiplier = 1.5f;
 

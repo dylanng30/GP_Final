@@ -59,6 +59,14 @@ MonoBehaviour:
   maxEnergyLimit: 200
   basicAttackConfig: {fileID: 11400000, guid: 9e675124711b1404bbdad22899b2f010, type: 2}
   abilities: []
+  jumpForce: 8
+  dashDistance: 5
+  dashDuration: 0.25
+  dashInvincibilityDuration: 0.2
+  characterController: {fileID: 4477347401851001304}
+  animatorController: {fileID: 5633327120749320400}
+  playerController: {fileID: -5332247174405931196}
+  aiController: {fileID: -7659630247077651416}
 --- !u!143 &4477347401851001304
 CharacterController:
   m_ObjectHideFlags: 0
@@ -288,15 +296,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: f33768b8f824ac14fa2befc91ce13d8d, type: 2}
     - target: {fileID: -8679921383154817045, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -465,10 +473,57 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2099114798078207875}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5633327120749320400}
   m_SourcePrefab: {fileID: 100100000, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
 --- !u!4 &1366385608033397169 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
   m_PrefabInstance: {fileID: 1548350991294008922}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1854833046188536587 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 06e462415b3337b42b12c7bd9702e7a9, type: 3}
+  m_PrefabInstance: {fileID: 1548350991294008922}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2099114798078207875
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854833046188536587}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0f12e59d4850bd345a2d2782620cb1d5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5633327120749320400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854833046188536587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18112eca8643bd94aaee7940920e94dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 4210a83ba38cd994db51c0e0e868db00, type: 2}
+  animator: {fileID: 2099114798078207875}
+  characterController: {fileID: 4477347401851001304}

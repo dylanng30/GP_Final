@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System;
 using UnityEngine;
 using Game.Gameplay.RPG.Abilities.Effects;
@@ -12,7 +13,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float Duration = 5f;
         public float TickInterval = 1f;
         public float DamagePerTickMultiplier = 0.5f; // e.g. 50% of ATK per tick
-        public ElementType Element;
+        public GameElement Element;
         public ZoneDamageInstance ZoneVFXPrefab;
         public bool IsAura = false; // If true, it follows the caster. If false, it spawns at 'point'.
 

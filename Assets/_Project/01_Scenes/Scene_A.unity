@@ -1130,7 +1130,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9022341960426268905, guid: 4ceeaa0d7462c40438bcb68ee77be7d7, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1457,7 +1457,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9022341960426268905, guid: 4ceeaa0d7462c40438bcb68ee77be7d7, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1721,6 +1721,10 @@ MonoBehaviour:
   maxEnergyLimit: 200
   basicAttackConfig: {fileID: 11400000, guid: f980ab2a5badb794198eef13797c3a41, type: 2}
   abilities: []
+  jumpForce: 8
+  dashDistance: 5
+  dashDuration: 0.25
+  dashInvincibilityDuration: 0.2
 --- !u!143 &1030986635
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2138,6 +2142,10 @@ MonoBehaviour:
   maxEnergyLimit: 200
   basicAttackConfig: {fileID: 11400000, guid: fb2edbffb1fa170428f29029e34f0dfd, type: 2}
   abilities: []
+  jumpForce: 8
+  dashDistance: 5
+  dashDuration: 0.25
+  dashInvincibilityDuration: 0.2
 --- !u!143 &1684144168
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2268,7 +2276,7 @@ MonoBehaviour:
   waterGradient: {fileID: 11400000, guid: a1000000000000000000000000000005, type: 2}
   earthGradient: {fileID: 11400000, guid: a1000000000000000000000000000006, type: 2}
   woodGradient: {fileID: 11400000, guid: a1000000000000000000000000000007, type: 2}
-  mentalGradient: {fileID: 11400000, guid: a1000000000000000000000000000008, type: 2}
+  MetalGradient: {fileID: 0}
   overrideGlobalDirection: 1
   globalDirection: 1
   globalHorizontalMapping: 1
@@ -2327,7 +2335,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9022341960426268905, guid: 4ceeaa0d7462c40438bcb68ee77be7d7, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

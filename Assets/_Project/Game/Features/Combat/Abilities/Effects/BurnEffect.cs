@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System;
 using System.Collections;
 using Dylanng.Gameplay.RPG.Abilities.Events;
@@ -12,7 +13,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float Duration = 5.0f;
         public float DamagePerTick = 20.0f;
         public float TickInterval = 1.0f;
-        public ElementType Element = ElementType.Fire;
+        public GameElement Element = GameElement.Fire;
 
         public void Execute(GameObject caster, GameObject target, Vector3 point)
         {

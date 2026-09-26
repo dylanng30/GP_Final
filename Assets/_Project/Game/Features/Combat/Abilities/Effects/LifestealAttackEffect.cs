@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System;
 using UnityEngine;
 using Dylanng.Gameplay.RPG.Abilities.Events;
@@ -10,7 +11,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     {
         public float DamageMultiplier = 1.0f;
         public float LifestealRatio = 0.5f; // Heals for 50% of damage dealt
-        public ElementType Element = ElementType.Physical;
+        public GameElement Element = GameElement.Physical;
         public PoolableObject HitVFXPrefab;
         public PoolableObject HealVFXPrefab;
 

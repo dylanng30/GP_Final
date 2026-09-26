@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System;
 using UnityEngine;
 using Dylanng.Gameplay.RPG.Abilities.Events;
@@ -8,7 +9,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     public class EmpoweredAttackEffect : IAbilityEffect
     {
         public float BonusDamage = 100f;
-        public ElementType Element = ElementType.Physical;
+        public GameElement Element = GameElement.Physical;
         public float Duration = 5f; // Buff expires if not used in 5s
         public PoolableObject BuffVFXPrefab;
         public PoolableObject HitVFXPrefab;
@@ -32,13 +33,13 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     public class EmpoweredAttackHandler : MonoBehaviour
     {
         private float _bonusDamage;
-        private ElementType _element;
+        private GameElement _element;
         private PoolableObject _hitVfxPrefab;
         private PoolableObject _buffVfxInstance;
         private string _buffVfxKey;
         private bool _isUsed = false;
 
-        public void Initialize(float bonusDamage, ElementType element, float duration, PoolableObject buffVfxPrefab, PoolableObject hitVfxPrefab)
+        public void Initialize(float bonusDamage, GameElement element, float duration, PoolableObject buffVfxPrefab, PoolableObject hitVfxPrefab)
         {
             _bonusDamage = bonusDamage;
             _element = element;

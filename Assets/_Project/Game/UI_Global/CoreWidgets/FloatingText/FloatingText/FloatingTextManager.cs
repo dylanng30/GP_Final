@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using Dylanng;
 using Dylanng.Gameplay.RPG.Abilities;
 using Dylanng.Gameplay.RPG.Abilities.Events;
@@ -19,12 +20,12 @@ namespace Game.UIs.FloatingText
         [SerializeField] private DamageGradientSO critGradient;
         [SerializeField] private DamageGradientSO playerTakenDamageGradient;
 
-        [Header("--- Elemental & DoT Gradients (SO) ---")]
+        [Header("--- EleMetal & DoT Gradients (SO) ---")]
         [SerializeField] private DamageGradientSO fireGradient;
         [SerializeField] private DamageGradientSO waterGradient;
         [SerializeField] private DamageGradientSO earthGradient;
         [SerializeField] private DamageGradientSO woodGradient;
-        [SerializeField] private DamageGradientSO mentalGradient;
+        [SerializeField] private DamageGradientSO MetalGradient;
 
         [Header("--- Global Batch Override ---")]
         [SerializeField] private bool overrideGlobalDirection = false;
@@ -62,7 +63,7 @@ namespace Game.UIs.FloatingText
             if (waterGradient == null) waterGradient = CreateRuntimeGradient(Color.white, new Color(0.1f, 0.65f, 1f, 1f));
             if (earthGradient == null) earthGradient = CreateRuntimeGradient(new Color(1f, 0.85f, 0.4f, 1f), new Color(0.75f, 0.45f, 0.1f, 1f));
             if (woodGradient == null) woodGradient = CreateRuntimeGradient(new Color(0.7f, 1f, 0.5f, 1f), new Color(0.15f, 0.75f, 0.2f, 1f));
-            if (mentalGradient == null) mentalGradient = CreateRuntimeGradient(new Color(0.95f, 0.6f, 1f, 1f), new Color(0.6f, 0.1f, 0.85f, 1f));
+            if (MetalGradient == null) MetalGradient = CreateRuntimeGradient(new Color(0.95f, 0.6f, 1f, 1f), new Color(0.6f, 0.1f, 0.85f, 1f));
         }
 
         private DamageGradientSO CreateRuntimeGradient(Color topOrLeft, Color bottomOrRight)
@@ -94,24 +95,24 @@ namespace Game.UIs.FloatingText
             DamageGradientSO chosenGradient = normalGradient;
 
             // 1. Phân loại theo nguyên tố trước (đặc biệt là Fire / Burn thiêu đốt)
-            if (evt.Element != ElementType.Physical)
+            if (evt.Element != GameElement.Physical)
             {
                 switch (evt.Element)
                 {
-                    case ElementType.Fire:
+                    case GameElement.Fire:
                         chosenGradient = fireGradient;
                         break;
-                    case ElementType.Water:
+                    case GameElement.Water:
                         chosenGradient = waterGradient;
                         break;
-                    case ElementType.Earth:
+                    case GameElement.Earth:
                         chosenGradient = earthGradient;
                         break;
-                    case ElementType.Wood:
+                    case GameElement.Wood:
                         chosenGradient = woodGradient;
                         break;
-                    case ElementType.Mental:
-                        chosenGradient = mentalGradient;
+                    case GameElement.Metal:
+                        chosenGradient = MetalGradient;
                         break;
                 }
             }
@@ -201,7 +202,7 @@ namespace Game.UIs.FloatingText
             waterGradient = CreateOrLoadAsset("DamageGradient_Water.asset", Color.white, new Color(0.1f, 0.65f, 1f, 1f));
             earthGradient = CreateOrLoadAsset("DamageGradient_Earth.asset", new Color(1f, 0.85f, 0.4f, 1f), new Color(0.75f, 0.45f, 0.1f, 1f));
             woodGradient = CreateOrLoadAsset("DamageGradient_Wood.asset", new Color(0.7f, 1f, 0.5f, 1f), new Color(0.15f, 0.75f, 0.2f, 1f));
-            mentalGradient = CreateOrLoadAsset("DamageGradient_Mental.asset", new Color(0.95f, 0.6f, 1f, 1f), new Color(0.6f, 0.1f, 0.85f, 1f));
+            MetalGradient = CreateOrLoadAsset("DamageGradient_Metal.asset", new Color(0.95f, 0.6f, 1f, 1f), new Color(0.6f, 0.1f, 0.85f, 1f));
 
             UnityEditor.EditorUtility.SetDirty(this);
             UnityEditor.AssetDatabase.SaveAssets();
@@ -211,7 +212,7 @@ namespace Game.UIs.FloatingText
         [ContextMenu("2. Batch Set ALL SOs to Horizontal Mode (Line Mapping)")]
         public void BatchSetToHorizontal()
         {
-            var all = new[] { normalGradient, critGradient, playerTakenDamageGradient, fireGradient, waterGradient, earthGradient, woodGradient, mentalGradient };
+            var all = new[] { normalGradient, critGradient, playerTakenDamageGradient, fireGradient, waterGradient, earthGradient, woodGradient, MetalGradient };
             foreach (var g in all)
             {
                 if (g != null)
@@ -228,7 +229,7 @@ namespace Game.UIs.FloatingText
         [ContextMenu("3. Batch Set ALL SOs to Vertical Mode (Line Mapping)")]
         public void BatchSetToVertical()
         {
-            var all = new[] { normalGradient, critGradient, playerTakenDamageGradient, fireGradient, waterGradient, earthGradient, woodGradient, mentalGradient };
+            var all = new[] { normalGradient, critGradient, playerTakenDamageGradient, fireGradient, waterGradient, earthGradient, woodGradient, MetalGradient };
             foreach (var g in all)
             {
                 if (g != null)

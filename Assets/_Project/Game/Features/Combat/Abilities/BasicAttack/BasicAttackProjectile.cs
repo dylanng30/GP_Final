@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Abilities.Projectiles;
 using Game.Gameplay.Entities;
@@ -11,7 +12,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
         private HeroInstance _caster;
         private ITargetable _target;
         private float _damage;
-        private ElementType _element;
+        private GameElement _element;
         private string _poolKey;
 
         private float _speed;
@@ -47,7 +48,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 _maxRange = 5f;
                 _maxLifetime = 2f;
                 _isInvisibleVisual = false;
-                _element = ElementType.Physical;
+                _element = GameElement.Physical;
             }
 
             if (config != null && config.TargetLayerMask.value != 0)

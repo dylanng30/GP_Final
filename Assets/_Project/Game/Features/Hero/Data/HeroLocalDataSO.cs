@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.Data.Hero
 {
-    [CreateAssetMenu(fileName = "HeroLocalDataSO",menuName = "SO/HeroLocalDataSO")]
+    [CreateAssetMenu(fileName = "HeroLocalDataSO", menuName = "SO/HeroLocalDataSO")]
     public class HeroLocalDataSO : ScriptableObject
     {
         [field: SerializeField] public List<HeroAsset> HeroAssets { get; private set; }
@@ -18,8 +18,10 @@ namespace Game.Data.Hero
         public string HeroId;
         public HeroInstance HeroPrefab;
         public Sprite HeroAvatarSprite;
+        [Tooltip("Config animation riêng cho hero này (tên Trigger, parameter Speed, v.v.)")]
+        public Game.Animation.Hero.HeroAnimationConfig AnimationConfig;
     }
-    
+
     [Serializable]
     public class BaseHeroData
     {
@@ -28,10 +30,7 @@ namespace Game.Data.Hero
         public string HeroName;
         public int HeroStarLevel;
         public HeroRarity BaseRarity;
-        public ElementalFaction Faction;
+        public GameElement Faction;
         public HeroRole Role;
     }
-    
-    
 }
-

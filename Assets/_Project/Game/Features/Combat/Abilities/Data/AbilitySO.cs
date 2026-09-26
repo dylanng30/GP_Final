@@ -1,3 +1,4 @@
+using Game.Data.Hero;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace Dylanng.Gameplay.RPG.Abilities
         [TextArea(3, 5)] public string Description;
         public Sprite Icon;
         public AbilityType Type;
-        public ElementType Element;
+        public GameElement Element;
 
         [Header("--- Costs & Cooldown ---")]
         public float Cooldown = 4.0f;
@@ -20,7 +21,12 @@ namespace Dylanng.Gameplay.RPG.Abilities
         public float StaminaCost = 0.0f;
 
         [Header("--- Animation & Timings ---")]
-        public int AnimationTriggerHash;
+        [Tooltip("Tên Trigger trong Animator (ví dụ: Skill_0). Tự động tính hash khi runtime.")]
+        public string AnimationTriggerName = "";
+
+        [Tooltip("Hash được tính tự động từ AnimationTriggerName. Không cần điền tay.")]
+        [HideInInspector] public int AnimationTriggerHash;
+
         public float TotalCastDuration = 1.2f;
 
         [Header("--- Aiming Config ---")]
@@ -30,8 +36,21 @@ namespace Dylanng.Gameplay.RPG.Abilities
         public bool RequiresTarget = false;
 
         [Header("--- Strategy Effects (Polymorphic) ---")]
-        [SerializeReference] 
+        [SerializeReference]
         public List<IAbilityEffect> Effects = new List<IAbilityEffect>();
+
+        /// <summary>
+        /// Lấy Animator hash cho animation này.
+        /// Ưu tiên AnimationTriggerName (string), fallback sang AnimationTriggerHash (int) nếu Name rỗng.
+        /// </summary>
+        public int GetAnimationHash()
+        {
+            if (!string.IsNullOrEmpty(AnimationTriggerName))
+            {
+                return Animator.StringToHash(AnimationTriggerName);
+            }
+            return AnimationTriggerHash;
+        }
 
         public void ExecuteEffects(GameObject caster, GameObject target, Vector3 point)
         {

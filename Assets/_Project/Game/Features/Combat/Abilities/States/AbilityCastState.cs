@@ -39,9 +39,19 @@ namespace Dylanng.Gameplay.RPG.Abilities.States
                 return;
             }
 
-            if (_abilitySO.AnimationTriggerHash != 0 && _caster.TryGetComponent<Animator>(out var animator))
+            // Delegate animation qua HeroAnimatorController nếu có (tách biệt View/Controller)
+            int animHash = _abilitySO.GetAnimationHash();
+            if (animHash != 0)
             {
-                animator.SetTrigger(_abilitySO.AnimationTriggerHash);
+                if (_caster.TryGetComponent<Game.Animation.Hero.HeroAnimatorController>(out var animCtrl))
+                {
+                    animCtrl.PlaySkillByHash(animHash);
+                }
+                else if (_caster.TryGetComponent<Animator>(out var animator))
+                {
+                    // Fallback: entity không phải Hero (ví dụ: Boss, NPC)
+                    animator.SetTrigger(animHash);
+                }
             }
 
             EventBus.Publish(new AbilityCastStartedEvent(_caster.gameObject, _abilitySO));
