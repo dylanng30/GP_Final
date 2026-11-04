@@ -16,6 +16,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float DamagePerTickMultiplier = 0.5f; // e.g. 50% of ATK per tick
         public GameElement Element;
         public ZoneDamageInstance ZoneVFXPrefab;
+        public Game.Combat.Domain.StatusDefinitionSO AppliedStatus;
         public bool IsAura = false; // If true, it follows the caster. If false, it spawns at 'point'.
 
         public void Execute(in AbilityContext context)
@@ -58,7 +59,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
 
             if (zoneInstance != null)
             {
-                zoneInstance.Initialize(caster, Radius, Duration, TickInterval, finalDamagePerTick, context.ResolveElement(Element), IsAura);
+                zoneInstance.Initialize(caster, Radius, Duration, TickInterval, finalDamagePerTick, context.ResolveElement(Element), IsAura, AppliedStatus);
             }
         }
     }

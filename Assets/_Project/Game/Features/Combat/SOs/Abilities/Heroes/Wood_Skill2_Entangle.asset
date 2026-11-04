@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae3868b9d7c63f4b880c7250a4d2574, type: 3}
+  m_Name: Wood_Skill2_Entangle
+  m_EditorClassIdentifier: 
+  AbilityID: Wood_Skill2_Entangle
+  AbilityName: "Qu\u1EA5n R\u1EC5"
+  Description: "R\u1EC5 c\xE2y tr\xF3i k\u1EBB \u0111\u1ECBch trong v\xF9ng."
+  Icon: {fileID: 0}
+  Type: 1
+  Element: 3
+  Cooldown: 10
+  EnergyCost: 0
+  StaminaCost: 0
+  UnlockLevel: 1
+  AnimationTriggerName: Skill_1
+  AnimationTriggerHash: 0
+  TotalCastDuration: 0.6
+  LocksMovement: 1
+  Range: 8
+  IndicatorRadius: 3
+  IndicatorType: 2
+  RequiresTarget: 0
+  Effects:
+  - rid: 4882419973442764826
+  - rid: 4882419973442764827
+  references:
+    version: 2
+    RefIds:
+    - rid: 4882419973442764826
+      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 161470, guid: ef2fdb9a8a7d35c448dae6d056e9b1e7, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 1.5
+        Lifetime: 2
+        FollowCaster: 0
+    - rid: 4882419973442764827
+      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Origin: 1
+        Team: 0
+        Radius: 3
+        ArcAngle: 360
+        IncludeCaster: 1
+        HitEffects:
+        - rid: 4882419973442764828
+        - rid: 4882419973442764829
+    - rid: 4882419973442764828
+      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 40
+        AtkMultiplier: 0.8
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+    - rid: 4882419973442764829
+      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: 7d58b6787aed9f64b9ee1e511900ed85, type: 2}
+        Chance: 1
+        ApplyToCaster: 0

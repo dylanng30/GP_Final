@@ -27,17 +27,18 @@ namespace Game.Editor.Combat
         [MenuItem("Tools/Combat/Build Combat Content")]
         public static void Build()
         {
-            StatusSet statuses = BuildStatuses();
+            StatusCatalog statuses = BuildStatuses();
             List<ReactionRuleSO> reactions = BuildReactions(statuses);
             List<ElementSynergySO> synergies = BuildSynergies();
             UpdateCombatRules(reactions, synergies);
             BuildAbilities(statuses);
+            BuildHud();
 
             AssetDatabase.SaveAssets();
             Debug.Log("[Content] Đã dựng xong dữ liệu combat.");
         }
 
-        private sealed class StatusSet
+        private sealed class StatusCatalog
         {
             public StatusDefinitionSO Root;
             public StatusDefinitionSO Burn;
@@ -45,11 +46,12 @@ namespace Game.Editor.Combat
             public StatusDefinitionSO ArmorBreak;
             public StatusDefinitionSO Wet;
             public StatusDefinitionSO Stun;
+            public StatusDefinitionSO TitanForm;
         }
 
-        private static StatusSet BuildStatuses()
+        private static StatusCatalog BuildStatuses()
         {
-            var set = new StatusSet
+            var set = new StatusCatalog
             {
                 Root = CreateStatus("Status_Root", "Trói", GameElement.Wood, 2.5f, ControlFlags.CannotMove),
                 Burn = CreateStatus("Status_Burn", "Thiêu Đốt", GameElement.Fire, 5f, ControlFlags.None),
@@ -57,6 +59,7 @@ namespace Game.Editor.Combat
                     ControlFlags.CannotMove | ControlFlags.CannotAct),
                 ArmorBreak = CreateStatus("Status_ArmorBreak", "Phá Giáp", GameElement.Metal, 5f, ControlFlags.None),
                 Wet = CreateStatus("Status_Wet", "Ướt", GameElement.Water, 4f, ControlFlags.None),
+                TitanForm = CreateStatus("Status_TitanForm", "Cự Nhân", GameElement.Metal, 8f, ControlFlags.None),
                 Stun = CreateStatus("Status_Stun", "Choáng", GameElement.Physical, 1.5f,
                     ControlFlags.CannotMove | ControlFlags.CannotAct)
             };
@@ -78,13 +81,20 @@ namespace Game.Editor.Combat
                 new StatBuff(StatType.Speed, -0.3f, StatModType.PercentAdd)
             };
 
+            set.TitanForm.ScaleMultiplier = 1.5f;
+            set.TitanForm.StatBuffs = new List<StatBuff>
+            {
+                new StatBuff(StatType.ATK, 0.4f, StatModType.PercentAdd),
+                new StatBuff(StatType.DEF, 0.3f, StatModType.PercentAdd)
+            };
+
             set.Root.LoopVfxPrefab = LoadVfx("MagicAuraGreen");
             set.Burn.LoopVfxPrefab = LoadVfx("TorchFire", "CampFire", "MagicAuraYellow");
             set.Wet.LoopVfxPrefab = LoadVfx("WaterRainRipples");
 
             foreach (StatusDefinitionSO status in new[]
                      {
-                         set.Root, set.Burn, set.Petrify, set.ArmorBreak, set.Wet, set.Stun
+                         set.Root, set.Burn, set.Petrify, set.ArmorBreak, set.Wet, set.Stun, set.TitanForm
                      })
             {
                 EditorUtility.SetDirty(status);
@@ -108,10 +118,11 @@ namespace Game.Editor.Combat
             status.TickInterval = 0f;
             status.TickDamage = 0f;
             status.TickAttackRatio = 0f;
+            status.ScaleMultiplier = 1f;
             return status;
         }
 
-        private static List<ReactionRuleSO> BuildReactions(StatusSet statuses)
+        private static List<ReactionRuleSO> BuildReactions(StatusCatalog statuses)
         {
             return new List<ReactionRuleSO>
             {

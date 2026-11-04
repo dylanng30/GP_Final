@@ -60,11 +60,13 @@ MonoBehaviour:
   _rotationSpeed: 15
   _gravity: -15
   controlledCircleSign: {fileID: 9189025695610123440}
+  element: 0
   maxEnergyLimit: 200
-  basicAttackConfig: {fileID: 11400000, guid: 9e675124711b1404bbdad22899b2f010, type: 2}
+  basicAttackConfig: {fileID: 11400000, guid: d8ea409f0cdc23b4ca7aa5a1b582ffaf, type: 2}
   abilities:
   - {fileID: 11400000, guid: 36d355c49ea39e14f9aadef08d7bf82b, type: 2}
-  - {fileID: 11400000, guid: 858628484599e6d4e831f859134a4a90, type: 2}
+  - {fileID: 11400000, guid: 9e0a775e5e0884146932cc70552c3ea4, type: 2}
+  - {fileID: 11400000, guid: f43323b1a52f72343b64c0ee83cae64b, type: 2}
   jumpForce: 8
   dashDistance: 5
   dashDuration: 0.25
@@ -172,6 +174,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   scanInterval: 0.3
+  angleScoreWeight: 2
 --- !u!114 &3957211061811005432
 MonoBehaviour:
   m_ObjectHideFlags: 0

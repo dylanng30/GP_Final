@@ -26,5 +26,6 @@ MonoBehaviour:
   TickInterval: 1
   TickDamage: 0
   TickAttackRatio: 0.2
+  ScaleMultiplier: 1
   LoopVfxPrefab: {fileID: 181232, guid: b9cf594d1d8302e4a884738a176ead3a, type: 3}
   VfxOffset: {x: 0, y: 1, z: 0}

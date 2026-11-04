@@ -45,12 +45,14 @@ namespace Game.Combat
         private void OnApplied(StatusInstance instance)
         {
             ApplyStatBuffs(instance);
+            ApplyScale(instance.Definition.ScaleMultiplier);
             SpawnVfx(instance);
         }
 
         private void OnRemoved(StatusInstance instance)
         {
             _owner.Stats?.RemoveAllModifiersFromSource(instance);
+            ApplyScale(1f / instance.Definition.ScaleMultiplier);
 
             if (_vfxInstances.TryGetValue(instance, out GameObject vfx))
             {
@@ -90,12 +92,17 @@ namespace Game.Combat
             }
         }
 
+        private void ApplyScale(float multiplier)
+        {
+            if (!Mathf.Approximately(multiplier, 1f)) _owner.Transform.localScale *= multiplier;
+        }
+
         private void SpawnVfx(StatusInstance instance)
         {
             StatusDefinitionSO definition = instance.Definition;
             if (definition.LoopVfxPrefab == null) return;
 
-            GameObject vfx = Object.Instantiate(definition.LoopVfxPrefab, _owner.Transform);
+            GameObject vfx = VfxSpawner.Spawn(definition.LoopVfxPrefab, _owner.Transform.position, _owner.Transform.rotation, _owner.Transform);
             vfx.transform.localPosition = definition.VfxOffset;
             _vfxInstances[instance] = vfx;
         }

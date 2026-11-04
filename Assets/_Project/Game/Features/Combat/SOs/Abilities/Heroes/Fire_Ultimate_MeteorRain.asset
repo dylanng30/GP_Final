@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae3868b9d7c63f4b880c7250a4d2574, type: 3}
+  m_Name: Fire_Ultimate_MeteorRain
+  m_EditorClassIdentifier: 
+  AbilityID: Fire_Ultimate_MeteorRain
+  AbilityName: "M\u01B0a H\u1ECFa Th\u1EA1ch"
+  Description: "Ba \u0111\u1EE3t n\u1ED5 li\xEAn ti\u1EBFp tr\xEAn v\xF9ng r\u1ED9ng."
+  Icon: {fileID: 0}
+  Type: 2
+  Element: 4
+  Cooldown: 18
+  EnergyCost: 100
+  StaminaCost: 0
+  UnlockLevel: 1
+  AnimationTriggerName: Skill_1
+  AnimationTriggerHash: 0
+  TotalCastDuration: 1
+  LocksMovement: 1
+  Range: 10
+  IndicatorRadius: 5
+  IndicatorType: 2
+  RequiresTarget: 0
+  Effects:
+  - rid: 4882419973442764800
+  - rid: 4882419973442764801
+  - rid: 4882419973442764802
+  references:
+    version: 2
+    RefIds:
+    - rid: 4882419973442764800
+      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Delay: 0.3
+        Effects:
+        - rid: 4882419973442764803
+    - rid: 4882419973442764801
+      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Delay: 0.8
+        Effects:
+        - rid: 4882419973442764804
+    - rid: 4882419973442764802
+      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Delay: 1.3
+        Effects:
+        - rid: 4882419973442764805
+    - rid: 4882419973442764803
+      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Delay: 0
+        Effects:
+        - rid: 4882419973442764806
+        - rid: 4882419973442764807
+    - rid: 4882419973442764804
+      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Delay: 0
+        Effects:
+        - rid: 4882419973442764808
+        - rid: 4882419973442764809
+    - rid: 4882419973442764805
+      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Delay: 0
+        Effects:
+        - rid: 4882419973442764810
+        - rid: 4882419973442764811
+    - rid: 4882419973442764806
+      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 130848, guid: d16221e794fe16e4e8994a7f8c770561, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 2.5
+        Lifetime: 2
+        FollowCaster: 0
+    - rid: 4882419973442764807
+      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Origin: 1
+        Team: 0
+        Radius: 5
+        ArcAngle: 360
+        IncludeCaster: 1
+        HitEffects:
+        - rid: 4882419973442764812
+        - rid: 4882419973442764813
+    - rid: 4882419973442764808
+      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 130848, guid: d16221e794fe16e4e8994a7f8c770561, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 2.5
+        Lifetime: 2
+        FollowCaster: 0
+    - rid: 4882419973442764809
+      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Origin: 1
+        Team: 0
+        Radius: 5
+        ArcAngle: 360
+        IncludeCaster: 1
+        HitEffects:
+        - rid: 4882419973442764814
+        - rid: 4882419973442764815
+    - rid: 4882419973442764810
+      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 130848, guid: d16221e794fe16e4e8994a7f8c770561, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 2.5
+        Lifetime: 2
+        FollowCaster: 0
+    - rid: 4882419973442764811
+      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Origin: 1
+        Team: 0
+        Radius: 5
+        ArcAngle: 360
+        IncludeCaster: 1
+        HitEffects:
+        - rid: 4882419973442764816
+        - rid: 4882419973442764817
+    - rid: 4882419973442764812
+      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 90
+        AtkMultiplier: 1.2
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+    - rid: 4882419973442764813
+      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
+        Chance: 1
+        ApplyToCaster: 0
+    - rid: 4882419973442764814
+      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 90
+        AtkMultiplier: 1.2
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+    - rid: 4882419973442764815
+      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
+        Chance: 1
+        ApplyToCaster: 0
+    - rid: 4882419973442764816
+      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 90
+        AtkMultiplier: 1.2
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+    - rid: 4882419973442764817
+      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
+        Chance: 1
+        ApplyToCaster: 0

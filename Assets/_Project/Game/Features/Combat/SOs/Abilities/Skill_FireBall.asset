@@ -13,16 +13,17 @@ MonoBehaviour:
   m_Name: Skill_FireBall
   m_EditorClassIdentifier: 
   AbilityID: 
-  AbilityName: Fireball
-  Description: 
+  AbilityName: "C\u1EA7u L\u1EEDa"
+  Description: "B\u1EAFn c\u1EA7u l\u1EEDa n\u1ED5 khi tr\xFAng \u0111\xEDch, g\xE2y
+    Thi\xEAu \u0110\u1ED1t."
   Icon: {fileID: 21300000, guid: 2461ccc6acb6a784ab1d5773c44f4f44, type: 3}
   Type: 0
   Element: 4
-  Cooldown: 3
+  Cooldown: 5
   EnergyCost: 0
   StaminaCost: 0
   UnlockLevel: 1
-  AnimationTriggerName: 
+  AnimationTriggerName: Skill_0
   AnimationTriggerHash: 0
   TotalCastDuration: 0.5
   LocksMovement: 1
@@ -31,11 +32,11 @@ MonoBehaviour:
   IndicatorType: 2
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973110104064
+  - rid: 4882419973442764818
   references:
     version: 2
     RefIds:
-    - rid: 4882419973110104064
+    - rid: 4882419973442764818
       type: {class: ProjectileEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
         ProjectilePoolKey: Fireball_Projectile
@@ -43,9 +44,9 @@ MonoBehaviour:
         SpawnOffset: {x: 0, y: 1.5, z: 1}
         SpawnPointName: 
         CollisionEffects:
-        - rid: 4882419973110104065
-        - rid: 4882419973110104066
-    - rid: 4882419973110104065
+        - rid: 4882419973442764819
+        - rid: 4882419973442764820
+    - rid: 4882419973442764819
       type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Element: 0
@@ -54,8 +55,9 @@ MonoBehaviour:
         UseFalloff: 1
         FalloffRadius: 3
         MinDamagePercent: 0.3
-    - rid: 4882419973110104066
+    - rid: 4882419973442764820
       type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
         Chance: 1
+        ApplyToCaster: 0

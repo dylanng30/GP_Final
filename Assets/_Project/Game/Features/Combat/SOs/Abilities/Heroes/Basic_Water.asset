@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bbcaa50025452142af24e2bd3cf5090, type: 3}
+  m_Name: Basic_Water
+  m_EditorClassIdentifier: 
+  ProjectilePoolKey: BasicAttack_Melee_Invisible
+  ProjectilePrefab: {fileID: 7511347521912373749, guid: 2e15bc3ce4620f8419117ccdd07f3374, type: 3}
+  IsInvisibleVisual: 0
+  ProjectileSpeed: 20
+  MaxRange: 12
+  MaxLifetime: 3
+  DamageMultiplier: 1
+  Element: 2
+  AttackCooldown: 0.8
+  EnergyPerHit: 15
+  SpawnOffset: {x: 0, y: 1.2, z: 0.8}
+  SpawnPointName: 
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  IsMelee: 0
+  Combo: []
+  ComboResetTime: 1.5

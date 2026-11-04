@@ -5,6 +5,8 @@ using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Gameplay.AI.Controllers;
+using Game.Combat.Domain;
+using Game.Events;
 using TMPro;
 using UnityEngine;
 
@@ -33,6 +35,14 @@ namespace Game.UIs.FloatingText
         [SerializeField] private TextureMappingOptions globalHorizontalMapping = TextureMappingOptions.Line;
         [SerializeField] private TextureMappingOptions globalVerticalMapping = TextureMappingOptions.Line;
 
+        private const string OvercomesText = "Khắc chế";
+        private const string OvercomedByText = "Bị khắc";
+        private const float LabelHeight = 2.2f;
+        private static readonly Color OvercomesColor = new Color(1f, 0.85f, 0.2f);
+        private static readonly Color OvercomedByColor = new Color(0.65f, 0.65f, 0.65f);
+        private static readonly Color HealColor = new Color(0.35f, 1f, 0.45f);
+        private static readonly Color ReactionColor = new Color(1f, 0.5f, 0.9f);
+
         private readonly string poolKey = "DamageText";
         private bool isPoolInitialized = false;
 
@@ -45,12 +55,16 @@ namespace Game.UIs.FloatingText
         {
             EventBus.Subscribe<GameBootedEvent>(OnGameBooted);
             EventBus.Subscribe<DamageDealtEvent>(OnDamageDealt);
+            EventBus.Subscribe<HealAppliedEvent>(OnHealApplied);
+            EventBus.Subscribe<ReactionTriggeredEvent>(OnReactionTriggered);
         }
 
         private void OnDestroy()
         {
             EventBus.Unsubscribe<GameBootedEvent>(OnGameBooted);
             EventBus.Unsubscribe<DamageDealtEvent>(OnDamageDealt);
+            EventBus.Unsubscribe<HealAppliedEvent>(OnHealApplied);
+            EventBus.Unsubscribe<ReactionTriggeredEvent>(OnReactionTriggered);
         }
 
         private void InitializeDefaultGradientsIfNull()
@@ -134,6 +148,39 @@ namespace Game.UIs.FloatingText
             }
 
             SpawnText(spawnPos, evt.Damage, chosenGradient);
+            SpawnRelationLabel(evt);
+        }
+
+        private void SpawnRelationLabel(DamageDealtEvent evt)
+        {
+            switch (evt.Relation)
+            {
+                case ElementRelation.Overcomes:
+                    SpawnLabel(evt.Target.transform, OvercomesText, OvercomesColor);
+                    break;
+                case ElementRelation.OvercomedBy:
+                    SpawnLabel(evt.Target.transform, OvercomedByText, OvercomedByColor);
+                    break;
+            }
+        }
+
+        private void OnHealApplied(HealAppliedEvent evt)
+        {
+            SpawnLabel(evt.Target.transform, $"+{Mathf.RoundToInt(evt.Amount)}", HealColor);
+        }
+
+        private void OnReactionTriggered(ReactionTriggeredEvent evt)
+        {
+            SpawnLabel(evt.Target.transform, evt.Rule.DisplayName, ReactionColor);
+        }
+
+        private void SpawnLabel(Transform target, string text, Color color)
+        {
+            if (!isPoolInitialized || target == null) return;
+
+            Vector3 position = target.position + Vector3.up * LabelHeight + Random.insideUnitSphere * 0.3f;
+            var label = ServiceLocator.Get<PoolManager>()?.Spawn<DamageText>(poolKey, position, Quaternion.identity);
+            if (label != null) label.SetupLabel(text, color);
         }
 
         private bool IsPlayerTarget(GameObject target)

@@ -18,13 +18,14 @@ namespace Game.Gameplay.RPG.Abilities.Effects
         private float _damage;
         private GameElement _element;
         private bool _isAura;
+        private Game.Combat.Domain.StatusDefinitionSO _appliedStatus;
         private LayerMask _enemyMask;
         private readonly System.Collections.Generic.List<ITargetable> _hitTargets = new System.Collections.Generic.List<ITargetable>();
 
         private float _elapsedTime;
         private float _tickTimer;
 
-        public void Initialize(GameObject caster, float radius, float duration, float tickInterval, float damage, GameElement element, bool isAura)
+        public void Initialize(GameObject caster, float radius, float duration, float tickInterval, float damage, GameElement element, bool isAura, Game.Combat.Domain.StatusDefinitionSO appliedStatus = null)
         {
             _caster = caster;
             _radius = radius;
@@ -33,6 +34,7 @@ namespace Game.Gameplay.RPG.Abilities.Effects
             _damage = damage;
             _element = element;
             _isAura = isAura;
+            _appliedStatus = appliedStatus;
             _enemyMask = TargetQuery.GetEnemyMask(caster);
 
             _elapsedTime = 0f;
@@ -94,6 +96,7 @@ namespace Game.Gameplay.RPG.Abilities.Effects
             foreach (ITargetable target in _hitTargets)
             {
                 ServiceLocator.Get<CombatResolver>()?.Deal(_caster, target.Transform.gameObject, _damage, _element, target.Transform.position);
+                if (_appliedStatus != null) ServiceLocator.Get<CombatResolver>()?.ApplyStatus(_caster, target.Transform.gameObject, _appliedStatus);
             }
 
         }

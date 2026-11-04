@@ -31,6 +31,11 @@ namespace Game.Combat
             ServiceLocator.Register<CombatResolver>(this);
         }
 
+        public ElementRelation GetRelation(GameElement attacker, GameElement defender)
+        {
+            return _rules.ElementChart.GetRelation(attacker, defender);
+        }
+
         public DamageResult Deal(
             GameObject source,
             GameObject target,

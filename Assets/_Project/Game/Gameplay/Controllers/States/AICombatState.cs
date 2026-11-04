@@ -1,16 +1,23 @@
 using Dylanng;
+using Game.Combat;
 using Game.Gameplay.Entities;
 using UnityEngine;
 
 namespace Game.Gameplay.Controllers.States
 {
+    /// <summary>Đuổi mục tiêu, giữ tầm đánh, ưu tiên ultimate rồi đến skill, cuối cùng là đánh thường.</summary>
     public class AICombatState : StateBase
     {
+        private const float TurnSpeed = 15f;
+
+        // Ultimate đứng đầu vì chỉ dùng được khi đủ Nộ.
+        private static readonly int[] SkillPriority = { AbilitySlot.Ultimate, AbilitySlot.Skill2, AbilitySlot.Skill1 };
+
         private readonly IEntityController _entityController;
         private readonly HeroInstance _heroInstance;
         private readonly HeroAIController _aiController;
         private ITargetable _target;
-        private float _attackCooldownTimer;
+        private float _actionCooldownTimer;
 
         public AICombatState(IEntityController entityController, HeroInstance heroInstance, HeroAIController aiController)
         {
@@ -27,7 +34,7 @@ namespace Game.Gameplay.Controllers.States
         public override void Enter()
         {
             base.Enter();
-            _attackCooldownTimer = 0f;
+            _actionCooldownTimer = 0f;
             if (_target == null && _aiController.CurrentTarget != null)
             {
                 _target = _aiController.CurrentTarget;
@@ -49,62 +56,59 @@ namespace Game.Gameplay.Controllers.States
         {
             base.Update();
 
-            // 1. Kiểm tra tính hợp lệ của mục tiêu
-            if (_target == null || _target.IsDead || _target.Transform == null)
+            if (ShouldDisengage())
             {
                 _aiController.FollowActiveHero();
                 return;
             }
 
-            Vector3 heroPos = _heroInstance.transform.position;
-            Vector3 targetPos = _target.Transform.position;
-            float distance = Vector3.Distance(heroPos, targetPos);
+            Vector3 heroPosition = _heroInstance.transform.position;
+            Vector3 targetPosition = _target.Transform.position;
 
-            // 2. Nếu mục tiêu đi ra quá xa khỏi tầm bỏ theo dõi (LoseTargetRadius)
-            if (distance > _aiController.LoseTargetRadius)
+            if (Vector3.Distance(heroPosition, targetPosition) > _aiController.AttackRange)
             {
-                Debug.Log($"[AICombatState] Mục tiêu đi quá xa ({distance:F1}m > {_aiController.LoseTargetRadius}m). Quay lại Follow.");
-                _aiController.FollowActiveHero();
+                _entityController.MoveInWorldSpace((targetPosition - heroPosition).normalized);
                 return;
             }
 
-            // 3. Xử lý di chuyển và khoảng cách tầm đánh
-            if (distance > _aiController.AttackRange)
-            {
-                Vector3 direction = (targetPos - heroPos).normalized;
-                
-                _entityController.MoveInWorldSpace(direction);
-            }
-            else
-            {
-                // Đã vào tầm đánh -> Dừng di chuyển và xoay người hướng về mục tiêu
-                _entityController.StopMove();
+            _entityController.StopMove();
+            FaceTarget(targetPosition - heroPosition);
+            TickActions();
+        }
 
-                Vector3 lookDir = (targetPos - heroPos);
-                lookDir.y = 0f;
-                if (lookDir.sqrMagnitude > 0.001f)
-                {
-                    Quaternion targetRot = Quaternion.LookRotation(lookDir);
-                    _heroInstance.transform.rotation = Quaternion.Slerp(_heroInstance.transform.rotation, targetRot, Time.deltaTime * 15f);
-                }
+        private bool ShouldDisengage()
+        {
+            if (_target == null || _target.IsDead || _target.Transform == null) return true;
 
-                // 4. Xử lý chu kỳ tấn công và tung kỹ năng
-                _attackCooldownTimer -= Time.deltaTime;
-                if (_attackCooldownTimer <= 0f)
-                {
-                    if (_heroInstance.CanUseSkill())
-                    {
-                        Debug.Log($"[AICombatState] {_heroInstance.HeroId} đủ Nộ! Tự động thi triển kỹ năng lên {_target.Transform.name}");
-                        _heroInstance.UseSkill(0, _target.Transform.gameObject);
-                        _attackCooldownTimer = _heroInstance.GetSkillCastDuration();
-                    }
-                    else
-                    {
-                        _heroInstance.Attack(_target);
-                        _attackCooldownTimer = _heroInstance.GetAttackCooldown(); // Cooldown giữa các đòn đánh thường lấy từ cấu hình Hero
-                    }
-                }
+            float distance = Vector3.Distance(_heroInstance.transform.position, _target.Transform.position);
+            return distance > _aiController.LoseTargetRadius;
+        }
+
+        private void FaceTarget(Vector3 direction)
+        {
+            direction.y = 0f;
+            if (direction.sqrMagnitude <= 0.001f) return;
+
+            Transform hero = _heroInstance.transform;
+            hero.rotation = Quaternion.Slerp(hero.rotation, Quaternion.LookRotation(direction), Time.deltaTime * TurnSpeed);
+        }
+
+        private void TickActions()
+        {
+            _actionCooldownTimer -= Time.deltaTime;
+            if (_actionCooldownTimer > 0f) return;
+
+            foreach (int slot in SkillPriority)
+            {
+                if (!_heroInstance.CanUseSkill(slot)) continue;
+
+                _heroInstance.UseSkill(slot, _target.Transform.gameObject);
+                _actionCooldownTimer = _heroInstance.GetSkillCastDuration(slot);
+                return;
             }
+
+            _heroInstance.Attack(_target);
+            _actionCooldownTimer = _heroInstance.GetAttackCooldown();
         }
     }
 }

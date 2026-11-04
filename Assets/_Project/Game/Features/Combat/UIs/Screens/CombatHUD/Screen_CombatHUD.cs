@@ -1,3 +1,4 @@
+using System.Linq;
 using Dylanng;
 using Game.Events;
 using Game.Managers.Party;
@@ -27,6 +28,7 @@ namespace Game.UIs.Screens.CombatHUD
         [SerializeField] private AttackCastButton attackBtn;
         [SerializeField] private SkillCastButton skill1Btn;
         [SerializeField] private SkillCastButton skill2Btn;
+        [SerializeField] private SkillCastButton ultimateBtn;
         [SerializeField] private Button dashBtn;
 
         private int _selectedWidgetId = 0;
@@ -37,6 +39,7 @@ namespace Game.UIs.Screens.CombatHUD
         public override void Initialize()
         {
             base.Initialize();
+            gameObject.AddComponent<CombatInfoPanel>();
 
             // Setup Toggle
 
@@ -92,7 +95,7 @@ namespace Game.UIs.Screens.CombatHUD
                         characterAvatarWidgets[i].SetHeroId(heroId);
                         Sprite sprite = heroDataManager != null ? heroDataManager.GetHeroSprite(heroId) : null;
                         characterAvatarWidgets[i].SetSprite(sprite);
-                        characterAvatarWidgets[i].UpdateHealth(1f, 1f);
+                        UpdateWidgetHealth(characterAvatarWidgets[i], heroId);
                     }
                     else
                     {
@@ -104,6 +107,13 @@ namespace Game.UIs.Screens.CombatHUD
                     characterAvatarWidgets[i].gameObject.SetActive(false);
                 }
             }
+        }
+
+        private void UpdateWidgetHealth(HeroAvatarWidget widget, string heroId)
+        {
+            var hero = PartyCombatManager?.ActiveHeroes.FirstOrDefault(candidate => candidate != null && candidate.HeroId == heroId);
+            if (hero != null && hero.Health.Max > 0f) widget.UpdateHealth(hero.Health.Current, hero.Health.Max);
+            else widget.UpdateHealth(1f, 1f);
         }
 
         public override void Hide()
@@ -143,6 +153,7 @@ namespace Game.UIs.Screens.CombatHUD
                 if (attackBtn != null) attackBtn.gameObject.SetActive(!isAutoMode);
                 if (skill1Btn != null) skill1Btn.gameObject.SetActive(!isAutoMode);
                 if (skill2Btn != null) skill2Btn.gameObject.SetActive(!isAutoMode);
+                if (ultimateBtn != null) ultimateBtn.gameObject.SetActive(!isAutoMode);
                 if (dashBtn != null) dashBtn.gameObject.SetActive(!isAutoMode);
             }
         }
@@ -184,6 +195,7 @@ namespace Game.UIs.Screens.CombatHUD
             var activeHero = PartyCombatManager?.GetActiveHero();
             if (skill1Btn != null) skill1Btn.SetupSkill(activeHero);
             if (skill2Btn != null) skill2Btn.SetupSkill(activeHero);
+            if (ultimateBtn != null) ultimateBtn.SetupSkill(activeHero);
         }
 
         private void OnEntityDamaged(EntityDamagedEvent evt)

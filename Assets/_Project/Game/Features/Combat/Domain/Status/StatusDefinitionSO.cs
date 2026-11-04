@@ -33,6 +33,8 @@ namespace Game.Combat.Domain
         public float TickAttackRatio;
 
         [Header("--- PRESENTATION ---")]
+        [Tooltip("Hệ số phóng to người mang trạng thái, ví dụ dạng khổng lồ")]
+        public float ScaleMultiplier = 1f;
         public GameObject LoopVfxPrefab;
         public Vector3 VfxOffset = Vector3.up;
 

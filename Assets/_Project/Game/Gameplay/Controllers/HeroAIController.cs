@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Dylanng;
 using Game.Combat;
+using Game.Combat.Domain;
 using Game.Gameplay.Controllers.States;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;
@@ -11,6 +13,10 @@ namespace Game.Gameplay.Controllers
     {
         private const float RegroupDistance = 15f;
         private const float RegroupSpreadRadius = 2f;
+        private const float OvercomesTargetWeight = 0.7f;
+        private const float OvercomedByTargetWeight = 1.3f;
+
+        private readonly List<ITargetable> _scanResults = new List<ITargetable>();
 
         [Header("--- AI COMBAT CONFIG ---")]
         [SerializeField] private float detectionRadius = 10.0f;
@@ -100,10 +106,40 @@ namespace Game.Gameplay.Controllers
 
         private void ScanForNearestTarget()
         {
-            ITargetable nearestTarget = TargetQuery.FindNearest(transform.position, detectionRadius, enemyLayerMask, transform);
-            if (nearestTarget != null)
+            TargetQuery.Collect(transform.position, detectionRadius, enemyLayerMask, transform, _scanResults);
+
+            ITargetable bestTarget = null;
+            float bestScore = float.MaxValue;
+
+            foreach (ITargetable candidate in _scanResults)
             {
-                SetTargetEnemy(nearestTarget);
+                float score = ScoreTarget(candidate);
+                if (score >= bestScore) continue;
+
+                bestScore = score;
+                bestTarget = candidate;
+            }
+
+            if (bestTarget != null)
+            {
+                SetTargetEnemy(bestTarget);
+            }
+        }
+
+        /// <summary>Điểm càng thấp càng ưu tiên: gần hơn và khắc được hệ của mục tiêu.</summary>
+        private float ScoreTarget(ITargetable candidate)
+        {
+            float distance = Vector3.Distance(transform.position, candidate.Transform.position);
+
+            var resolver = ServiceLocator.Get<CombatResolver>();
+            var hero = GetComponent<HeroInstance>();
+            if (resolver == null || hero == null) return distance;
+
+            switch (resolver.GetRelation(hero.Element, candidate.Element))
+            {
+                case ElementRelation.Overcomes: return distance * OvercomesTargetWeight;
+                case ElementRelation.OvercomedBy: return distance * OvercomedByTargetWeight;
+                default: return distance;
             }
         }
 

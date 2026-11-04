@@ -29,6 +29,7 @@ namespace Game.UIs.Screens.Hero
         public override void Initialize()
         {
             base.Initialize();
+            gameObject.AddComponent<Game.UIs.Party.SynergyPreviewLabel>();
             
             SwitchMode(HeroCollectionMode.Normal);
             

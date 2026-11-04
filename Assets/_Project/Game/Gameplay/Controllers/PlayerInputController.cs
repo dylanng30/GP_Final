@@ -10,12 +10,16 @@ namespace Game.Gameplay.Controllers
     public class PlayerInputController : MonoBehaviour
     {
         private const float MoveDeadZone = 0.01f;
+        private const float SkillBufferWindow = 0.8f;
+        private const int NoBufferedSkill = -1;
         private static readonly int[] SkillSlots = { AbilitySlot.Skill1, AbilitySlot.Skill2, AbilitySlot.Ultimate };
 
         private HeroInstance _hero;
         private HeroAIController _aiController;
         private PlayerTargetingSystem _targetingSystem;
         private IPlayerIntentSource _intentSource;
+        private int _bufferedSkillSlot = NoBufferedSkill;
+        private float _skillBufferExpireTime;
 
         public void Initialize(HeroInstance hero)
         {
@@ -89,13 +93,33 @@ namespace Game.Gameplay.Controllers
 
         private void ApplySkills(in PlayerIntent intent)
         {
+            ConsumeBufferedSkill();
+
             if (intent.Skill1) UseSkill(SkillSlots[0]);
             if (intent.Skill2) UseSkill(SkillSlots[1]);
             if (intent.Ultimate) UseSkill(SkillSlots[2]);
         }
 
+        private void ConsumeBufferedSkill()
+        {
+            if (_bufferedSkillSlot == NoBufferedSkill || _hero.IsCasting) return;
+
+            int slot = _bufferedSkillSlot;
+            _bufferedSkillSlot = NoBufferedSkill;
+
+            if (Time.time <= _skillBufferExpireTime) UseSkill(slot);
+        }
+
         private void UseSkill(int slot)
         {
+            // Bấm trong lúc đang cast thì giữ lại để dùng ngay khi cast xong.
+            if (_hero.IsCasting)
+            {
+                _bufferedSkillSlot = slot;
+                _skillBufferExpireTime = Time.time + SkillBufferWindow;
+                return;
+            }
+
             ITargetable selected = _targetingSystem != null ? _targetingSystem.CurrentTarget : null;
             AimResult aim = AimResolver.Resolve(_hero, selected, _hero.GetAbility(slot));
 

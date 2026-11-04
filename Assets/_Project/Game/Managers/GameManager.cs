@@ -123,6 +123,7 @@ namespace GAME
             }
 
             gameObject.AddComponent<CursorCaptureController>();
+            gameObject.AddComponent<SingleEventSystemGuard>();
 
             yield return null;
             gameModeManager.Initialize();

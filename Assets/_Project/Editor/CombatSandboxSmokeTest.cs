@@ -84,6 +84,7 @@ namespace Game.Editor.Combat
         private static bool _hasCastSkill;
         private static float _energyBaseline;
         private static bool _hasToggledViewBack;
+        private static int _castCursor;
         private static readonly ScriptedIntentSource _scripted = new ScriptedIntentSource();
         private static Vector3 _positionBaseline;
 
@@ -187,6 +188,14 @@ namespace Game.Editor.Combat
                     Name = "Sandbox đã tải đủ đối tượng",
                     Timeout = 5d,
                     Verify = VerifySceneContent
+                },
+                new Step
+                {
+                    Name = "Chỉ còn một EventSystem",
+                    Timeout = 3d,
+                    Verify = () => Object.FindObjectsOfType<UnityEngine.EventSystems.EventSystem>().Length == 1
+                        ? null
+                        : "Có nhiều EventSystem"
                 },
                 new Step
                 {
@@ -323,6 +332,34 @@ namespace Game.Editor.Combat
                     Timeout = 3d,
                     Begin = SwitchToNextHero,
                     Verify = VerifyHeroSwitched
+                },
+                new Step
+                {
+                    Name = "Đổi đội để có đủ hệ Kim và Thủy",
+                    Timeout = 5d,
+                    Begin = SwapPartyToMetalAndWater,
+                    Verify = VerifyPartySwapped
+                },
+                new Step
+                {
+                    Name = "Đội mới có đủ 3 skill và đúng liên kết",
+                    Timeout = 2d,
+                    Verify = VerifyHeroKits
+                },
+                new Step
+                {
+                    Name = "Toàn bộ skill của đội dùng được",
+                    Timeout = 45d,
+                    Begin = () => _castCursor = 0,
+                    Verify = CastNextPartySkill
+                },
+                new Step
+                {
+                    Name = "HUD chiến đấu mở được và có nút Ultimate",
+                    Timeout = 4d,
+                    Begin = OpenCombatHud,
+                    Verify = VerifyCombatHud,
+                    End = () => CaptureCamera("sandbox_end.png")
                 },
                 new Step
                 {
@@ -517,6 +554,9 @@ namespace Game.Editor.Combat
         private static void StartDash()
         {
             _positionBaseline = ActiveHero.transform.position;
+
+            // Lùi về sau để không bị DummyBot phía trước chặn đường.
+            ActiveHero.Move(Vector2.down);
             ActiveHero.Dash();
         }
 
@@ -600,6 +640,78 @@ namespace Game.Editor.Combat
             IReadOnlyList<HeroInstance> heroes = _party.ActiveHeroes;
             if (heroes.Count < 2) return null;
             return ActiveHero == heroes[1] ? null : "Hero điều khiển chưa đổi";
+        }
+
+        private static void SwapPartyToMetalAndWater()
+        {
+            var partyManager = ServiceLocator.Get<PartyManager>();
+            partyManager.TrySwapHero("hero_000001", "hero_000003");
+            partyManager.TrySwapHero("hero_000002", "hero_000004");
+        }
+
+        private static string VerifyPartySwapped()
+        {
+            IReadOnlyList<HeroInstance> heroes = _party.ActiveHeroes;
+            if (heroes.Count != 3) return $"Đội có {heroes.Count} hero";
+
+            bool isExpected = heroes[1] != null && heroes[1].Element == GameElement.Metal
+                              && heroes[2] != null && heroes[2].Element == GameElement.Water;
+            return isExpected ? null : "Hệ của đội chưa đúng";
+        }
+
+        private static string VerifyHeroKits()
+        {
+            foreach (HeroInstance hero in _party.ActiveHeroes)
+            {
+                for (int slot = 0; slot < AbilitySlot.Count; slot++)
+                {
+                    if (hero.GetAbility(slot) == null) return $"{hero.HeroId} thiếu skill slot {slot}";
+                }
+            }
+
+            int links = ServiceLocator.Get<PartySynergyService>().ActiveLinks.Count;
+            return links == 1 ? null : $"Có {links} liên kết thay vì 1";
+        }
+
+        private static string CastNextPartySkill()
+        {
+            int totalCasts = _party.ActiveHeroes.Count * AbilitySlot.Count;
+            if (_castCursor >= totalCasts) return null;
+
+            HeroInstance hero = _party.ActiveHeroes[_castCursor / AbilitySlot.Count];
+            int slot = _castCursor % AbilitySlot.Count;
+
+            hero.GainEnergy(FullEnergy);
+
+            // AI của đồng đội có thể đã dùng skill này trước, vẫn tính là skill hoạt động.
+            if (hero.GetSkillRemainingCooldown(slot) > 0f)
+            {
+                _castCursor++;
+                return "Đang cast";
+            }
+
+            if (!hero.CanUseSkill(slot)) return $"Đang chờ {hero.HeroId} slot {slot}";
+
+            Vector3 point = hero.transform.position + hero.transform.forward * 3f;
+            hero.UseSkill(slot, null, point);
+            _castCursor++;
+            return "Đang cast";
+        }
+
+        private static void OpenCombatHud()
+        {
+            EventBus.Publish(new SwitchGameModeEvent(Game.Data.GameMode.GameModeType.Combat));
+        }
+
+        private static string VerifyCombatHud()
+        {
+            var hud = Object.FindObjectOfType<Game.UIs.Screens.CombatHUD.Screen_CombatHUD>();
+            if (hud == null) return "Chưa mở HUD";
+            if (hud.GetComponent<Game.UIs.Screens.CombatHUD.CombatInfoPanel>() == null) return "Thiếu CombatInfoPanel";
+
+            bool hasUltimateButton = hud.GetComponentsInChildren<Game.UIs.Widgets.SkillCastButton>(true)
+                .Any(button => button.name == "UltimateCastButton");
+            return hasUltimateButton ? null : "Thiếu nút Ultimate";
         }
 
         private static void ReportConsoleErrors()

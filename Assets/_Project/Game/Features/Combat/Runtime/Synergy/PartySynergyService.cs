@@ -55,6 +55,12 @@ namespace Game.Combat
             EventBus.Publish(new PartySynergyChangedEvent(_activeLinks));
         }
 
+        /// <summary>Tính liên kết cho một đội hình giả định, dùng trên màn xếp đội.</summary>
+        public void Preview(IReadOnlyList<GameElement> elements, List<ElementSynergySO> results)
+        {
+            SynergyEvaluator.FindActive(elements, _rules.Synergies, _rules.MaxActiveLinks, results);
+        }
+
         private void ClearBuffs(IReadOnlyList<HeroInstance> heroes)
         {
             foreach (HeroInstance hero in heroes)

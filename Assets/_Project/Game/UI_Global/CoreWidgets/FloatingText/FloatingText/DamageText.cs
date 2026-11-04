@@ -68,6 +68,20 @@ namespace Game.UIs.FloatingText
             AnimateAndDespawn();
         }
 
+        public void SetupLabel(string text, Color color)
+        {
+            currentGradientSO = null;
+            if (damageText != null)
+            {
+                damageText.text = text;
+                damageText.enableVertexGradient = false;
+                damageText.colorGradientPreset = null;
+                damageText.color = color;
+            }
+
+            AnimateAndDespawn();
+        }
+
         public void Setup(float damageAmount, Color color)
         {
             currentGradientSO = null;

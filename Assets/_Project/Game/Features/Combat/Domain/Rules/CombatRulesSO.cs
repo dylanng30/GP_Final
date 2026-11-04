@@ -28,6 +28,7 @@ namespace Game.Combat.Domain
         [Tooltip("Số liên kết tương sinh tối đa, 0 là không giới hạn")]
         [SerializeField] private int maxActiveLinks;
 
+        public IElementChart ElementChart => elementChart;
         public IReadOnlyList<ReactionRuleSO> ReactionRules => reactionRules;
         public IReadOnlyList<ElementSynergySO> Synergies => synergies;
         public int MaxActiveLinks => maxActiveLinks;
