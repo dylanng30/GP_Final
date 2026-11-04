@@ -3,7 +3,7 @@ using Dylanng;
 using Game.Events;
 using Game.Managers.Party;
 using Game.Managers.Hero;
-using GAME.Utilities;
+using Game.Utilities;
 using Game.UIs.Widgets;
 using UnityEngine;
 using UnityEngine.Serialization;

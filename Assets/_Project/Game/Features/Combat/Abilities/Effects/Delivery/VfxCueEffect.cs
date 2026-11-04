@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
 using Game.Combat;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     /// <summary>Hiển thị một VFX tại vị trí chỉ định, tự hủy sau Lifetime.</summary>
     [Serializable]

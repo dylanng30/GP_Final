@@ -32,13 +32,13 @@ MonoBehaviour:
   IndicatorType: 0
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764857
-  - rid: 4882419973442764858
+  - rid: 4882419973506465849
+  - rid: 4882419973506465850
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764857
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465849
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 1771782089385040, guid: b098b4ebd6582a04da9c69c07452bba9, type: 3}
         Origin: 0
@@ -46,8 +46,8 @@ MonoBehaviour:
         Scale: 1
         Lifetime: 3
         FollowCaster: 1
-    - rid: 4882419973442764858
-      type: {class: ZoneDamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465850
+      type: {class: ZoneDamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Radius: 3
         Duration: 3

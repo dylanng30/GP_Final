@@ -1,9 +1,10 @@
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Dylanng;
+using Game.Combat.Abilities.Events;
 using Game.Animation.Hero;
 using Game.Combat;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.States
+namespace Game.Combat.Abilities.States
 {
     /// <summary>Thi triển một skill: chạy animation, kích hoạt effect tại animation event hoặc khi hết thời gian cast.</summary>
     public class AbilityCastState : StateBase

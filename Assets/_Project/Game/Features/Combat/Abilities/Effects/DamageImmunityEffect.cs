@@ -1,10 +1,11 @@
+using Dylanng;
 using Game.Combat;
 using System;
 using System.Collections;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class DamageImmunityEffect : IAbilityEffect
@@ -45,7 +46,6 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             var immunityMod = new StatModifier(100f, StatModType.Flat, this);
             stats.AddModifier(StatType.DamageImmunity, immunityMod);
 
-            Debug.Log($"[DamageImmunityEffect] Cấp Miễn nhiễm sát thương cho {target.name} trong {Duration}s.");
 
             ScienceFictionShield shieldInstance = null;
             string shieldKey = null;
@@ -71,7 +71,6 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             if (stats != null)
             {
                 stats.RemoveModifier(StatType.DamageImmunity, immunityMod);
-                Debug.Log($"[DamageImmunityEffect] Hết hạn Miễn nhiễm sát thương của {target.name}.");
             }
 
             if (shieldInstance != null && poolManager != null)

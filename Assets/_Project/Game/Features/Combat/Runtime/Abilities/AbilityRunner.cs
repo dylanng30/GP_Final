@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities;
-using Dylanng.Gameplay.RPG.Abilities.States;
+using Game.Combat.Abilities;
+using Game.Combat.Abilities.States;
 using Game.Combat.Domain;
 using UnityEngine;
 

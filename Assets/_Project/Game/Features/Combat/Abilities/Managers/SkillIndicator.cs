@@ -1,6 +1,7 @@
+using Dylanng;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Managers
+namespace Game.Combat.Abilities.Managers
 {
     public class SkillIndicator : MonoBehaviour
     {

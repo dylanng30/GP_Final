@@ -1,10 +1,11 @@
+using Dylanng;
 using Game.Combat;
 using Game.Data.Hero;
 using System;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities.Events;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class EmpoweredAttackEffect : IAbilityEffect
@@ -72,7 +73,6 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             if (evt.Caster == gameObject && evt.Target != null)
             {
                 _isUsed = true;
-                Debug.Log($"[EmpoweredAttack] Đòn đánh được cường hóa! Gây thêm {_bonusDamage} sát thương.");
 
                 // Deal bonus damage
                 ServiceLocator.Get<CombatResolver>()?.Deal(gameObject, evt.Target, _bonusDamage, _element, evt.HitPoint, canCrit: false);

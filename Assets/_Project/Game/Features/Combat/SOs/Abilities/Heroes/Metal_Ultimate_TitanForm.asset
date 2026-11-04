@@ -32,13 +32,13 @@ MonoBehaviour:
   IndicatorType: 0
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764841
-  - rid: 4882419973442764842
+  - rid: 4882419973506465839
+  - rid: 4882419973506465840
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764841
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465839
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 147642, guid: 685c97d007af49549b239b56b6d2000a, type: 3}
         Origin: 0
@@ -46,8 +46,8 @@ MonoBehaviour:
         Scale: 2
         Lifetime: 2
         FollowCaster: 0
-    - rid: 4882419973442764842
-      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465840
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Status: {fileID: 11400000, guid: 48332a684a0ef5e4686f8653f3800d84, type: 2}
         Chance: 1

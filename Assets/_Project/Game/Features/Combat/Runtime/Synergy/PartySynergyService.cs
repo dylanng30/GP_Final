@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities.Events;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Abilities.Events;
+using Game.Combat.Stats;
 using Game.Combat.Domain;
 using Game.Data.Hero;
 using Game.Events;

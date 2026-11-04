@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities.Events;
 using Game.Combat;
 using Game.Combat.Domain;
 using Game.Data.Hero;
@@ -85,6 +85,7 @@ namespace Game.Editor.Combat
         private static float _energyBaseline;
         private static bool _hasToggledViewBack;
         private static int _castCursor;
+        private static HeroInstance _fallenHero;
         private static readonly ScriptedIntentSource _scripted = new ScriptedIntentSource();
         private static Vector3 _positionBaseline;
 
@@ -355,6 +356,13 @@ namespace Game.Editor.Combat
                 },
                 new Step
                 {
+                    Name = "Hero ngã thì chuyển sang hero còn sống",
+                    Timeout = 3d,
+                    Begin = KillActiveHero,
+                    Verify = VerifyActiveHeroReplaced
+                },
+                new Step
+                {
                     Name = "HUD chiến đấu mở được và có nút Ultimate",
                     Timeout = 4d,
                     Begin = OpenCombatHud,
@@ -393,7 +401,7 @@ namespace Game.Editor.Combat
             int links = ServiceLocator.Get<PartySynergyService>().ActiveLinks.Count;
             if (heroes.Count >= 3 && links != 2) return $"Có {links} liên kết thay vì 2";
 
-            float fireBonus = heroes[0].Stats.GetStatValue(Dylanng.Gameplay.RPG.Stats.StatType.DamageBonus);
+            float fireBonus = heroes[0].Stats.GetStatValue(Game.Combat.Stats.StatType.DamageBonus);
             return fireBonus > 0f ? null : "Hero Hỏa chưa có DamageBonus";
         }
 
@@ -696,6 +704,18 @@ namespace Game.Editor.Combat
             hero.UseSkill(slot, null, point);
             _castCursor++;
             return "Đang cast";
+        }
+
+        private static void KillActiveHero()
+        {
+            _fallenHero = ActiveHero;
+            _fallenHero.Health.TakeDamage(_fallenHero.Health.Max * 10f);
+        }
+
+        private static string VerifyActiveHeroReplaced()
+        {
+            if (ActiveHero == _fallenHero || ActiveHero.IsDead) return "Chưa đổi sang hero còn sống";
+            return _fallenHero.CanAttack() ? "Hero đã ngã vẫn đánh được" : null;
         }
 
         private static void OpenCombatHud()

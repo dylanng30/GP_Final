@@ -1,6 +1,6 @@
 using Dylanng;
 
-namespace GP_Final.Navigation.Events
+namespace Game.Navigation.Events
 {
     public struct TeleportRequestEvent : IEvent
     {

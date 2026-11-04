@@ -1,7 +1,8 @@
+using Dylanng;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Inventory
+namespace Game.Inventory
 {
     [CreateAssetMenu(fileName = "NewConsumable", menuName = "RPG/Inventory/Consumable Item")]
     public class ConsumableItemSO : ItemSO

@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
 using Game.Combat;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     /// <summary>Dựng một vật thể chặn đường và chặn đạn phía trước người thi triển.</summary>
     [Serializable]

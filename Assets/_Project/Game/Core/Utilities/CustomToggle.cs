@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GAME.Utilities
+namespace Game.Utilities
 {
     [RequireComponent(typeof(Image))]
     public class CustomToggle : UIBase, IPointerClickHandler

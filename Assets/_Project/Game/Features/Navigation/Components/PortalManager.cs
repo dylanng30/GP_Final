@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GP_Final.Navigation.Components
+namespace Game.Navigation.Components
 {
     public class PortalManager : MonoBehaviour
     {

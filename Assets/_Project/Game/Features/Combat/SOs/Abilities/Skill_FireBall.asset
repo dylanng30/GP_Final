@@ -32,22 +32,22 @@ MonoBehaviour:
   IndicatorType: 2
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764818
+  - rid: 4882419973506465810
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764818
-      type: {class: ProjectileEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465810
+      type: {class: ProjectileEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         ProjectilePoolKey: Fireball_Projectile
         ProjectilePrefab: {fileID: 8683257774760217751, guid: c78ef86e0831cb4418f292e34f192d9e, type: 3}
         SpawnOffset: {x: 0, y: 1.5, z: 1}
         SpawnPointName: 
         CollisionEffects:
-        - rid: 4882419973442764819
-        - rid: 4882419973442764820
-    - rid: 4882419973442764819
-      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465811
+        - rid: 4882419973506465812
+    - rid: 4882419973506465811
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Element: 0
         BaseDamage: 100
@@ -55,8 +55,8 @@ MonoBehaviour:
         UseFalloff: 1
         FalloffRadius: 3
         MinDamagePercent: 0.3
-    - rid: 4882419973442764820
-      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465812
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
         Chance: 1

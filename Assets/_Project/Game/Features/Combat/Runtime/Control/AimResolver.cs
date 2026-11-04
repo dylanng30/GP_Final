@@ -1,4 +1,4 @@
-using Dylanng.Gameplay.RPG.Abilities;
+using Game.Combat.Abilities;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using UnityEngine;

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 using Game.Combat;
 using Game.Gameplay.AI.Core;
 using Game.Gameplay.AI.Gambit;

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using GP_Final.Navigation.HexGrid.Data;
+using Game.Navigation.HexGrid.Data;
 using UnityEngine;
 
-namespace GP_Final.Navigation.HexGrid.Pathfinding
+namespace Game.Navigation.HexGrid.Pathfinding
 {
     public class HexPathfinder
     {

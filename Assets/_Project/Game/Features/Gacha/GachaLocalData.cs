@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GAME.Data.Gacha
+namespace Game.Data.Gacha
 {
     [Serializable]
     public class GachaLocalData

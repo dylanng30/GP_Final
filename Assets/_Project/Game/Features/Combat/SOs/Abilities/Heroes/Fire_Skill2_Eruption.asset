@@ -32,13 +32,13 @@ MonoBehaviour:
   IndicatorType: 2
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764830
-  - rid: 4882419973442764831
+  - rid: 4882419973506465822
+  - rid: 4882419973506465823
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764830
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465822
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 107076, guid: 1048366b48a8cc3429168da2a8224d7d, type: 3}
         Origin: 1
@@ -46,15 +46,15 @@ MonoBehaviour:
         Scale: 1
         Lifetime: 1.2
         FollowCaster: 0
-    - rid: 4882419973442764831
-      type: {class: DelayedEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465823
+      type: {class: DelayedEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Delay: 0.8
         Effects:
-        - rid: 4882419973442764832
-        - rid: 4882419973442764833
-    - rid: 4882419973442764832
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465824
+        - rid: 4882419973506465825
+    - rid: 4882419973506465824
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 130848, guid: d16221e794fe16e4e8994a7f8c770561, type: 3}
         Origin: 1
@@ -62,8 +62,8 @@ MonoBehaviour:
         Scale: 2
         Lifetime: 2
         FollowCaster: 0
-    - rid: 4882419973442764833
-      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465825
+      type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Origin: 1
         Team: 0
@@ -71,10 +71,10 @@ MonoBehaviour:
         ArcAngle: 360
         IncludeCaster: 1
         HitEffects:
-        - rid: 4882419973442764834
-        - rid: 4882419973442764835
-    - rid: 4882419973442764834
-      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465826
+        - rid: 4882419973506465827
+    - rid: 4882419973506465826
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Element: 0
         BaseDamage: 150
@@ -82,8 +82,8 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
-    - rid: 4882419973442764835
-      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465827
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
         Chance: 1

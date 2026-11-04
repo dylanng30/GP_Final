@@ -1,8 +1,8 @@
 using UnityEngine;
 using Dylanng;
-using GP_Final.Navigation.Events;
+using Game.Navigation.Events;
 
-namespace GP_Final.Navigation.Components
+namespace Game.Navigation.Components
 {
     [RequireComponent(typeof(MultiSceneNavigator))]
     public class MultiSceneTransitionHandler : MonoBehaviour

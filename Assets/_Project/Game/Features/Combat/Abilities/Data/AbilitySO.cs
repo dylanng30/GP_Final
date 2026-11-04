@@ -1,9 +1,10 @@
+using Dylanng;
 using Game.Combat;
 using Game.Data.Hero;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities
+namespace Game.Combat.Abilities
 {
     [CreateAssetMenu(fileName = "NewAbility", menuName = "Dylanng/RPG/Abilities/Ability Data")]
     public class AbilitySO : ScriptableData

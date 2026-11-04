@@ -1,4 +1,4 @@
-namespace GAME.Utilities
+namespace Game.Utilities
 {
     public static class Constants
     {

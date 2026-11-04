@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GP_Final.Navigation.Data;
+using Game.Navigation.Data;
 
-namespace GP_Final.Navigation.Core
+namespace Game.Navigation.Core
 {
     public class GlobalPathfinder
     {

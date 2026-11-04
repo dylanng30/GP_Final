@@ -2,10 +2,10 @@ using Game.Combat;
 using Game.Data.Hero;
 using UnityEngine;
 using Game.Gameplay.Entities;
-using Dylanng.Gameplay.RPG.Abilities;
+using Game.Combat.Abilities;
 using Dylanng;
 
-namespace Game.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     public class ZoneDamageInstance : PoolableObject, IUpdatable
     {

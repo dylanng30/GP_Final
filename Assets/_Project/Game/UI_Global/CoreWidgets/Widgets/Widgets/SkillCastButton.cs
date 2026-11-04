@@ -1,7 +1,7 @@
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities;
+using Game.Combat.Abilities;
 using Game.Gameplay.Entities;
-using Dylanng.Gameplay.RPG.Abilities.Managers;
+using Game.Combat.Abilities.Managers;
 using Game.Managers.Party;
 using UnityEngine;
 using UnityEngine.EventSystems;

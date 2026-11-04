@@ -1,10 +1,11 @@
+using Dylanng;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Game.Combat;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     /// <summary>Chạy các effect sau một khoảng trễ, dùng cho đòn có báo hiệu trước.</summary>
     [Serializable]

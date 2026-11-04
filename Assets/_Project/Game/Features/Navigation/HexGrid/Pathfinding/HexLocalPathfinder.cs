@@ -1,10 +1,10 @@
 using UnityEngine;
-using GP_Final.Navigation.Core;
-using GP_Final.Navigation.HexGrid.Data;
+using Game.Navigation.Core;
+using Game.Navigation.HexGrid.Data;
 using System.Collections.Generic;
 using System;
 
-namespace GP_Final.Navigation.HexGrid.Pathfinding
+namespace Game.Navigation.HexGrid.Pathfinding
 {
     public class HexLocalPathfinder : MonoBehaviour, ILocalPathfinder
     {

@@ -1,7 +1,8 @@
+using Dylanng;
 using System.Collections.Generic;
 using Game.Combat;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
+namespace Game.Combat.Abilities.Projectiles
 {
     public interface IAbilityProjectile
     {

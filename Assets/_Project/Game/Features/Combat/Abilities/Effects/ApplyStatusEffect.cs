@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
 using Game.Combat;
 using Game.Combat.Domain;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     /// <summary>Áp một trạng thái lên mục tiêu, qua CombatResolver để kích hoạt tương khắc.</summary>
     [Serializable]

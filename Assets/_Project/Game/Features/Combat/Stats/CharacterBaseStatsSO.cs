@@ -1,6 +1,7 @@
+using Dylanng;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     [CreateAssetMenu(fileName = "NewCharacterStats", menuName = "RPG/Character Stats")]
     public class CharacterBaseStatsSO : ScriptableData

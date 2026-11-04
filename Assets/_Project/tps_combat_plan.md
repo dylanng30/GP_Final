@@ -1,23 +1,55 @@
-# Kế hoạch combat góc nhìn thứ 3 và hệ skill Ngũ Hành
+# Combat góc nhìn thứ 3 và hệ skill Ngũ Hành
 
 Nhánh làm việc: `feature/tps-combat`. Tài liệu thiết kế gốc: `Game/Skill_Interaction.docx`.
 
-## Quyết định đã chốt
+## Trạng thái
 
-Các giá trị này là mặc định được áp dụng khi bắt đầu Phase 0. Có thể đổi, nhưng đổi sau Phase 4 sẽ phải sửa dữ liệu.
+Cả 9 phase đã có code và dữ liệu. Chưa có người chơi thử, xem mục "Cần kiểm tra khi chơi thật".
+
+| Phase | Nội dung |
+|---|---|
+| 0 | Nhánh, Sandbox, checklist |
+| 1 | Assembly Domain, ElementChart, DamagePipeline, unit test |
+| 2 | Tách máu, khiên, Nộ, di chuyển khỏi `HeroInstance` |
+| 3 | `AbilityRunner`, `AbilityContext`, slot Ultimate, mở khóa theo cấp |
+| 4 | Status, ControlFlags, tương khắc, tương sinh |
+| 5 | Intent, camera, chọn mục tiêu, ngắm, combo, hitbox cận chiến |
+| 6 | 15 skill cho 5 hero, tường đá, dạng khổng lồ của Kim |
+| 7 | AI dùng đủ skill, HUD, chữ phản ứng, nhãn liên kết |
+| 8 | Xóa code cũ, chuẩn hóa namespace, bỏ log thừa |
+
+## Điều khiển
+
+| Hành động | PC | Mobile |
+|---|---|---|
+| Di chuyển | WASD | Joystick |
+| Xoay camera | Chuột | Vuốt nửa phải màn hình |
+| Zoom | Con lăn | Chụm hai ngón |
+| Đánh thường | Chuột trái, giữ để đánh liên tục | Nút đánh |
+| Skill 1, Skill 2, Ultimate | E, R, Q | Nút skill |
+| Dash | Left Shift | Nút dash |
+| Nhảy | Space | Nút nhảy |
+| Lock-on | Chuột giữa | Chưa có nút |
+| Đổi hero | 1, 2, 3 | Chạm chân dung |
+| Tập hợp đội | G | Chưa có nút |
+| Đổi góc nhìn | V | Chưa có nút |
+| Hiện con trỏ để bấm UI | Giữ Left Alt | Không cần |
+
+Mặc định chơi tay ở góc nhìn thứ 3. Nút Auto trên HUD chỉ đổi chế độ tự đánh, không đổi camera.
+
+## Quyết định thiết kế
 
 | Chủ đề | Quyết định |
 |---|---|
-| Top-down và auto | Giữ. Tách thành hai trục `ViewMode` và `ControlMode` |
-| Phạm vi góc nhìn thứ 3 | Dùng cả khi khám phá, không chỉ trong trận |
+| Top-down và auto | Giữ, độc lập với nhau |
+| Phạm vi góc nhìn thứ 3 | Dùng cả khi khám phá |
 | Hero trên sân | Cả đội cùng chiến, người chơi điều khiển một hero, đồng đội do AI đánh |
-| Sĩ số đội | 3, lưu trong dữ liệu. Nếu tăng lên 5 phải bật `MaxActiveLinks` |
-| Bộ skill | 2 skill dùng cooldown và 1 ultimate dùng Nộ |
+| Sĩ số đội | 3. Nếu tăng lên 5 nên đặt `maxActiveLinks` trong `CombatRules` |
+| Bộ skill | 2 skill dùng cooldown, 1 ultimate dùng Nộ |
 | Chạm chân dung | Đổi hero điều khiển, ultimate của đồng đội do AI dùng |
 | Tương sinh | Bị động khi hai hero cùng đội, hiện trên màn xếp đội |
-| Tương khắc | Phá status và cộng khoảng 15% sát thương của đòn đó, chỉnh được |
-| Vai trò và hệ | Hai trục độc lập trong dữ liệu |
-| Hệ của hero hiện có | `hero_000000` Hỏa, `000001` Mộc, `000002` Thổ, `000003` Kim, `000004` Thủy (tạm theo vòng tương sinh) |
+| Tương khắc | Phá trạng thái và cộng sát thương bằng 15% ATK, chỉnh trong từng rule |
+| Hệ của hero | `hero_000000` Hỏa, `000001` Mộc, `000002` Thổ, `000003` Kim, `000004` Thủy (tạm, cần đổi cho đúng model) |
 | Nền tảng | PC trước, mobile màn ngang dùng chung Intent |
 
 ### Phần tài liệu thiết kế chưa rõ
@@ -30,34 +62,34 @@ Các giá trị này là mặc định được áp dụng khi bắt đầu Phas
 | Thủy Skill 1 | Khiên. Hồi máu chuyển sang ultimate |
 | Kim sinh Thủy (game không có mana) | Tăng hồi máu |
 
-## Lộ trình
+### Khác với kế hoạch ban đầu
 
-| Phase | Nội dung | Trạng thái |
-|---|---|---|
-| 0 | Chốt nền: nhánh, sandbox, checklist | Xong |
-| 1 | Domain và test: ElementChart, DamagePipeline, asmdef | Xong |
-| 2 | Tách `HeroInstance` thành các component | Chưa làm |
-| 3 | Ability runtime: slot, Ultimate, Targeting, Delivery | Chưa làm |
-| 4 | Status, Reaction, Synergy | Chưa làm |
-| 5 | Điều khiển góc nhìn thứ 3 | Chưa làm |
-| 6 | Nội dung 5 hero | Chưa làm |
-| 7 | AI và HUD | Chưa làm |
-| 8 | Dọn code cũ, chuẩn hóa namespace, profile mobile | Chưa làm |
+- Camera tự viết tiếp trên `CameraController`, chưa dùng Cinemachine. Thêm package và rig vào 4 scene mà không kiểm tra được cảm giác camera là rủi ro lớn.
+- Input vẫn dùng Input Manager cũ. Mọi input đã đi qua `IPlayerIntentSource`, nên đổi sang Input System chỉ cần viết nguồn mới.
+- Chưa có hit-stop, vì đổi `Time.timeScale` xung đột với `PauseSystem`. Hiện có rung camera khi trúng đòn.
+- Chỉ phần Domain là asmdef riêng. Phần Runtime vẫn nằm trong `Assembly-CSharp`.
 
-## Sandbox
+## Chỉnh nội dung
 
-- `Tools/Combat/Play Sandbox`: game khởi động qua Bootstrapper rồi vào `Combat_Sandbox`. Nút Play thường vẫn vào Scene_A.
+| Muốn đổi | Sửa ở đâu |
+|---|---|
+| Hệ số khắc, vòng sinh, vòng khắc | `Combat/SOs/Rules/ElementChart.asset` |
+| Công thức DEF, sát thương tối thiểu, số liên kết tối đa | `Combat/SOs/Rules/CombatRules.asset` |
+| Trạng thái | `Combat/SOs/Status/` |
+| Luật tương khắc | `Combat/SOs/Reactions/`, rồi thêm vào `CombatRules` |
+| Liên kết tương sinh | `Combat/SOs/Synergies/`, rồi thêm vào `CombatRules` |
+| Skill, combo, đánh thường | `Combat/SOs/Abilities/Heroes/` |
+
+`Tools/Combat/Build Combat Content` ghi đè dữ liệu trên theo giá trị trong `Editor/CombatContentBuilder*.cs`. Sau khi chỉnh tay trong Inspector, đừng chạy lại lệnh này, hoặc sửa luôn trong builder.
+
+## Sandbox và kiểm thử
+
+- `Tools/Combat/Play Sandbox`: khởi động qua Bootstrapper rồi vào `Combat_Sandbox`. Nút Play thường vẫn vào Scene_A.
 - `Tools/Combat/Run Smoke Test`: chạy tự động các bước chính, ghi kết quả vào `Logs/CombatSandboxSmoke.txt`.
 - `Tools/Combat/Build Sandbox Scene`: dựng lại scene từ Scene_A, xóa mọi chỉnh sửa tay trong Sandbox.
+- Unit test nằm ở `Game/Features/Combat/Tests/EditMode`.
 
-Sandbox gồm 8 DummyBot (3 có sẵn từ Scene_A và 5 thêm mới, mỗi con một hệ), bỏ portal, thêm một tường và một dốc.
-
-## Kiểm thử
-
-- Unit test nằm ở `Game/Features/Combat/Tests/EditMode`, chạy trong Test Runner hoặc bằng `-runTests -testPlatform EditMode`.
-- Logic combat thuần đặt trong assembly `Game.Combat.Domain` để test được mà không cần scene.
-
-Chạy smoke test bằng dòng lệnh khi Editor không mở project này:
+Sandbox có 8 DummyBot (3 từ Scene_A và 5 con, mỗi con một hệ), một tường và một dốc.
 
 ```bash
 Unity -batchmode -projectPath <path> -executeMethod Game.Editor.Combat.CombatSandboxSmokeTest.Run -logFile smoke.log
@@ -65,44 +97,36 @@ Unity -batchmode -projectPath <path> -executeMethod Game.Editor.Combat.CombatSan
 
 Mã thoát: 0 là đạt, 1 là có mục lỗi, 2 là quá thời gian.
 
-## Checklist chơi thử
+## Cần kiểm tra khi chơi thật
 
-Chạy trong Sandbox sau mỗi phase. Cột "Hiện tại" ghi hành vi trước refactor, kể cả lỗi đã biết. Smoke test phủ các mục 1–6, 8, 9, 12 và 13. Hiện chưa kiểm chứng tự động: các mục lỗi đã biết 7, 10, 11, phần hiển thị HUD, và việc bot đánh hero.
+Các mục này chưa thể kiểm chứng tự động:
 
-| # | Thao tác | Hiện tại |
-|---|---|---|
-| 1 | Vào game | Sinh hero trong đội, HUD hiện, không lỗi Console |
-| 2 | Đi bằng WASD hoặc joystick | Hero đi theo hướng camera, đồng đội bám theo |
-| 3 | Space, nút Dash | Nhảy, lộn né kèm miễn sát thương ngắn |
-| 4 | Đứng yên gần địch khi bật auto | Cả đội tự đánh, Nộ tăng và tự dùng skill đầu |
-| 5 | Tắt auto | Camera chuyển sang góc nhìn thứ 3, hiện nút hành động |
-| 6 | Bấm nút đánh thường khi tắt auto | Đánh theo animation, số sát thương nổi lên |
-| 7 | Dùng skill khi tắt auto | Lỗi đã biết: Nộ không tăng nên skill có `EnergyCost` không dùng được |
-| 8 | Dùng Fireball | Bay vòng cung, nổ, gây sát thương và thiêu đốt |
-| 9 | Chạm chân dung | Đổi hero điều khiển, camera đổi theo |
-| 10 | Bot đánh hero | Hero mất máu. Lỗi đã biết: thanh máu HUD không đổi |
-| 11 | Hero không được điều khiển bị stun | Lỗi đã biết: hero đó có thể nhận input sau khi hết stun |
-| 12 | Đánh DummyBot | Trúng đòn, sát thương tính theo hệ của DummyBot |
-| 13 | Đánh mục tiêu bị khắc hoặc khắc lại | Hệ số 1.2 hoặc 0.8, số nổi là sát thương cuối cùng |
+1. Cảm giác camera, độ nhạy chuột, zoom và lúc camera chạm tường.
+2. Nhịp combo, tầm đánh, độ lao và độ nặng của đòn.
+3. Hiển thị của HUD: vị trí nút Ultimate, bảng thông tin, tâm ngắm, chữ tiếng Việt trên số nổi.
+4. VFX của từng skill: kích thước, vị trí, màu.
+5. Tường đá: chặn đạn, chặn di chuyển của hero và quái.
+6. Cân bằng: sát thương, cooldown, Nộ, tốc độ giết quái.
+7. Bot đánh hero và việc thanh máu trên HUD giảm đúng.
+8. Chuyển scene qua portal, EventSystem còn hoạt động sau khi đổi scene.
+9. Mobile: chạm, vuốt, hiệu năng. Chưa profile trên thiết bị thật.
 
-## Lỗi đã thấy khi chạy baseline
+## Việc còn lại
 
-Xử lý ở phase tương ứng:
+- Animation: combo và ultimate đang dùng chung clip `Attack`, `Skill_0`, `Skill_1`. Chưa có phản ứng trúng đòn, strafe, cutscene ultimate.
+- VFX riêng cho Mộc Skill 2 và hai skill của Thổ: đang dùng tạm prefab Epic Toon FX.
+- Model dạng khổng lồ của Kim đang là phóng to model hiện có. Gọi pet chưa làm.
+- Hóa Đá, Trói, Choáng chưa có animation đứng yên riêng.
+- Nút mobile cho lock-on, tập hợp, đổi góc nhìn.
+- UI: `CombatInfoPanel` và nhãn liên kết dựng bằng code, chưa có icon trạng thái hay art.
+- VFX tạo bằng Instantiate, nên chuyển sang pool nếu thấy tụt khung hình.
 
-| Lỗi | Phase |
-|---|---|
-| Scene có 2 EventSystem, Unity cảnh báo mỗi frame | 7 |
-| Số nổi vẫn hiện khi đòn bị khiên, miễn nhiễm hoặc dash chặn | 2 |
-| Đánh thường của mọi hero đang là hệ Physical | 6 |
-| Khi thoát Play Mode, service bị xóa trước các object còn cần nó, gây lỗi `ServiceLocator` và `NullReferenceException` | 2 |
+## Thay đổi cân bằng
 
-## Thay đổi cân bằng từ Phase 1
-
-- DEF nay giảm sát thương theo công thức `100 / (100 + DEF)`, trước đây DEF không có tác dụng.
-- Chí mạng dùng `CritRate` và `CritDamage` của nguồn, trước đây cố định 10–20% và không tăng sát thương.
-- Kẻ địch không có chỉ số `CritRate` thì không chí mạng.
-
-Các giá trị chỉnh tại `Game/Features/Combat/SOs/Rules/`.
+- DEF giảm sát thương theo công thức `100 / (100 + DEF)`.
+- Chí mạng dùng `CritRate`, `CritDamage` của nguồn. Kẻ địch không có `CritRate` thì không chí mạng.
+- Đánh thường trúng đích tăng Nộ theo `EnergyPerHit`, cả khi chơi tay.
+- Skill thường không tốn Nộ, ultimate tốn 100.
 
 ## Quy tắc code
 

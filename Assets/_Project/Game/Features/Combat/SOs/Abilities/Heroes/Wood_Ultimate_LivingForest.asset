@@ -31,13 +31,13 @@ MonoBehaviour:
   IndicatorType: 2
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764853
-  - rid: 4882419973442764854
+  - rid: 4882419973506465845
+  - rid: 4882419973506465846
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764853
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465845
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 182876, guid: b69cacae8a5b6f24ea06ba15a8bb910e, type: 3}
         Origin: 1
@@ -45,8 +45,8 @@ MonoBehaviour:
         Scale: 2.5
         Lifetime: 2
         FollowCaster: 0
-    - rid: 4882419973442764854
-      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465846
+      type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Origin: 1
         Team: 0
@@ -54,10 +54,10 @@ MonoBehaviour:
         ArcAngle: 360
         IncludeCaster: 1
         HitEffects:
-        - rid: 4882419973442764855
-        - rid: 4882419973442764856
-    - rid: 4882419973442764855
-      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465847
+        - rid: 4882419973506465848
+    - rid: 4882419973506465847
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Element: 0
         BaseDamage: 120
@@ -65,8 +65,8 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
-    - rid: 4882419973442764856
-      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465848
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Status: {fileID: 11400000, guid: 7d58b6787aed9f64b9ee1e511900ed85, type: 2}
         Chance: 1

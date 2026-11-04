@@ -73,7 +73,6 @@ namespace Game.UIs.Screens
 
         private void OnAvatarButtonClicked()
         {
-            Debug.Log("OnAvatarButtonClicked");
             _onClickCallback?.Invoke(_widgetId);
         }
 

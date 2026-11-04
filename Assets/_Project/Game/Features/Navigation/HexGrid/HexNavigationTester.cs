@@ -1,9 +1,9 @@
 using UnityEngine;
-using GP_Final.Navigation.Components;
-using GP_Final.Navigation.HexGrid.Core;
+using Game.Navigation.Components;
+using Game.Navigation.HexGrid.Core;
 using UnityEngine.SceneManagement;
 
-namespace GP_Final.Navigation.HexGrid
+namespace Game.Navigation.HexGrid
 {
     /// <summary>
     /// Attach this script to your Hero (or an empty GameObject with reference to the Hero) to test pathfinding.

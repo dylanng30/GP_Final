@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dylanng;
 using Game.Data.Hero;
 using Game.Gameplay.Entities;
-using GAME.Utilities;
+using Game.Utilities;
 using UnityEngine;
 
 namespace Game.Managers.Hero
@@ -80,11 +80,9 @@ namespace Game.Managers.Hero
         {
             if (_remoteHeroDataDic != null && _remoteHeroDataDic.TryGetValue(heroId, out var heroData))
             {
-                Debug.Log($"Get remote hero data for {heroId}");
                 return heroData;
             }
             
-            Debug.Log($"Get local hero data for {heroId}");
             return _localHeroDataDic.TryGetValue(heroId, out var hero) ? hero : null;
         }
         #endregion

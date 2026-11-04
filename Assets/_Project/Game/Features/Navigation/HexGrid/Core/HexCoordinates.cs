@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-namespace GP_Final.Navigation.HexGrid.Core
+namespace Game.Navigation.HexGrid.Core
 {
     [Serializable]
     public struct HexCoordinates : IEquatable<HexCoordinates>

@@ -1,8 +1,9 @@
+using Dylanng;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     public class StatController : ComponentBase
     {
@@ -93,10 +94,6 @@ namespace Dylanng.Gameplay.RPG.Stats
             stat.AddModifier(mod);
         }
 
-        public void AddModifier(StatModifier mod, StatField field)
-        {
-            AddModifier((StatType)field, mod);
-        }
 
         public bool RemoveModifier(StatType type, StatModifier mod)
         {
@@ -107,10 +104,6 @@ namespace Dylanng.Gameplay.RPG.Stats
             return false;
         }
 
-        public bool RemoveModifier(StatModifier mod, StatField field)
-        {
-            return RemoveModifier((StatType)field, mod);
-        }
 
         public bool RemoveAllModifiersFromSource(object source)
         {
@@ -139,8 +132,4 @@ namespace Dylanng.Gameplay.RPG.Stats
         }
     }
 
-    // Complete replacement alias ensuring 100% backward compatibility with CharacterStats
-    public class CharacterStats : StatController
-    {
-    }
 }

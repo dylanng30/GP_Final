@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System;
 
-namespace GP_Final.Navigation.Core
+namespace Game.Navigation.Core
 {
     [RequireComponent(typeof(NavMeshAgent))]
     public class NavMeshLocalPathfinder : MonoBehaviour, ILocalPathfinder

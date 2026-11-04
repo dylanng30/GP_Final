@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GP_Final.Navigation.HexGrid.Core;
-using GP_Final.Navigation.HexGrid.Data;
+using Game.Navigation.HexGrid.Core;
+using Game.Navigation.HexGrid.Data;
 
-namespace GP_Final.Navigation.HexGrid
+namespace Game.Navigation.HexGrid
 {
     public class HexGrid : MonoBehaviour
     {

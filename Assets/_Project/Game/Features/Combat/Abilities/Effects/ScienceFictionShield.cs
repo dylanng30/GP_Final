@@ -1,8 +1,9 @@
+using Dylanng;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Abilities.Projectiles;
+using Game.Combat.Abilities.Projectiles;
 using UnityEngine.VFX;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
     public class ScienceFictionShield : PoolableObject
@@ -65,7 +66,6 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
                     Destroy(ripples, 2f);
                 }
 
-                Debug.Log($"[ScienceFictionShield] Đã chặn một viên đạn từ {projectile.Caster?.name}!");
             }
         }
     }

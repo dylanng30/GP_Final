@@ -1,5 +1,5 @@
 using System.Linq;
-using GAME;
+using Game.Managers;
 using Game.Data.Hero;
 using Game.Gameplay.Entities;
 using TCO_CustomSceneController;

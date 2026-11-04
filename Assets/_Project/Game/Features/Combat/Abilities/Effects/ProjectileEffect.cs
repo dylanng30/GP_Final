@@ -1,10 +1,11 @@
+using Dylanng;
 using Game.Combat;
 using System;
 using System.Collections.Generic;
-using Dylanng.Gameplay.RPG.Abilities.Projectiles;
+using Game.Combat.Abilities.Projectiles;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class ProjectileEffect : IAbilityEffect

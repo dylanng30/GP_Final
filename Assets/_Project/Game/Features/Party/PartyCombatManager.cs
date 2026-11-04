@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities.Events;
 using Game.Events;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
@@ -32,6 +32,7 @@ namespace Game.Managers.Party
             EventBus.Subscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
             EventBus.Subscribe<DamageDealtEvent>(OnDamageDealt);
             EventBus.Subscribe<SceneLoadedEvent>(OnSceneLoaded);
+            EventBus.Subscribe<ActorDiedEvent>(OnActorDied);
         }
 
         protected override void OnDestroy()
@@ -45,6 +46,7 @@ namespace Game.Managers.Party
             EventBus.Unsubscribe<ToggleFollowModeEvent>(OnToggleFollowMode);
             EventBus.Unsubscribe<DamageDealtEvent>(OnDamageDealt);
             EventBus.Unsubscribe<SceneLoadedEvent>(OnSceneLoaded);
+            EventBus.Unsubscribe<ActorDiedEvent>(OnActorDied);
 
             ClearHeroes();
 
@@ -154,6 +156,16 @@ namespace Game.Managers.Party
             EventBus.Publish(new ActiveHeroChangedEvent(_currentActiveHeroIndex, _activeHeroes[_currentActiveHeroIndex].HeroId));
             
             GameLogger.Log($"Switched Active Hero to index {_currentActiveHeroIndex}");
+        }
+
+        /// <summary>Hero đang điều khiển ngã thì chuyển quyền sang hero còn sống đầu tiên.</summary>
+        private void OnActorDied(ActorDiedEvent evt)
+        {
+            HeroInstance activeHero = GetActiveHero();
+            if (activeHero == null || evt.Actor != activeHero.gameObject) return;
+
+            int nextIndex = _activeHeroes.FindIndex(hero => hero != null && !hero.IsDead);
+            if (nextIndex >= 0) SwitchActiveHero(nextIndex);
         }
 
         /// <summary>Gọi đồng đội về ngay cạnh hero đang điều khiển.</summary>

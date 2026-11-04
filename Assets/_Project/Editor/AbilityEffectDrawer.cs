@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Abilities;
-using Dylanng.Gameplay.RPG.Abilities.Effects;
+using Game.Combat.Abilities;
+using Game.Combat.Abilities.Effects;
 
 namespace Dylanng.Editor
 {

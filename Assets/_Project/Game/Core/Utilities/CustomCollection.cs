@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GAME.Utilities
+namespace Game.Utilities
 {
     public class WeightedCollection<T>
     {

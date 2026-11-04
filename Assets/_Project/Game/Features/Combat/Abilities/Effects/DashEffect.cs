@@ -1,3 +1,4 @@
+using Dylanng;
 using Game.Gameplay.Entities;
 using Game.Combat.Domain;
 using Game.Combat;
@@ -6,7 +7,7 @@ using System.Collections;
 using UnityEngine;
 using Game.Gameplay.Controllers;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class DashEffect : IAbilityEffect

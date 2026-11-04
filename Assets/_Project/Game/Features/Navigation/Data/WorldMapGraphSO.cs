@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GP_Final.Navigation.Data
+namespace Game.Navigation.Data
 {
     [CreateAssetMenu(fileName = "WorldMapGraph", menuName = "Dylanng/Pathfinding/WorldMapGraph")]
     public class WorldMapGraphSO : ScriptableObject

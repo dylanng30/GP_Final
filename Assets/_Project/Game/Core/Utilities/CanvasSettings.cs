@@ -1,7 +1,7 @@
 using Dylanng;
 using UnityEngine;
 
-namespace GAME.Utilities
+namespace Game.Utilities
 {
     [RequireComponent(typeof(Canvas))]
     public class CanvasSettings : MonoBehaviourBase

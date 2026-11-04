@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities;
-using Dylanng.Gameplay.RPG.Abilities.BasicAttack;
-using Dylanng.Gameplay.RPG.Abilities.Events;
-using Dylanng.Gameplay.RPG.Inventory;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Abilities;
+using Game.Combat.Abilities.BasicAttack;
+using Game.Combat.Abilities.Events;
+using Game.Inventory;
+using Game.Combat.Stats;
 using Game.Animation.Hero;
 using Game.Combat;
 using Game.Combat.Domain;
@@ -75,7 +75,8 @@ namespace Game.Gameplay.Entities
         public GameElement Element => element;
         public bool IsDead => Health.IsDead;
         public bool IsCasting => _abilityRunner.IsCasting;
-        public bool IsInvulnerable => _motor.IsInvincible || Stats.GetStatValue(StatType.DamageImmunity) > 0f;
+        public bool IsInvulnerable =>
+            _motor.IsInvincible || (Stats != null && Stats.GetStatValue(StatType.DamageImmunity) > 0f);
 
         public Vector2 CurrentMoveInput => _motor.MoveInput;
         public bool IsGrounded => _motor.IsGrounded;
@@ -263,6 +264,7 @@ namespace Game.Gameplay.Entities
         {
             animatorController?.PlayDeath();
             Status.Set.Clear();
+            Status.AddLock(ControlFlags.CannotMove | ControlFlags.CannotAct);
             EventBus.Publish(new ActorDiedEvent(GameObjectCache));
         }
 

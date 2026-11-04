@@ -1,6 +1,7 @@
+using Dylanng;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Inventory
+namespace Game.Inventory
 {
     [CreateAssetMenu(fileName = "HealEffect", menuName = "RPG/Inventory/Effects/Heal")]
     public class HealEffectSO : ScriptableEffect

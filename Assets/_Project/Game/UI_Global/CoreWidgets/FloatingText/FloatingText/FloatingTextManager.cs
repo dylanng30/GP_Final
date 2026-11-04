@@ -1,7 +1,7 @@
 using Game.Data.Hero;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities;
+using Game.Combat.Abilities.Events;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Gameplay.AI.Controllers;

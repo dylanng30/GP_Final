@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
 using System.Collections.Generic;
 using Game.Data.Hero;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
+namespace Game.Combat.Abilities.BasicAttack
 {
     [CreateAssetMenu(fileName = "NewBasicAttack", menuName = "Dylanng/RPG/Abilities/Basic Attack Data")]
     public class BasicAttackSO : ScriptableData

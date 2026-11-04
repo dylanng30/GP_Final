@@ -1,4 +1,4 @@
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     public enum StatModType
     {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using Dylanng;
-using GAME.Data.Gacha;
+using Game.Data.Gacha;
 using Game.UIs.Screens.Explore;
-using GAME.Utilities;
+using Game.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

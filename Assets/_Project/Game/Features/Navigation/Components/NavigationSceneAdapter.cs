@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
-using GP_Final.Navigation.Events;
+using Game.Navigation.Events;
 using TCO_CustomSceneController;
 using Dylanng; // For SceneLoadedEvent
 
-namespace GP_Final.Navigation.Components
+namespace Game.Navigation.Components
 {
     /// <summary>
     /// Lắng nghe yêu cầu chuyển cảnh từ hệ thống Navigation (TeleportRequestEvent)

@@ -1,9 +1,9 @@
 using UnityEngine;
-using GP_Final.Navigation.Events;
+using Game.Navigation.Events;
 using Dylanng;
 using Game.Gameplay.Entities;
 
-namespace GP_Final.Navigation.Components
+namespace Game.Navigation.Components
 {
     [RequireComponent(typeof(Collider))]
     public class Portal : MonoBehaviour

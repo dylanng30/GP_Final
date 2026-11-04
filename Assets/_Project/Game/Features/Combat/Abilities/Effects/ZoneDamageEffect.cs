@@ -1,11 +1,12 @@
+using Dylanng;
 using Game.Combat;
 using Game.Data.Hero;
 using System;
 using UnityEngine;
-using Game.Gameplay.RPG.Abilities.Effects;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Abilities.Effects;
+using Game.Combat.Stats;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class ZoneDamageEffect : IAbilityEffect

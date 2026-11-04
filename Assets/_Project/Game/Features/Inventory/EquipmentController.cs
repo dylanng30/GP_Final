@@ -1,10 +1,11 @@
+using Dylanng;
 using System;
 using System.Collections.Generic;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 using Game.Data.Item;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Inventory
+namespace Game.Inventory
 {
     [RequireComponent(typeof(StatController))]
     public class EquipmentController : ComponentBase

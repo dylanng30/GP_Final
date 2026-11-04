@@ -1,7 +1,8 @@
-using Dylanng.Gameplay.RPG.Abilities.Projectiles;
+using Dylanng;
+using Game.Combat.Abilities.Projectiles;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     /// <summary>Tường đá: collider thường chặn di chuyển, trigger chặn đạn của kẻ địch.</summary>
     public class StoneWallStructure : MonoBehaviour

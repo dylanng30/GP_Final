@@ -1,6 +1,7 @@
+using Dylanng;
 using Game.Data.Hero;
 
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     public interface IStatRepository : IService
     {

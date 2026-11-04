@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GP_Final.Navigation.HexGrid.Core
+namespace Game.Navigation.HexGrid.Core
 {
     public static class HexMetrics
     {

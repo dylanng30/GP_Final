@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GP_Final.Navigation.Core;
-using GP_Final.Navigation.Data;
+using Game.Navigation.Core;
+using Game.Navigation.Data;
 using UnityEngine.SceneManagement;
 
-namespace GP_Final.Navigation.Components
+namespace Game.Navigation.Components
 {
     public class MultiSceneNavigator : MonoBehaviour
     {

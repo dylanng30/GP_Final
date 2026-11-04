@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities.BasicAttack;
+using Game.Combat.Abilities.BasicAttack;
 using Game.Animation.Hero;
 using Game.Data.Hero;
 using Game.Gameplay.Entities;

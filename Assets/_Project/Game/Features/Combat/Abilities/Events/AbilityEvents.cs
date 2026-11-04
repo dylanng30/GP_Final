@@ -1,8 +1,9 @@
+using Dylanng;
 using Game.Combat.Domain;
 using Game.Data.Hero;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Events
+namespace Game.Combat.Abilities.Events
 {
     public struct SpawnVFXEvent : IEvent
     {

@@ -1,8 +1,9 @@
+using Dylanng;
 using UnityEngine;
 using Game.Data.Hero;
 using Game.Data.Monster;
 
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     public static class StatGrowthCalculator
     {

@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
 using Game.Combat;
 using Game.Gameplay.Entities;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     /// <summary>Phá toàn bộ khiên của mục tiêu.</summary>
     [Serializable]

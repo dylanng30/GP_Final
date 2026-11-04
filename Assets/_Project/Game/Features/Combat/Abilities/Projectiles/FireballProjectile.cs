@@ -1,10 +1,11 @@
+using Dylanng;
 using Game.Combat;
 using System.Collections.Generic;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities.Events;
 using Game.Gameplay.Entities;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
+namespace Game.Combat.Abilities.Projectiles
 {
     public class FireballProjectile : PoolableObject, IAbilityProjectile, IUpdatable, IBlockableProjectile
     {

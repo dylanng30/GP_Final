@@ -1,6 +1,7 @@
+using Dylanng;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
+namespace Game.Combat.Abilities.Projectiles
 {
     public interface IBlockableProjectile
     {

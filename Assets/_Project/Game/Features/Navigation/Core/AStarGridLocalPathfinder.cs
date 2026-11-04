@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-namespace GP_Final.Navigation.Core
+namespace Game.Navigation.Core
 {
     /// <summary>
     /// Placeholder structure for A* Grid Pathfinding. 

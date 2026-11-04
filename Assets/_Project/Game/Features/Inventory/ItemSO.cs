@@ -1,6 +1,7 @@
+using Dylanng;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Inventory
+namespace Game.Inventory
 {
     public abstract class ItemSO : ScriptableData
     {

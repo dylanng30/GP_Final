@@ -1,4 +1,5 @@
-namespace Dylanng.Gameplay.RPG.Abilities
+using Dylanng;
+namespace Game.Combat.Abilities
 {
     public enum AbilityType
     {

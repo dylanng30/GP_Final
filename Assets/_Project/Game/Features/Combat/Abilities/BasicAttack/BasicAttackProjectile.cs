@@ -1,10 +1,11 @@
+using Dylanng;
 using Game.Combat;
 using Game.Data.Hero;
-using Dylanng.Gameplay.RPG.Abilities.Projectiles;
+using Game.Combat.Abilities.Projectiles;
 using Game.Gameplay.Entities;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
+namespace Game.Combat.Abilities.BasicAttack
 {
     [RequireComponent(typeof(Collider))]
     public class BasicAttackProjectile : PoolableObject, IUpdatable, IBlockableProjectile

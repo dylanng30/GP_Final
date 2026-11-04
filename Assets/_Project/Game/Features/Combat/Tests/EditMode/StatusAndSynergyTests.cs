@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 using Game.Data.Hero;
 using NUnit.Framework;
 using UnityEngine;

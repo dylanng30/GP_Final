@@ -1,10 +1,11 @@
+using Dylanng;
 using Game.Combat;
 using Game.Data.Hero;
 using System;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class LifestealAttackEffect : IAbilityEffect

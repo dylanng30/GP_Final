@@ -1,6 +1,7 @@
+using Dylanng;
 using Game.Combat;
 
-namespace Dylanng.Gameplay.RPG.Abilities
+namespace Game.Combat.Abilities
 {
     public interface IAbilityEffect
     {

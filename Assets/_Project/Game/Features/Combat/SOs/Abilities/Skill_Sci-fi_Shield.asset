@@ -33,7 +33,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1273186554345684993
-      type: {class: DamageImmunityEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      type: {class: DamageImmunityEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Height: 1
         ScaleSize: 2

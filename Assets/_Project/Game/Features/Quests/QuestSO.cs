@@ -1,8 +1,9 @@
+using Dylanng;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Quests
+namespace Game.Quests
 {
     public enum QuestStatus { Inactive, Active, Completed, Failed }
 

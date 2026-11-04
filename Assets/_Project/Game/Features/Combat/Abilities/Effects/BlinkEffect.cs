@@ -1,8 +1,9 @@
+using Dylanng;
 using Game.Combat;
 using System;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class BlinkEffect : IAbilityEffect

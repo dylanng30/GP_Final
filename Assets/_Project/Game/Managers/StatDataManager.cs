@@ -1,5 +1,5 @@
 using Dylanng;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 using UnityEngine;
 
 namespace Game.Managers

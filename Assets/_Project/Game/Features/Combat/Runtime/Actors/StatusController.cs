@@ -86,7 +86,7 @@ namespace Game.Combat
 
             foreach (StatBuff buff in instance.Definition.StatBuffs)
             {
-                var modifier = new Dylanng.Gameplay.RPG.Stats.StatModifier(
+                var modifier = new Game.Combat.Stats.StatModifier(
                     buff.Value * instance.Stacks, buff.ModifierType, instance);
                 _owner.Stats.AddModifier(buff.StatType, modifier);
             }

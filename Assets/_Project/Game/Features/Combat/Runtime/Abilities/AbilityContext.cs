@@ -1,4 +1,4 @@
-using Dylanng.Gameplay.RPG.Abilities;
+using Game.Combat.Abilities;
 using Game.Data.Hero;
 using UnityEngine;
 

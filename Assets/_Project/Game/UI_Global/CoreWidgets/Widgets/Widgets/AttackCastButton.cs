@@ -1,5 +1,5 @@
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities.Managers;
+using Game.Combat.Abilities.Managers;
 using Game.Gameplay.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;

@@ -6,12 +6,12 @@ using Game.Managers;
 using Game.Managers.Hero;
 using Game.Managers.Item;
 using Game.Managers.Party;
-using Dylanng.Gameplay.RPG.Abilities.Managers;
+using Game.Combat.Abilities.Managers;
 using TCO_CustomSceneController;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GAME
+namespace Game.Managers
 {
     public class GameManager : PersistentSingleton<GameManager>
     {
@@ -117,9 +117,9 @@ namespace GAME
             partyManager.Initialize();
             
             // Tự động gán NavigationSceneAdapter vào GameManager (khỏi lo bị huỷ hoặc quên kéo)
-            if (gameObject.GetComponent<GP_Final.Navigation.Components.NavigationSceneAdapter>() == null)
+            if (gameObject.GetComponent<Game.Navigation.Components.NavigationSceneAdapter>() == null)
             {
-                gameObject.AddComponent<GP_Final.Navigation.Components.NavigationSceneAdapter>();
+                gameObject.AddComponent<Game.Navigation.Components.NavigationSceneAdapter>();
             }
 
             gameObject.AddComponent<CursorCaptureController>();

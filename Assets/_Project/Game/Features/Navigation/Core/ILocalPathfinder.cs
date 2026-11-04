@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-namespace GP_Final.Navigation.Core
+namespace Game.Navigation.Core
 {
     public interface ILocalPathfinder
     {

@@ -1,8 +1,8 @@
 using UnityEngine;
-using GP_Final.Navigation.HexGrid.Core;
+using Game.Navigation.HexGrid.Core;
 using System;
 
-namespace GP_Final.Navigation.HexGrid.Data
+namespace Game.Navigation.HexGrid.Data
 {
     [Serializable]
     public class HexNode

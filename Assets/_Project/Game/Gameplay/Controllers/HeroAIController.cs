@@ -30,6 +30,7 @@ namespace Game.Gameplay.Controllers
         public float LoseTargetRadius => loseTargetRadius;
         public LayerMask EnemyLayerMask => enemyLayerMask;
 
+        private HeroInstance _heroInstance;
         private StateMachine _stateMachine;
         private AIFollowState _followState;
         private AICombatState _combatState;
@@ -42,6 +43,7 @@ namespace Game.Gameplay.Controllers
 
         public void Initialize(IEntityController entityController, HeroInstance heroInstance)
         {
+            _heroInstance = heroInstance;
             _stateMachine = new StateMachine();
             
             _followState = new AIFollowState(entityController, heroInstance);
@@ -67,7 +69,7 @@ namespace Game.Gameplay.Controllers
             }
 
             // Ở chế độ độc lập (isFollowEnabled == false), Active Hero không chạy AI combat hay tự động bắn
-            var myHeroInstance = GetComponent<HeroInstance>();
+            HeroInstance myHeroInstance = _heroInstance;
             bool isActiveHero = partyManager != null && partyManager.GetActiveHero() == myHeroInstance;
             if (isActiveHero && !isFollowEnabled)
             {
@@ -132,7 +134,7 @@ namespace Game.Gameplay.Controllers
             float distance = Vector3.Distance(transform.position, candidate.Transform.position);
 
             var resolver = ServiceLocator.Get<CombatResolver>();
-            var hero = GetComponent<HeroInstance>();
+            HeroInstance hero = _heroInstance;
             if (resolver == null || hero == null) return distance;
 
             switch (resolver.GetRelation(hero.Element, candidate.Element))
@@ -168,7 +170,7 @@ namespace Game.Gameplay.Controllers
         public void SetTargetEnemy(ITargetable target, bool broadcast = true)
         {
             var partyManager = ServiceLocator.Get<PartyCombatManager>();
-            var myHeroInstance = GetComponent<HeroInstance>();
+            HeroInstance myHeroInstance = _heroInstance;
             bool isActiveHero = partyManager != null && partyManager.GetActiveHero() == myHeroInstance;
             bool isFollowEnabled = partyManager != null && partyManager.IsFollowModeEnabled;
 

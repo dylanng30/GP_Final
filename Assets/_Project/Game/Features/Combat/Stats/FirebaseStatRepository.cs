@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
 using System.Collections.Generic;
 using Game.Data.Hero;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     public class FirebaseStatRepository : IStatRepository
     {

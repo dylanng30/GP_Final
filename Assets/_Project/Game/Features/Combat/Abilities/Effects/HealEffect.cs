@@ -1,9 +1,10 @@
+using Dylanng;
 using System;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 using Game.Combat;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     [Serializable]
     public class HealEffect : IAbilityEffect

@@ -1,5 +1,5 @@
 using Dylanng;
-using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat.Stats;
 using Game.Combat;
 using Game.Combat.Domain;
 using Game.Data.Hero;

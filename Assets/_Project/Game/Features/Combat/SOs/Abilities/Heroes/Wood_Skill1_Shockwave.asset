@@ -32,13 +32,13 @@ MonoBehaviour:
   IndicatorType: 1
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764822
-  - rid: 4882419973442764823
+  - rid: 4882419973506465814
+  - rid: 4882419973506465815
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764822
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465814
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 182876, guid: b69cacae8a5b6f24ea06ba15a8bb910e, type: 3}
         Origin: 0
@@ -46,8 +46,8 @@ MonoBehaviour:
         Scale: 1.2
         Lifetime: 2
         FollowCaster: 0
-    - rid: 4882419973442764823
-      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465815
+      type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Origin: 0
         Team: 0
@@ -55,10 +55,10 @@ MonoBehaviour:
         ArcAngle: 120
         IncludeCaster: 1
         HitEffects:
-        - rid: 4882419973442764824
-        - rid: 4882419973442764825
-    - rid: 4882419973442764824
-      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465816
+        - rid: 4882419973506465817
+    - rid: 4882419973506465816
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Element: 0
         BaseDamage: 60
@@ -66,8 +66,8 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
-    - rid: 4882419973442764825
-      type: {class: DisplacementEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465817
+      type: {class: DisplacementEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Type: 0
         Distance: 3

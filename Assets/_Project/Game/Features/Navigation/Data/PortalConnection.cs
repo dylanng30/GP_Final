@@ -1,6 +1,6 @@
 using System;
 
-namespace GP_Final.Navigation.Data
+namespace Game.Navigation.Data
 {
     [Serializable]
     public class PortalConnection

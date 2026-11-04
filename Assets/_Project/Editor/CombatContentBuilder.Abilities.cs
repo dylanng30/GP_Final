@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities;
-using Dylanng.Gameplay.RPG.Abilities.BasicAttack;
-using Dylanng.Gameplay.RPG.Abilities.Effects;
+using Game.Combat.Abilities;
+using Game.Combat.Abilities.BasicAttack;
+using Game.Combat.Abilities.Effects;
 using Game.Combat.Domain;
 using Game.Data.Hero;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
-using Game.Gameplay.RPG.Abilities.Effects;
+using Game.Combat.Abilities.Effects;
 using UnityEditor;
 using UnityEngine;
 

@@ -31,13 +31,13 @@ MonoBehaviour:
   IndicatorType: 1
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764859
-  - rid: 4882419973442764860
+  - rid: 4882419973506465851
+  - rid: 4882419973506465852
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764859
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465851
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 1205235233878744, guid: 2b2844f70cdc117499cbac5446906321, type: 3}
         Origin: 0
@@ -45,8 +45,8 @@ MonoBehaviour:
         Scale: 1.5
         Lifetime: 1.5
         FollowCaster: 0
-    - rid: 4882419973442764860
-      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465852
+      type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Origin: 0
         Team: 0
@@ -54,11 +54,11 @@ MonoBehaviour:
         ArcAngle: 50
         IncludeCaster: 1
         HitEffects:
-        - rid: 4882419973442764861
-        - rid: 4882419973442764862
-        - rid: 4882419973442764863
-    - rid: 4882419973442764861
-      type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465853
+        - rid: 4882419973506465854
+        - rid: 4882419973506465855
+    - rid: 4882419973506465853
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Element: 0
         BaseDamage: 120
@@ -66,11 +66,11 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
-    - rid: 4882419973442764862
-      type: {class: BreakShieldEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465854
+      type: {class: BreakShieldEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data: 
-    - rid: 4882419973442764863
-      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465855
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Status: {fileID: 11400000, guid: 27c092c39e8526c4b82736bad9d2a7a0, type: 2}
         Chance: 1

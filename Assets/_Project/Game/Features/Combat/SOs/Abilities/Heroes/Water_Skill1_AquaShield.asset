@@ -31,13 +31,13 @@ MonoBehaviour:
   IndicatorType: 0
   RequiresTarget: 0
   Effects:
-  - rid: 4882419973442764864
-  - rid: 4882419973442764865
+  - rid: 4882419973506465856
+  - rid: 4882419973506465857
   references:
     version: 2
     RefIds:
-    - rid: 4882419973442764864
-      type: {class: VfxCueEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465856
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Prefab: {fileID: 106386, guid: 831c85159903ac84399ac3c3e1d5c5ad, type: 3}
         Origin: 0
@@ -45,8 +45,8 @@ MonoBehaviour:
         Scale: 1.5
         Lifetime: 3
         FollowCaster: 0
-    - rid: 4882419973442764865
-      type: {class: AreaEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+    - rid: 4882419973506465857
+      type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         Origin: 0
         Team: 1
@@ -54,9 +54,9 @@ MonoBehaviour:
         ArcAngle: 360
         IncludeCaster: 1
         HitEffects:
-        - rid: 4882419973442764866
-    - rid: 4882419973442764866
-      type: {class: ShieldEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+        - rid: 4882419973506465858
+    - rid: 4882419973506465858
+      type: {class: ShieldEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
         ShieldAmount: 150
         Duration: 6

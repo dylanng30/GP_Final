@@ -1,6 +1,6 @@
 using System.Collections;
 using Dylanng;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities.Events;
 using Game.Events;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;

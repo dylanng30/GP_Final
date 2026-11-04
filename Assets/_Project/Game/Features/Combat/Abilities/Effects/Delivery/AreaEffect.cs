@@ -1,10 +1,11 @@
+using Dylanng;
 using System;
 using System.Collections.Generic;
 using Game.Combat;
 using Game.Gameplay.Entities;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Effects
+namespace Game.Combat.Abilities.Effects
 {
     public enum EffectOrigin
     {

@@ -1,10 +1,10 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using GP_Final.Navigation.HexGrid.Data;
-using GP_Final.Navigation.HexGrid.Core;
+using Game.Navigation.HexGrid.Data;
+using Game.Navigation.HexGrid.Core;
 
-namespace GP_Final.Navigation.HexGrid.Editor
+namespace Game.Navigation.HexGrid.Editor
 {
     [CustomEditor(typeof(HexGrid))]
     public class HexGridEditor : UnityEditor.Editor

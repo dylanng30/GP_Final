@@ -1,9 +1,10 @@
+using Dylanng;
 using System.Collections;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Abilities.Events;
 using Game.VFXs;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Abilities.Managers
+namespace Game.Combat.Abilities.Managers
 {
     public class AbilityVFXManager : ManagerBase
     {

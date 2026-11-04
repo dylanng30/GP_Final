@@ -1,4 +1,4 @@
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     public enum StatType
     {
@@ -26,12 +26,4 @@ namespace Dylanng.Gameplay.RPG.Stats
         ControlDurationBonus = 14
     }
 
-    // Retained for compatibility with older code referencing StatField
-    public enum StatField
-    {
-        HP = StatType.MaxHP,
-        ATK = StatType.ATK,
-        DEF = StatType.DEF,
-        Speed = StatType.Speed
-    }
 }

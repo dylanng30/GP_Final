@@ -1,9 +1,10 @@
+using Dylanng;
 using System.Collections.Generic;
 using System.Linq;
 using Game.Data.Hero;
 using UnityEngine;
 
-namespace Dylanng.Gameplay.RPG.Stats
+namespace Game.Combat.Stats
 {
     [CreateAssetMenu(fileName = "SOStatRepository", menuName = "RPG/SO Stat Repository")]
     public class SOStatRepository : ScriptableObject, IStatRepository
