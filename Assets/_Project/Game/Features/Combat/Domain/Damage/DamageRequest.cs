@@ -13,6 +13,7 @@ namespace Game.Combat.Domain
         public readonly float CritDamage;
         public readonly float TargetDefense;
         public readonly bool CanCrit;
+        public readonly float OutgoingMultiplier;
 
         public DamageRequest(
             float amount,
@@ -22,7 +23,8 @@ namespace Game.Combat.Domain
             float critRate = 0f,
             float critDamage = 0f,
             float targetDefense = 0f,
-            bool canCrit = true)
+            bool canCrit = true,
+            float outgoingMultiplier = 1f)
         {
             Amount = amount;
             Element = element;
@@ -32,6 +34,7 @@ namespace Game.Combat.Domain
             CritDamage = critDamage;
             TargetDefense = targetDefense;
             CanCrit = canCrit;
+            OutgoingMultiplier = outgoingMultiplier;
         }
     }
 }

@@ -21,39 +21,41 @@ MonoBehaviour:
   Cooldown: 3
   EnergyCost: 0
   StaminaCost: 0
+  UnlockLevel: 1
+  AnimationTriggerName: 
   AnimationTriggerHash: 0
   TotalCastDuration: 0.5
+  LocksMovement: 1
   Range: 8
   IndicatorRadius: 2
   IndicatorType: 2
   RequiresTarget: 0
   Effects:
-  - rid: 1273186508660539396
+  - rid: 4882419973110104064
   references:
     version: 2
     RefIds:
-    - rid: 1273186508660539396
+    - rid: 4882419973110104064
       type: {class: ProjectileEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
         ProjectilePoolKey: Fireball_Projectile
         ProjectilePrefab: {fileID: 8683257774760217751, guid: c78ef86e0831cb4418f292e34f192d9e, type: 3}
         SpawnOffset: {x: 0, y: 1.5, z: 1}
+        SpawnPointName: 
         CollisionEffects:
-        - rid: 1273186508660539398
-        - rid: 1273186520412979201
-    - rid: 1273186508660539398
-      type: {class: BurnEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
-      data:
-        Duration: 5
-        DamagePerTick: 20
-        TickInterval: 1
-        Element: 4
-    - rid: 1273186520412979201
+        - rid: 4882419973110104065
+        - rid: 4882419973110104066
+    - rid: 4882419973110104065
       type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
-        Element: 4
+        Element: 0
         BaseDamage: 100
         AtkMultiplier: 1.5
         UseFalloff: 1
         FalloffRadius: 3
         MinDamagePercent: 0.3
+    - rid: 4882419973110104066
+      type: {class: ApplyStatusEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
+        Chance: 1

@@ -16,3 +16,15 @@ MonoBehaviour:
   defenseConstant: 100
   defaultCritMultiplier: 1.5
   minimumDamage: 1
+  reactionRules:
+  - {fileID: 11400000, guid: 3e9e5d89a00c36340b87c342560e0c5c, type: 2}
+  - {fileID: 11400000, guid: 88d2aa5ee5715464ab712bc8bc102272, type: 2}
+  - {fileID: 11400000, guid: 32ad5b07c4c18be4cb72a51e6f8f0251, type: 2}
+  - {fileID: 11400000, guid: 50ff9b49c532ba743b72205c2c06c7c2, type: 2}
+  synergies:
+  - {fileID: 11400000, guid: 3b7cd510cb171104eb715a29da560824, type: 2}
+  - {fileID: 11400000, guid: e0644c15c07322846910fea802333ec6, type: 2}
+  - {fileID: 11400000, guid: fd98e275a2b3f20428e9cf0e7d801e57, type: 2}
+  - {fileID: 11400000, guid: 530649f6e8f588a47947277e79bca770, type: 2}
+  - {fileID: 11400000, guid: d65b555291ad1ca43a6f408f5e24dce0, type: 2}
+  maxActiveLinks: 0

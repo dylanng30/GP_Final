@@ -1,3 +1,5 @@
+using Game.Gameplay.Entities;
+using Game.Combat.Domain;
 using Game.Combat;
 using Game.Data.Hero;
 using System;
@@ -35,11 +37,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             if (cc == null) yield break;
 
             var entityController = caster.GetComponent<IEntityController>();
-            var aiController = caster.GetComponent<HeroAIController>();
-            var inputController = caster.GetComponent<PlayerInputController>();
             
-            if (aiController != null) aiController.enabled = false;
-            if (inputController != null) inputController.enabled = false;
+            var controlTarget = caster.GetComponent<ITargetable>();
+            object controlLock = controlTarget?.Status.AddLock(ControlFlags.CannotMove | ControlFlags.CannotAct);
             entityController?.StopMove();
 
             Vector3 startPos = caster.transform.position;
@@ -103,8 +103,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             }
 
             // Restore controllers
-            if (aiController != null) aiController.enabled = true;
-            if (inputController != null) inputController.enabled = true;
+            controlTarget?.Status.RemoveLock(controlLock);
         }
     }
 }

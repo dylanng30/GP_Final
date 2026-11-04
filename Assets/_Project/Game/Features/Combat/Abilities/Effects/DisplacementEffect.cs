@@ -1,8 +1,10 @@
-using Game.Combat;
 using System;
 using System.Collections;
-using UnityEngine;
+using Game.Combat;
+using Game.Combat.Domain;
 using Game.Gameplay.Controllers;
+using Game.Gameplay.Entities;
+using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Effects
 {
@@ -16,6 +18,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
     [Serializable]
     public class DisplacementEffect : IAbilityEffect
     {
+        private const float MinimumPullGap = 1.5f;
+
         public DisplacementType Type = DisplacementType.Knockback;
         public float Distance = 3f;
         public float Duration = 0.3f;
@@ -24,103 +28,79 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
 
         public void Execute(in AbilityContext context)
         {
-            var (caster, target, point) = context;
+            var (caster, target, _) = context;
             if (target == null || caster == null || UnityEngine.Random.value > Chance) return;
 
-            var mono = target.GetComponent<MonoBehaviour>();
-            if (mono != null)
+            var targetable = target.GetComponentInParent<ITargetable>();
+            if (targetable is MonoBehaviour owner && owner.isActiveAndEnabled && !targetable.IsDead)
             {
-                mono.StartCoroutine(DisplaceCoroutine(caster, target));
+                owner.StartCoroutine(DisplaceRoutine(caster, targetable));
             }
         }
 
-        private IEnumerator DisplaceCoroutine(GameObject caster, GameObject target)
+        private IEnumerator DisplaceRoutine(GameObject caster, ITargetable targetable)
         {
-            // Temporarily disable AI/Input if it's a hero or intelligent entity
-            var aiController = target.GetComponent<HeroAIController>();
-            var inputController = target.GetComponent<PlayerInputController>();
-            var entityController = target.GetComponent<IEntityController>();
-            
-            if (aiController != null) aiController.enabled = false;
-            if (inputController != null) inputController.enabled = false;
-            entityController?.StopMove();
+            Transform target = targetable.Transform;
+            object controlLock = targetable.Status.AddLock(ControlFlags.CannotMove | ControlFlags.CannotAct);
+            target.GetComponent<IEntityController>()?.StopMove();
 
-            var cc = target.GetComponent<CharacterController>();
-            var rb = target.GetComponent<Rigidbody>();
+            var characterController = target.GetComponent<CharacterController>();
+            var body = target.GetComponent<Rigidbody>();
 
-            Vector3 startPos = target.transform.position;
-            Vector3 direction = Vector3.zero;
+            Vector3 start = target.position;
+            Vector3 direction = ResolveDirection(caster.transform.position, start);
+            float distance = ResolveDistance(caster.transform.position, start);
 
-            if (Type == DisplacementType.Knockback)
+            float elapsed = 0f;
+            Vector3 previous = start;
+
+            while (elapsed < Duration && target != null)
             {
-                direction = (target.transform.position - caster.transform.position);
-                direction.y = 0;
-                direction.Normalize();
-            }
-            else if (Type == DisplacementType.Pull)
-            {
-                direction = (caster.transform.position - target.transform.position);
-                direction.y = 0;
-                direction.Normalize();
-                
-                // Adjust distance so we don't pull them inside the caster
-                float distToCaster = Vector3.Distance(target.transform.position, caster.transform.position);
-                if (Distance > distToCaster - 1.5f)
-                {
-                    Distance = Mathf.Max(0, distToCaster - 1.5f);
-                }
-            }
-            else if (Type == DisplacementType.Knockup)
-            {
-                direction = Vector3.up;
-            }
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / Duration);
 
-            float elapsedTime = 0f;
-            Vector3 previousLerpPos = startPos;
+                Vector3 current = Type == DisplacementType.Knockup
+                    ? start + Vector3.up * (Mathf.Sin(t * Mathf.PI) * distance)
+                    : start + direction * (distance * Curve.Evaluate(t));
 
-            while (elapsedTime < Duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float t = elapsedTime / Duration;
-                
-                float curveValue = Curve.Evaluate(t);
-                
-                Vector3 currentLerpPos;
-
-                if (Type == DisplacementType.Knockup)
-                {
-                    // Parabola for knockup
-                    float verticalOffset = Mathf.Sin(t * Mathf.PI) * Distance;
-                    currentLerpPos = new Vector3(startPos.x, startPos.y + verticalOffset, startPos.z);
-                }
-                else
-                {
-                    currentLerpPos = startPos + direction * (Distance * curveValue);
-                }
-                
-                Vector3 moveDelta = currentLerpPos - previousLerpPos;
-                
-                if (cc != null)
-                {
-                    cc.Move(moveDelta);
-                }
-                else if (rb != null && !rb.isKinematic)
-                {
-                    rb.MovePosition(rb.position + moveDelta);
-                }
-                else
-                {
-                    target.transform.position += moveDelta;
-                }
-
-                previousLerpPos = currentLerpPos;
+                MoveTarget(target, characterController, body, current - previous);
+                previous = current;
 
                 yield return null;
             }
 
-            // Restore controllers
-            if (aiController != null) aiController.enabled = true;
-            if (inputController != null) inputController.enabled = true;
+            targetable.Status.RemoveLock(controlLock);
+        }
+
+        private Vector3 ResolveDirection(Vector3 casterPosition, Vector3 targetPosition)
+        {
+            Vector3 toTarget = targetPosition - casterPosition;
+            toTarget.y = 0f;
+            return (Type == DisplacementType.Pull ? -toTarget : toTarget).normalized;
+        }
+
+        private float ResolveDistance(Vector3 casterPosition, Vector3 targetPosition)
+        {
+            if (Type != DisplacementType.Pull) return Distance;
+
+            float maxPull = Vector3.Distance(casterPosition, targetPosition) - MinimumPullGap;
+            return Mathf.Clamp(Distance, 0f, Mathf.Max(0f, maxPull));
+        }
+
+        private static void MoveTarget(Transform target, CharacterController controller, Rigidbody body, Vector3 delta)
+        {
+            if (controller != null && controller.enabled)
+            {
+                controller.Move(delta);
+            }
+            else if (body != null && !body.isKinematic)
+            {
+                body.MovePosition(body.position + delta);
+            }
+            else
+            {
+                target.position += delta;
+            }
         }
     }
 }

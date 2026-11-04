@@ -132,6 +132,7 @@ namespace Game.Managers.Party
         public void InitializeCombat()
         {
             SwitchActiveHero(0);
+            EventBus.Publish(new PartyHeroesSpawnedEvent());
         }
 
         public void SwitchActiveHero(int index)

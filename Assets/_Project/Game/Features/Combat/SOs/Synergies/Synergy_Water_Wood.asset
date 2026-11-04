@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5613767daab2491a8307a47ed8ba0ac2, type: 3}
+  m_Name: Synergy_Water_Wood
+  m_EditorClassIdentifier: 
+  DisplayName: "Th\u1EE7y sinh M\u1ED9c"
+  Description: "M\u1ED9c t\u0103ng th\u1EDDi gian kh\u1ED1ng ch\u1EBF"
+  Source: 2
+  Target: 3
+  Buffs:
+  - StatType: 14
+    Value: 0.3
+    ModifierType: 100

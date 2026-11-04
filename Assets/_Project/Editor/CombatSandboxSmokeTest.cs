@@ -6,6 +6,7 @@ using System.Text;
 using Dylanng;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Combat;
+using Game.Combat.Domain;
 using Game.Data.Hero;
 using Game.Events;
 using Game.Gameplay.Entities;
@@ -190,6 +191,30 @@ namespace Game.Editor.Combat
                 },
                 new Step
                 {
+                    Name = "Tương sinh kích hoạt đúng liên kết",
+                    Timeout = 2d,
+                    Verify = VerifySynergy
+                },
+                new Step
+                {
+                    Name = "Thủy dập Thiêu Đốt trên mục tiêu",
+                    Timeout = 1d,
+                    Verify = VerifyWaterExtinguishesBurn
+                },
+                new Step
+                {
+                    Name = "Choáng khóa hành động và tự hết",
+                    Timeout = 1d,
+                    Verify = VerifyStunBlocksActions
+                },
+                new Step
+                {
+                    Name = "Khống chế không bật input của hero khác",
+                    Timeout = 1d,
+                    Verify = VerifyControlKeepsInputOff
+                },
+                new Step
+                {
                     Name = "Auto combat gây sát thương",
                     Timeout = 30d,
                     Begin = MarkDamageBaseline,
@@ -271,6 +296,65 @@ namespace Game.Editor.Combat
             if (heroes[0].Element != GameElement.Fire) return $"Hero đầu có hệ {heroes[0].Element}";
             if (heroes.Count > 1 && heroes[1].Element != GameElement.Wood) return $"Hero thứ hai có hệ {heroes[1].Element}";
             return null;
+        }
+
+        private static string VerifySynergy()
+        {
+            IReadOnlyList<HeroInstance> heroes = _party.ActiveHeroes;
+            int links = ServiceLocator.Get<PartySynergyService>().ActiveLinks.Count;
+            if (heroes.Count >= 3 && links != 2) return $"Có {links} liên kết thay vì 2";
+
+            float fireBonus = heroes[0].Stats.GetStatValue(Dylanng.Gameplay.RPG.Stats.StatType.DamageBonus);
+            return fireBonus > 0f ? null : "Hero Hỏa chưa có DamageBonus";
+        }
+
+        private static StatusDefinitionSO LoadStatus(string assetName)
+        {
+            return AssetDatabase.LoadAssetAtPath<StatusDefinitionSO>(
+                $"Assets/_Project/Game/Features/Combat/SOs/Status/{assetName}.asset");
+        }
+
+        private static string VerifyWaterExtinguishesBurn()
+        {
+            DummyBotInstance dummy = Object.FindObjectsOfType<DummyBotInstance>()
+                .First(candidate => candidate.Element == GameElement.Earth);
+            StatusDefinitionSO burn = LoadStatus("Status_Burn");
+            StatusDefinitionSO wet = LoadStatus("Status_Wet");
+            var resolver = ServiceLocator.Get<CombatResolver>();
+
+            resolver.ApplyStatus(null, dummy.gameObject, burn);
+            if (!dummy.Status.Set.Has(burn)) return "Không áp được Thiêu Đốt";
+
+            resolver.ApplyStatus(null, dummy.gameObject, wet);
+            bool isExtinguished = !dummy.Status.Set.Has(burn) && dummy.Status.Set.Has(wet);
+            dummy.Status.Set.Clear();
+
+            return isExtinguished ? null : "Thiêu Đốt chưa bị dập";
+        }
+
+        private static string VerifyStunBlocksActions()
+        {
+            HeroInstance hero = ActiveHero;
+            StatusDefinitionSO stun = LoadStatus("Status_Stun");
+
+            ServiceLocator.Get<CombatResolver>().ApplyStatus(null, hero.gameObject, stun);
+            bool isBlocked = !hero.Status.CanAct && !hero.CanAttack() && !hero.CanUseSkill();
+            hero.Status.Set.Remove(stun);
+
+            if (!isBlocked) return "Hero vẫn hành động được khi choáng";
+            return hero.Status.CanAct ? null : "Hero vẫn bị khóa sau khi hết choáng";
+        }
+
+        private static string VerifyControlKeepsInputOff()
+        {
+            if (_party.ActiveHeroes.Count < 2) return null;
+
+            HeroInstance follower = _party.ActiveHeroes[1];
+            var input = follower.GetComponent<Game.Gameplay.Controllers.PlayerInputController>();
+            object controlLock = follower.Status.AddLock(ControlFlags.CannotAct);
+            follower.Status.RemoveLock(controlLock);
+
+            return input.enabled ? "Input của hero không điều khiển bị bật" : null;
         }
 
         private static string VerifyElementMultipliers()

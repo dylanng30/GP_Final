@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05bed7a08f344e1b9250758429647258, type: 3}
+  m_Name: Status_Petrify
+  m_EditorClassIdentifier: 
+  DisplayName: "H\xF3a \u0110\xE1"
+  Icon: {fileID: 0}
+  Element: 5
+  Duration: 2
+  StackPolicy: 0
+  MaxStacks: 1
+  ControlFlags: 3
+  StatBuffs: []
+  OutgoingDamageModifiers: []
+  TickInterval: 0
+  TickDamage: 0
+  TickAttackRatio: 0
+  LoopVfxPrefab: {fileID: 0}
+  VfxOffset: {x: 0, y: 1, z: 0}

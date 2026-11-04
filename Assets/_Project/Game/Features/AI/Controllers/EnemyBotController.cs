@@ -105,6 +105,7 @@ namespace Game.Gameplay.AI.Controllers
         {
             _scanTimer -= deltaTime;
             _worldState.SetState(AIWorldStateKey.IsAtSpawn, DistanceToSpawn <= 0.5f);
+            _worldState.SetState(AIWorldStateKey.IsStaggered, !_heroInstance.Status.CanAct);
 
             if (_currentTarget != null)
             {

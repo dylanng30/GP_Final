@@ -70,6 +70,7 @@ namespace Game.Gameplay.Entities
         public EquipmentController Equipments { get; private set; }
         public HealthPool Health { get; } = new HealthPool();
         public EnergyPool Energy { get; private set; }
+        public StatusController Status { get; private set; }
         public Transform Transform => TransformCache;
         public GameElement Element => element;
         public bool IsDead => Health.IsDead;
@@ -88,6 +89,7 @@ namespace Game.Gameplay.Entities
             Stats = GetComponent<StatController>();
             Equipments = GetComponent<EquipmentController>();
             Energy = new EnergyPool(maxEnergyLimit);
+            Status = new StatusController(this);
 
             _motor = new CharacterMotor(TransformCache, characterController, new MotorSettings
             {
@@ -105,6 +107,7 @@ namespace Game.Gameplay.Entities
 
             Health.Changed += OnHealthChanged;
             Health.Died += OnDied;
+            Status.ControlChanged += OnControlChanged;
         }
 
         protected override void OnEnable()
@@ -229,9 +232,11 @@ namespace Game.Gameplay.Entities
         {
             if (characterController == null) return;
 
-            _motor.Tick(Time.deltaTime, canMove: !_abilityRunner.IsMovementLocked);
-            animatorController?.SetMovementSpeed(_motor.MoveMagnitude);
+            bool canMove = Status.CanMove && !_abilityRunner.IsMovementLocked;
+            _motor.Tick(Time.deltaTime, canMove);
+            animatorController?.SetMovementSpeed(canMove ? _motor.MoveMagnitude : 0f);
 
+            Status.Tick(Time.deltaTime);
             _abilityRunner.Tick();
             _basicAttack.Tick();
         }
@@ -239,6 +244,12 @@ namespace Game.Gameplay.Entities
         private void OnStatChanged(StatType type, float oldValue, float newValue)
         {
             if (type == StatType.MaxHP && Health.Max > 0f) Health.SetMax(newValue);
+            if (type == StatType.Speed && newValue > 0f) _motor.SetMoveSpeed(newValue * SpeedStatToMoveSpeed);
+        }
+
+        private void OnControlChanged()
+        {
+            if (!Status.CanAct) _abilityRunner.Interrupt();
         }
 
         private void OnHealthChanged()
@@ -251,6 +262,7 @@ namespace Game.Gameplay.Entities
         private void OnDied()
         {
             animatorController?.PlayDeath();
+            Status.Set.Clear();
             EventBus.Publish(new ActorDiedEvent(GameObjectCache));
         }
 
@@ -276,11 +288,14 @@ namespace Game.Gameplay.Entities
 
         #region --- Basic Attack ---
 
-        public bool CanAttack() => _basicAttack.CanAttack;
+        public bool CanAttack() => Status.CanAct && _basicAttack.CanAttack;
 
         public float GetAttackCooldown() => _basicAttack.Cooldown;
 
-        public void Attack(ITargetable target) => _basicAttack.Attack(target ?? ResolveCurrentTarget());
+        public void Attack(ITargetable target)
+        {
+            if (Status.CanAct) _basicAttack.Attack(target ?? ResolveCurrentTarget());
+        }
 
         private ITargetable ResolveCurrentTarget()
         {
@@ -305,7 +320,7 @@ namespace Game.Gameplay.Entities
 
         public AbilitySO GetAbility(int slot) => _abilityRunner.Get(slot);
 
-        public bool CanUseSkill(int slot = AbilitySlot.Skill1) => _abilityRunner.CanUse(slot);
+        public bool CanUseSkill(int slot = AbilitySlot.Skill1) => Status.CanAct && _abilityRunner.CanUse(slot);
 
         public float GetSkillRemainingCooldown(int slot = AbilitySlot.Skill1) => _abilityRunner.GetRemainingCooldown(slot);
 
@@ -329,7 +344,7 @@ namespace Game.Gameplay.Entities
 
         public void UseSkill(int slot, GameObject target, Vector3 point)
         {
-            if (!_abilityRunner.TryUse(slot, target, point)) return;
+            if (!Status.CanAct || !_abilityRunner.TryUse(slot, target, point)) return;
 
             FaceTowards(target != null ? target.transform.position : point);
         }
@@ -368,12 +383,12 @@ namespace Game.Gameplay.Entities
 
         public void Jump()
         {
-            if (_motor.TryJump()) animatorController?.PlayJump();
+            if (Status.CanMove && _motor.TryJump()) animatorController?.PlayJump();
         }
 
         public void Dash()
         {
-            if (!IsDead && _motor.TryDash()) animatorController?.PlayRoll();
+            if (!IsDead && Status.CanMove && _motor.TryDash()) animatorController?.PlayRoll();
         }
 
         #endregion

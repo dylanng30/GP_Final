@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Combat.Domain
@@ -18,11 +19,25 @@ namespace Game.Combat.Domain
 
         [SerializeField] private float minimumDamage = 1f;
 
+        [Header("--- TƯƠNG KHẮC ---")]
+        [SerializeField] private List<ReactionRuleSO> reactionRules = new List<ReactionRuleSO>();
+
+        [Header("--- TƯƠNG SINH ---")]
+        [SerializeField] private List<ElementSynergySO> synergies = new List<ElementSynergySO>();
+
+        [Tooltip("Số liên kết tương sinh tối đa, 0 là không giới hạn")]
+        [SerializeField] private int maxActiveLinks;
+
+        public IReadOnlyList<ReactionRuleSO> ReactionRules => reactionRules;
+        public IReadOnlyList<ElementSynergySO> Synergies => synergies;
+        public int MaxActiveLinks => maxActiveLinks;
+
         public DamagePipeline CreateDamagePipeline(IRandomSource random)
         {
             return new DamagePipeline(new IDamageStep[]
             {
                 new ElementRelationStep(elementChart),
+                new OutgoingModifierStep(),
                 new DamageBonusStep(),
                 new CriticalStep(random, defaultCritMultiplier),
                 new DefenseStep(defenseConstant),

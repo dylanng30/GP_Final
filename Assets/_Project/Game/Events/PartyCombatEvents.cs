@@ -1,4 +1,6 @@
 using Dylanng;
+using System.Collections.Generic;
+using Game.Combat.Domain;
 
 namespace Game.Events
 {

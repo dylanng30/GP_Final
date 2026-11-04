@@ -48,6 +48,7 @@ namespace GAME
         private PauseSystem _pauseSystem;
         private DataStorageService _storageService;
         private CombatResolver _combatResolver;
+        private PartySynergyService _partySynergyService;
 
         protected override void Awake()
         {
@@ -84,6 +85,9 @@ namespace GAME
 
             _combatResolver = new CombatResolver(combatRules);
             _combatResolver.Initialize();
+
+            _partySynergyService = new PartySynergyService(combatRules);
+            _partySynergyService.Initialize();
 
             yield return null;
 
