@@ -9,6 +9,16 @@ namespace Game.Events
     {
     }
 
+    public struct LockOnChangedEvent : IEvent
+    {
+        public Transform Target;
+
+        public LockOnChangedEvent(Transform target)
+        {
+            Target = target;
+        }
+    }
+
     public struct PartySynergyChangedEvent : IEvent
     {
         public IReadOnlyList<ElementSynergySO> ActiveLinks;

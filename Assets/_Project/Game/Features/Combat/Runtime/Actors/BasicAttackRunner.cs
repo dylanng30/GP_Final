@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Dylanng;
 using Dylanng.Gameplay.RPG.Abilities.BasicAttack;
 using Game.Animation.Hero;
@@ -7,13 +8,18 @@ using UnityEngine;
 
 namespace Game.Combat
 {
-    /// <summary>Thực hiện đánh thường: bắt đầu animation, chờ điểm trúng rồi mới tạo đòn.</summary>
+    /// <summary>
+    /// Đánh thường theo chuỗi combo: bắt đầu animation, chờ điểm trúng rồi tạo đòn.
+    /// Cận chiến quét vùng trước mặt, tầm xa bắn đạn.
+    /// </summary>
     public sealed class BasicAttackRunner
     {
         private const string FallbackPoolKey = "BasicAttack_Melee_Invisible";
         private const float PendingTimeout = 1f;
         private const float FallbackCooldown = 1f;
         private const float FallbackAttack = 50f;
+        private const float BufferWindow = 0.3f;
+        private const float LungeDuration = 0.12f;
         private static readonly Vector3 FallbackSpawnOffset = new Vector3(0f, 1.2f, 0.8f);
         private static readonly Vector3 AimHeightOffset = Vector3.up;
 
@@ -21,15 +27,24 @@ namespace Game.Combat
         private readonly BasicAttackSO _config;
         private readonly HeroAnimatorController _animator;
         private readonly AttachPoints _attachPoints;
+        private readonly List<ITargetable> _meleeCandidates = new List<ITargetable>();
 
         private float _lastAttackTime = float.NegativeInfinity;
+        private int _comboIndex;
+
         private bool _isPending;
         private ITargetable _pendingTarget;
+        private ComboStep _pendingStep;
         private float _pendingStartTime;
         private float _pendingDamage;
 
+        private bool _hasBufferedAttack;
+        private ITargetable _bufferedTarget;
+        private float _bufferExpireTime;
+
         public float Cooldown => _config != null ? _config.AttackCooldown : FallbackCooldown;
-        public bool CanAttack => Time.time - _lastAttackTime >= Cooldown;
+        public bool CanAttack => Time.time - _lastAttackTime >= Cooldown && !_isPending;
+        public int ComboIndex => _comboIndex;
 
         public BasicAttackRunner(
             HeroInstance owner, BasicAttackSO config, HeroAnimatorController animator, AttachPoints attachPoints)
@@ -50,28 +65,31 @@ namespace Game.Combat
         public void Attack(ITargetable target)
         {
             if (target != null && (target.IsDead || target.Transform == null)) return;
-            if (!CanAttack) return;
 
-            _lastAttackTime = Time.time;
+            if (!CanAttack)
+            {
+                BufferAttack(target);
+                return;
+            }
 
-            if (target != null) _owner.FaceTowards(target.Transform.position);
-
-            _animator?.PlayAttack();
-
-            float attack = _owner.Stats != null ? _owner.Stats.ATK : FallbackAttack;
-            float multiplier = _config != null ? _config.DamageMultiplier : 1f;
-
-            _isPending = true;
-            _pendingTarget = target;
-            _pendingDamage = attack * multiplier;
-            _pendingStartTime = Time.time;
-
-            if (_animator == null) ExecutePending();
+            StartAttack(target);
         }
 
         public void Tick()
         {
             if (_isPending && Time.time - _pendingStartTime > PendingTimeout) ExecutePending();
+
+            if (!_hasBufferedAttack) return;
+
+            if (Time.time > _bufferExpireTime)
+            {
+                _hasBufferedAttack = false;
+            }
+            else if (CanAttack)
+            {
+                _hasBufferedAttack = false;
+                Attack(_bufferedTarget);
+            }
         }
 
         /// <summary>Gọi từ animation event tại thời điểm đòn đánh trúng.</summary>
@@ -80,10 +98,89 @@ namespace Game.Combat
             if (_isPending) ExecutePending();
         }
 
+        private void BufferAttack(ITargetable target)
+        {
+            _hasBufferedAttack = true;
+            _bufferedTarget = target;
+            _bufferExpireTime = Time.time + BufferWindow;
+        }
+
+        private void StartAttack(ITargetable target)
+        {
+            AdvanceCombo();
+            _lastAttackTime = Time.time;
+
+            if (target != null) _owner.FaceTowards(target.Transform.position);
+
+            _animator?.PlayAttack();
+
+            ComboStep step = _config != null ? _config.GetComboStep(_comboIndex) : ComboStep.Default;
+            float attack = _owner.Stats != null ? _owner.Stats.ATK : FallbackAttack;
+            float multiplier = _config != null ? _config.DamageMultiplier : 1f;
+
+            _isPending = true;
+            _pendingTarget = target;
+            _pendingStep = step;
+            _pendingDamage = attack * multiplier * step.DamageMultiplier;
+            _pendingStartTime = Time.time;
+
+            if (step.LungeDistance > 0f) _owner.Lunge(step.LungeDistance, LungeDuration);
+
+            if (_animator == null) ExecutePending();
+        }
+
+        private void AdvanceCombo()
+        {
+            int stepCount = _config != null ? _config.Combo.Count : 0;
+            bool isComboAlive = stepCount > 0 && Time.time - _lastAttackTime <= _config.ComboResetTime;
+
+            _comboIndex = isComboAlive ? (_comboIndex + 1) % stepCount : 0;
+        }
+
         private void ExecutePending()
         {
             _isPending = false;
 
+            if (_config != null && _config.IsMelee)
+            {
+                ExecuteMeleeHit();
+            }
+            else
+            {
+                ExecuteProjectile();
+            }
+        }
+
+        private void ExecuteMeleeHit()
+        {
+            Transform owner = _owner.transform;
+            TargetQuery.Collect(
+                owner.position, _pendingStep.Range, _owner.GetTargetLayerMask(), owner, _meleeCandidates);
+
+            var resolver = ServiceLocator.Get<CombatResolver>();
+            bool hasHit = false;
+
+            foreach (ITargetable candidate in _meleeCandidates)
+            {
+                if (!IsInsideArc(owner, candidate.Transform.position)) continue;
+
+                hasHit = true;
+                resolver?.Deal(owner.gameObject, candidate.Transform.gameObject, _pendingDamage, _config.Element,
+                    candidate.Transform.position);
+            }
+
+            if (hasHit) _owner.GainEnergy(_config.EnergyPerHit);
+        }
+
+        private bool IsInsideArc(Transform owner, Vector3 point)
+        {
+            Vector3 toPoint = point - owner.position;
+            toPoint.y = 0f;
+            return Vector3.Angle(owner.forward, toPoint) <= _pendingStep.ArcAngle * 0.5f;
+        }
+
+        private void ExecuteProjectile()
+        {
             ResolveSpawnPose(_pendingTarget, out Vector3 position, out Quaternion rotation);
 
             string poolKey = _config != null ? _config.ProjectilePoolKey : FallbackPoolKey;
@@ -122,7 +219,7 @@ namespace Game.Combat
             if (spawnPoint != null)
             {
                 position = spawnPoint.position;
-                rotation = spawnPoint.rotation;
+                rotation = owner.rotation;
             }
 
             if (target == null || target.Transform == null) return;

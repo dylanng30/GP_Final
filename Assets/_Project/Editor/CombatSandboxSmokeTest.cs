@@ -9,6 +9,7 @@ using Game.Combat;
 using Game.Combat.Domain;
 using Game.Data.Hero;
 using Game.Events;
+using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;
 using UnityEditor;
@@ -36,6 +37,26 @@ namespace Game.Editor.Combat
         private const float OvercomesMultiplier = 1.2f;
         private const float OvercomedByMultiplier = 0.8f;
 
+        /// <summary>Nguồn input giả: Move giữ nguyên, Pending chỉ có tác dụng trong một lần đọc.</summary>
+        private sealed class ScriptedIntentSource : IPlayerIntentSource
+        {
+            public Vector2 Move;
+            public PlayerIntent Pending = NewIntent();
+
+            public PlayerIntent Read()
+            {
+                PlayerIntent intent = Pending;
+                intent.Move = Move;
+                Pending = NewIntent();
+                return intent;
+            }
+
+            private static PlayerIntent NewIntent()
+            {
+                return new PlayerIntent { SwitchHeroIndex = PlayerIntent.NoHeroSelected };
+            }
+        }
+
         private sealed class Step
         {
             public string Name;
@@ -62,6 +83,8 @@ namespace Game.Editor.Combat
         private static bool _hasSeenFireDamage;
         private static bool _hasCastSkill;
         private static float _energyBaseline;
+        private static bool _hasToggledViewBack;
+        private static readonly ScriptedIntentSource _scripted = new ScriptedIntentSource();
         private static Vector3 _positionBaseline;
 
         private static HeroInstance ActiveHero => _party != null ? _party.GetActiveHero() : null;
@@ -217,17 +240,24 @@ namespace Game.Editor.Combat
                 {
                     Name = "Auto combat gây sát thương",
                     Timeout = 30d,
-                    Begin = MarkDamageBaseline,
+                    Begin = StartAutoCombat,
                     Verify = VerifyDamageIncreased,
                     End = () => CaptureCamera("sandbox_auto.png")
                 },
                 new Step
                 {
-                    Name = "Tắt auto chuyển sang góc nhìn thứ 3",
+                    Name = "Tắt auto, giữ góc nhìn thứ 3",
                     Timeout = 6d,
-                    Begin = () => EventBus.Publish(new ToggleFollowModeEvent(false)),
+                    Begin = StartManualMode,
                     Verify = VerifyManualMode,
                     End = () => CaptureCamera("sandbox_third_person.png")
+                },
+                new Step
+                {
+                    Name = "Phím đổi góc nhìn sang top-down và ngược lại",
+                    Timeout = 5d,
+                    Begin = () => _scripted.Pending.ToggleView = true,
+                    Verify = VerifyViewToggled
                 },
                 new Step
                 {
@@ -264,6 +294,28 @@ namespace Game.Editor.Combat
                     Timeout = 8d,
                     Begin = StartSkill,
                     Verify = VerifySkillResult
+                },
+                new Step
+                {
+                    Name = "Phím skill 2 dùng đúng slot",
+                    Timeout = 5d,
+                    Begin = () => _scripted.Pending.Skill2 = true,
+                    Verify = () => ActiveHero.GetSkillRemainingCooldown(AbilitySlot.Skill2) > 0f ? null : "Skill 2 chưa được dùng"
+                },
+                new Step
+                {
+                    Name = "Lock-on giữ mục tiêu",
+                    Timeout = 3d,
+                    Begin = StartLockOn,
+                    Verify = VerifyLockOn,
+                    End = () => _scripted.Pending.LockOn = true
+                },
+                new Step
+                {
+                    Name = "Lệnh tập hợp kéo đồng đội về",
+                    Timeout = 2d,
+                    Begin = StartRegroup,
+                    Verify = VerifyRegrouped
                 },
                 new Step
                 {
@@ -388,24 +440,72 @@ namespace Game.Editor.Combat
             return _damageCount > _damageBaseline ? null : "Chưa có sự kiện sát thương";
         }
 
+        private static void StartAutoCombat()
+        {
+            MarkDamageBaseline();
+            EventBus.Publish(new ToggleFollowModeEvent(true));
+        }
+
+        private static void StartManualMode()
+        {
+            EventBus.Publish(new ToggleFollowModeEvent(false));
+            ActiveHero.GetComponent<PlayerInputController>().SetIntentSource(_scripted);
+        }
+
         private static string VerifyManualMode()
         {
             if (_party.IsFollowModeEnabled) return "Vẫn ở chế độ auto";
-            if (StepElapsed < 1.5d) return "Đang chờ camera chuyển";
-            return Mathf.Approximately(Time.timeScale, 1f) ? null : $"timeScale = {Time.timeScale}";
+            return CameraController.Instance.Mode == CameraMode.ThirdPerson ? null : "Camera không ở góc nhìn thứ 3";
+        }
+
+        private static string VerifyViewToggled()
+        {
+            if (CameraController.Instance.Mode == CameraMode.TopDown && !_hasToggledViewBack)
+            {
+                _hasToggledViewBack = true;
+                _scripted.Pending.ToggleView = true;
+                return "Đang đổi lại";
+            }
+
+            bool isBack = _hasToggledViewBack && CameraController.Instance.Mode == CameraMode.ThirdPerson;
+            return isBack ? null : "Góc nhìn chưa đổi";
         }
 
         private static void StartMoving()
         {
             _positionBaseline = ActiveHero.transform.position;
-            _input.SetJoystickActive(true);
-            _input.SetMovementInput(Vector2.up);
+            _scripted.Move = Vector2.up;
         }
 
         private static void StopMoving()
         {
-            _input.SetMovementInput(Vector2.zero);
-            _input.SetJoystickActive(false);
+            _scripted.Move = Vector2.zero;
+        }
+
+        private static void StartLockOn()
+        {
+            ActiveHero.GetComponent<PlayerTargetingSystem>().SetTarget(FindNearestDummy());
+            _scripted.Pending.LockOn = true;
+        }
+
+        private static string VerifyLockOn()
+        {
+            var targeting = ActiveHero.GetComponent<PlayerTargetingSystem>();
+            return targeting.IsHardLocked && targeting.CurrentTarget != null ? null : "Chưa hard-lock";
+        }
+
+        private static void StartRegroup()
+        {
+            HeroInstance follower = _party.ActiveHeroes[_party.ActiveHeroes.Count - 1];
+            follower.GetComponent<HeroAIController>().RegroupTo(ActiveHero.transform.position + Vector3.right * 12f);
+            _scripted.Pending.Regroup = true;
+        }
+
+        private static string VerifyRegrouped()
+        {
+            HeroInstance follower = _party.ActiveHeroes[_party.ActiveHeroes.Count - 1];
+            float distance = Vector3.Distance(follower.transform.position, ActiveHero.transform.position);
+            return distance <= 6f ? null : $"Đồng đội còn cách {distance:F1}m";
         }
 
         private static string VerifyMovedAtLeast(float distance)
@@ -492,7 +592,7 @@ namespace Game.Editor.Combat
 
         private static void SwitchToNextHero()
         {
-            if (_party.ActiveHeroes.Count > 1) _party.SwitchActiveHero(1);
+            _scripted.Pending.SwitchHeroIndex = 1;
         }
 
         private static string VerifyHeroSwitched()

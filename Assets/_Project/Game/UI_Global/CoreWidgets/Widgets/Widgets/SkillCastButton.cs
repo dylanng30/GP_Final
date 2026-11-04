@@ -157,23 +157,8 @@ namespace Game.UIs.Widgets
 
         private GameObject FindTargetNearPoint(HeroInstance hero, Vector3 point, float radius)
         {
-            Collider[] colliders = Physics.OverlapSphere(point, radius);
-            GameObject bestTarget = null;
-            float minSqrDist = float.MaxValue;
-            foreach (var col in colliders)
-            {
-                if (col.TryGetComponent<ITargetable>(out var targetable))
-                {
-                    if (targetable.IsDead || targetable.Transform == hero.transform) continue;
-                    float sqrDist = (targetable.Transform.position - point).sqrMagnitude;
-                    if (sqrDist < minSqrDist)
-                    {
-                        minSqrDist = sqrDist;
-                        bestTarget = targetable.Transform.gameObject;
-                    }
-                }
-            }
-            return bestTarget;
+            ITargetable target = Game.Combat.TargetQuery.FindNearest(point, radius, hero.GetTargetLayerMask(), hero.transform);
+            return target?.Transform.gameObject;
         }
 
         public void OnPointerUp(PointerEventData eventData)

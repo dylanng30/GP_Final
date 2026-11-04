@@ -18,6 +18,8 @@ namespace Game.Gameplay.RPG.Abilities.Effects
         private float _damage;
         private GameElement _element;
         private bool _isAura;
+        private LayerMask _enemyMask;
+        private readonly System.Collections.Generic.List<ITargetable> _hitTargets = new System.Collections.Generic.List<ITargetable>();
 
         private float _elapsedTime;
         private float _tickTimer;
@@ -31,6 +33,7 @@ namespace Game.Gameplay.RPG.Abilities.Effects
             _damage = damage;
             _element = element;
             _isAura = isAura;
+            _enemyMask = TargetQuery.GetEnemyMask(caster);
 
             _elapsedTime = 0f;
             _tickTimer = tickInterval; 
@@ -86,17 +89,13 @@ namespace Game.Gameplay.RPG.Abilities.Effects
         {
             if (_caster == null && _isAura) return;
 
-            Collider[] colliders = Physics.OverlapSphere(transform.position, _radius);
-            foreach (var col in colliders)
+            TargetQuery.Collect(transform.position, _radius, _enemyMask, _caster != null ? _caster.transform : null, _hitTargets);
+
+            foreach (ITargetable target in _hitTargets)
             {
-                if (col.TryGetComponent<ITargetable>(out var targetable))
-                {
-                    if (targetable.IsDead) continue;
-                    if (_caster != null && targetable.Transform == _caster.transform) continue; // Don't damage self
-                    
-                    ServiceLocator.Get<CombatResolver>()?.Deal(_caster, targetable.Transform.gameObject, _damage, _element, targetable.Transform.position);
-                }
+                ServiceLocator.Get<CombatResolver>()?.Deal(_caster, target.Transform.gameObject, _damage, _element, target.Transform.position);
             }
+
         }
 
         private void DespawnZone()

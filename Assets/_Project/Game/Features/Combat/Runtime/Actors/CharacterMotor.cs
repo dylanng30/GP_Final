@@ -31,6 +31,8 @@ namespace Game.Combat
 
         private Vector3 _dashDirection;
         private Vector3 _dashStart;
+        private float _dashDistance;
+        private float _dashDuration;
         private float _dashElapsed;
         private float _invincibleTimer;
 
@@ -71,12 +73,29 @@ namespace Game.Combat
             if (IsDashing) return false;
 
             Vector3 inputDirection = ToWorldDirection(MoveInput);
-            _dashDirection = inputDirection != Vector3.zero ? inputDirection.normalized : _transform.forward;
+            Vector3 direction = inputDirection != Vector3.zero ? inputDirection.normalized : _transform.forward;
+
+            BeginDash(direction, _settings.DashDistance, _settings.DashDuration);
+            _invincibleTimer = _settings.DashInvincibilityDuration;
+            return true;
+        }
+
+        private void BeginDash(Vector3 direction, float distance, float duration)
+        {
+            _dashDirection = direction;
+            _dashDistance = distance;
+            _dashDuration = duration;
             _dashStart = _transform.position;
             _dashElapsed = 0f;
-            _invincibleTimer = _settings.DashInvincibilityDuration;
             IsDashing = true;
-            return true;
+        }
+
+        /// <summary>Lao ngắn về phía trước, không có miễn sát thương.</summary>
+        public void Lunge(float distance, float duration)
+        {
+            if (IsDashing) return;
+
+            BeginDash(_transform.forward, distance, duration);
         }
 
         public void Tick(float deltaTime, bool canMove)
@@ -113,11 +132,11 @@ namespace Game.Combat
         private void TickDash(float deltaTime)
         {
             _dashElapsed += deltaTime;
-            float t = Mathf.Clamp01(_dashElapsed / _settings.DashDuration);
+            float t = Mathf.Clamp01(_dashElapsed / _dashDuration);
 
             // Ease-out: bắt đầu nhanh, chậm dần về cuối.
             float easedT = 1f - (1f - t) * (1f - t);
-            Vector3 destination = _dashStart + _dashDirection * (_settings.DashDistance * easedT);
+            Vector3 destination = _dashStart + _dashDirection * (_dashDistance * easedT);
             destination.y = _transform.position.y;
 
             _controller.Move(destination - _transform.position);

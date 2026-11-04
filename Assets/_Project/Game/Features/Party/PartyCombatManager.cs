@@ -15,7 +15,7 @@ namespace Game.Managers.Party
         private int _currentActiveHeroIndex = 0;
         private bool _hasSpawnedHeroes = false;
 
-        public bool IsFollowModeEnabled { get; private set; } = true;
+        public bool IsFollowModeEnabled { get; private set; }
         public IReadOnlyList<HeroInstance> ActiveHeroes => _activeHeroes;
 
         public override void Initialize()
@@ -154,6 +154,22 @@ namespace Game.Managers.Party
             EventBus.Publish(new ActiveHeroChangedEvent(_currentActiveHeroIndex, _activeHeroes[_currentActiveHeroIndex].HeroId));
             
             GameLogger.Log($"Switched Active Hero to index {_currentActiveHeroIndex}");
+        }
+
+        /// <summary>Gọi đồng đội về ngay cạnh hero đang điều khiển.</summary>
+        public void RegroupFollowers()
+        {
+            HeroInstance leader = GetActiveHero();
+            if (leader == null) return;
+
+            foreach (HeroInstance hero in _activeHeroes)
+            {
+                if (hero == null || hero == leader || hero.IsDead) continue;
+
+                var aiController = hero.GetComponent<HeroAIController>();
+                aiController.RegroupTo(leader.transform.position);
+                aiController.FollowActiveHero();
+            }
         }
 
         public void CleanupCombat()

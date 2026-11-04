@@ -59,21 +59,6 @@ namespace Game.Gameplay.Controllers.States
 
             if (_targetToFollow != null)
             {
-                bool isFollowEnabled = partyManager != null && partyManager.IsFollowModeEnabled;
-
-                if (!isFollowEnabled)
-                {
-                    _currentMoveVector = Vector2.Lerp(_currentMoveVector, Vector2.zero, Time.deltaTime * MovementLerpSpeed);
-                    if (_currentMoveVector.sqrMagnitude > 0.001f)
-                    {
-                        _entityController.Move(_currentMoveVector);
-                    }
-                    else
-                    {
-                        _entityController.StopMove();
-                    }
-                    return;
-                }
 
                 // Get individual slot position instead of active hero center
                 Vector3 targetSlotPosition = GetSlotPosition(partyManager);

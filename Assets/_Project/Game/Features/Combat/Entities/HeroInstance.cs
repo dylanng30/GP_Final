@@ -284,6 +284,8 @@ namespace Game.Gameplay.Entities
 
         public void GainEnergy(float amount) => Energy.Gain(amount);
 
+        public void Lunge(float distance, float duration) => _motor.Lunge(distance, duration);
+
         public Transform GetBone(string boneName) => _attachPoints.Get(boneName);
 
         #region --- Basic Attack ---

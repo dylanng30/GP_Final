@@ -122,6 +122,8 @@ namespace GAME
                 gameObject.AddComponent<GP_Final.Navigation.Components.NavigationSceneAdapter>();
             }
 
+            gameObject.AddComponent<CursorCaptureController>();
+
             yield return null;
             gameModeManager.Initialize();
 

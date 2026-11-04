@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Dylanng.Gameplay.RPG.Stats;
+using Game.Combat;
 using Game.Gameplay.AI.Core;
 using Game.Gameplay.AI.Gambit;
 using Game.Gameplay.AI.GOAP;
@@ -33,6 +34,7 @@ namespace Game.Gameplay.AI.Controllers
         private Vector3 _spawnPosition;
 
         private readonly Dictionary<int, float> _skillCooldownTimers = new Dictionary<int, float>();
+        private readonly List<ITargetable> _scanResults = new List<ITargetable>();
         private float _scanTimer;
         private const float SCAN_INTERVAL = 0.25f;
 
@@ -149,26 +151,23 @@ namespace Game.Gameplay.AI.Controllers
 
         private ITargetable FindNearestTarget(LayerMask mask)
         {
-            Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, mask);
+            TargetQuery.Collect(transform.position, detectionRadius, mask, transform, _scanResults);
+
             ITargetable nearest = null;
             float minSqrDist = float.MaxValue;
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                if (colliders[i] == null) continue;
-                ITargetable targetable = colliders[i].GetComponent<ITargetable>() ?? colliders[i].GetComponentInParent<ITargetable>();
-                if (targetable != null)
-                {
-                    if (targetable.IsDead || targetable.Transform == transform || targetable.Transform == _heroInstance?.Transform) continue;
-                    
-                    if (maxDistanceFromSpawn > 0f && Vector3.Distance(_spawnPosition, targetable.Transform.position) > maxDistanceFromSpawn) continue;
 
-                    float sqrDist = (targetable.Transform.position - transform.position).sqrMagnitude;
-                    if (sqrDist < minSqrDist && sqrDist <= detectionRadius * detectionRadius)
-                    {
-                        minSqrDist = sqrDist;
-                        nearest = targetable;
-                    }
-                }
+            foreach (ITargetable candidate in _scanResults)
+            {
+                Vector3 candidatePosition = candidate.Transform.position;
+                bool isOutsideLeash = maxDistanceFromSpawn > 0f
+                                      && Vector3.Distance(_spawnPosition, candidatePosition) > maxDistanceFromSpawn;
+                if (isOutsideLeash) continue;
+
+                float sqrDist = (candidatePosition - transform.position).sqrMagnitude;
+                if (sqrDist >= minSqrDist) continue;
+
+                minSqrDist = sqrDist;
+                nearest = candidate;
             }
             return nearest;
         }

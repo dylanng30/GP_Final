@@ -1,72 +1,122 @@
 using Dylanng;
+using Game.Combat;
+using Game.Gameplay.Entities;
+using Game.Managers.Party;
 using UnityEngine;
 
 namespace Game.Gameplay.Controllers
 {
+    /// <summary>Biến PlayerIntent thành hành động của hero đang điều khiển.</summary>
     public class PlayerInputController : MonoBehaviour
     {
-        private IEntityController _entityController;
-        private InputManager _inputManager;
+        private const float MoveDeadZone = 0.01f;
+        private static readonly int[] SkillSlots = { AbilitySlot.Skill1, AbilitySlot.Skill2, AbilitySlot.Ultimate };
+
+        private HeroInstance _hero;
+        private HeroAIController _aiController;
         private PlayerTargetingSystem _targetingSystem;
+        private IPlayerIntentSource _intentSource;
 
-        public void Initialize(IEntityController entityController)
+        public void Initialize(HeroInstance hero)
         {
-            _entityController = entityController;
-            _inputManager = ServiceLocator.Get<InputManager>();
-
+            _hero = hero;
+            _aiController = GetComponent<HeroAIController>();
             _targetingSystem = GetComponent<PlayerTargetingSystem>();
+            _intentSource = new DeviceIntentSource(ServiceLocator.Get<InputManager>());
+        }
+
+        /// <summary>Thay nguồn input, ví dụ khi chạy kiểm thử tự động.</summary>
+        public void SetIntentSource(IPlayerIntentSource intentSource)
+        {
+            _intentSource = intentSource;
         }
 
         private void OnEnable()
         {
-            if (_targetingSystem == null)
-            {
-                _targetingSystem = GetComponent<PlayerTargetingSystem>();
-            }
-            if (_targetingSystem != null)
-            {
-                _targetingSystem.enabled = true;
-            }
+            if (_targetingSystem == null) _targetingSystem = GetComponent<PlayerTargetingSystem>();
+            if (_targetingSystem != null) _targetingSystem.enabled = true;
         }
 
         private void OnDisable()
         {
-            if (_targetingSystem != null)
-            {
-                _targetingSystem.ClearTarget();
-                _targetingSystem.enabled = false;
-            }
+            if (_targetingSystem == null) return;
+
+            _targetingSystem.ClearTarget();
+            _targetingSystem.enabled = false;
         }
 
         private void Update()
         {
-            if (_inputManager == null || _entityController == null) return;
+            if (_hero == null || _intentSource == null) return;
 
-            // Handle Movement
-            if (_inputManager.MovementInput.sqrMagnitude > 0.01f)
+            PlayerIntent intent = _intentSource.Read();
+
+            ApplyMovement(intent.Move);
+            ApplyActions(intent);
+            ApplySkills(intent);
+            ApplySystemCommands(intent);
+        }
+
+        private void ApplyMovement(Vector2 move)
+        {
+            if (move.sqrMagnitude > MoveDeadZone)
             {
-                _entityController.Move(_inputManager.MovementInput);
+                _hero.Move(move);
             }
-            else
+            else if (_aiController == null || !_aiController.IsInCombatState)
             {
-                var aiController = GetComponent<HeroAIController>();
-                if (aiController == null || !aiController.IsInCombatState)
-                {
-                    _entityController.StopMove();
-                }
+                _hero.StopMove();
+            }
+        }
+
+        private void ApplyActions(in PlayerIntent intent)
+        {
+            if (intent.Jump) _hero.Jump();
+            if (intent.Dash) _hero.Dash();
+            if (intent.Attack) Attack();
+        }
+
+        private void Attack()
+        {
+            ITargetable target = _targetingSystem != null ? _targetingSystem.CurrentTarget : null;
+            if (target == null)
+            {
+                _hero.FaceTowards(AimResolver.Resolve(_hero, null, null).Point);
             }
 
-            // Handle Attack
-            if (_inputManager.AttackInput)
-            {
-                _entityController.Attack();
-            }
+            _hero.Attack(target);
+        }
 
-            // Handle Jump
-            if (_inputManager.JumpInput)
-            {
-                _entityController.Jump();
-            }
+        private void ApplySkills(in PlayerIntent intent)
+        {
+            if (intent.Skill1) UseSkill(SkillSlots[0]);
+            if (intent.Skill2) UseSkill(SkillSlots[1]);
+            if (intent.Ultimate) UseSkill(SkillSlots[2]);
+        }
+
+        private void UseSkill(int slot)
+        {
+            ITargetable selected = _targetingSystem != null ? _targetingSystem.CurrentTarget : null;
+            AimResult aim = AimResolver.Resolve(_hero, selected, _hero.GetAbility(slot));
+
+            var ability = _hero.GetAbility(slot);
+            if (ability != null && ability.RequiresTarget && aim.Target == null) return;
+
+            _hero.UseSkill(slot, aim.Target, aim.Point);
+        }
+
+        private void ApplySystemCommands(in PlayerIntent intent)
+        {
+            if (intent.LockOn && _targetingSystem != null) _targetingSystem.ToggleHardLock();
+            if (intent.ToggleView && CameraController.Instance != null) CameraController.Instance.ToggleMode();
+
+            var party = (intent.Regroup || intent.SwitchHeroIndex != PlayerIntent.NoHeroSelected)
+                ? ServiceLocator.Get<PartyCombatManager>()
+                : null;
+            if (party == null) return;
+
+            if (intent.Regroup) party.RegroupFollowers();
+            if (intent.SwitchHeroIndex != PlayerIntent.NoHeroSelected) party.SwitchActiveHero(intent.SwitchHeroIndex);
         }
     }
 }

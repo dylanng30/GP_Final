@@ -42,14 +42,14 @@ namespace Game.UIs.Screens.CombatHUD
 
             if (followActiveHeroToggle != null)
             {
-                followActiveHeroToggle.SetIsOn(true);
+                followActiveHeroToggle.SetIsOn(PartyCombatManager != null && PartyCombatManager.IsFollowModeEnabled);
                 followActiveHeroToggle.SetAction(OnFollowActiveHeroToggleClicked);
             }
             
             // Setup Action Buttons
             if (dashBtn != null) dashBtn.onClick.AddListener(OnDashClicked);
 
-            UpdateActionButtonsVisibility(true); // Default to Auto mode (Toggle is ON)
+            UpdateActionButtonsVisibility(PartyCombatManager != null && PartyCombatManager.IsFollowModeEnabled);
             
             // Setup HeroAvatarWidgets
             for (int i = 0; i < characterAvatarWidgets.Length; i++)
@@ -112,12 +112,6 @@ namespace Game.UIs.Screens.CombatHUD
             EventBus.Unsubscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Unsubscribe<EntityDamagedEvent>(OnEntityDamaged);
 
-            // Tự động reset về trạng thái Auto Follow (TopDown) khi chuyển sang Explore hoặc ẩn HUD
-            if (followActiveHeroToggle != null)
-            {
-                followActiveHeroToggle.SetIsOn(true);
-            }
-            OnFollowActiveHeroToggleClicked(true);
         }
 
         public override void Setup(object data = null)

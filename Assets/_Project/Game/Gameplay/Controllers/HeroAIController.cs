@@ -1,4 +1,5 @@
 using Dylanng;
+using Game.Combat;
 using Game.Gameplay.Controllers.States;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;
@@ -8,6 +9,9 @@ namespace Game.Gameplay.Controllers
 {
     public class HeroAIController : MonoBehaviour
     {
+        private const float RegroupDistance = 15f;
+        private const float RegroupSpreadRadius = 2f;
+
         [Header("--- AI COMBAT CONFIG ---")]
         [SerializeField] private float detectionRadius = 10.0f;
         [SerializeField] private float attackRange = 2.0f;
@@ -49,27 +53,11 @@ namespace Game.Gameplay.Controllers
             bool isUserMoving = inputManager != null && inputManager.MovementInput.sqrMagnitude > 0.01f;
             bool isFollowEnabled = partyManager != null && partyManager.IsFollowModeEnabled;
 
-            if (partyManager != null)
+            HeroInstance leader = partyManager != null ? partyManager.GetActiveHero() : null;
+            if (leader != null && leader.transform != transform
+                               && Vector3.Distance(transform.position, leader.transform.position) > RegroupDistance)
             {
-                // Teleport logic: Teleport far away heroes back near the active hero (regardless of toggle state)
-                var activeHero = partyManager.GetActiveHero();
-                if (activeHero != null && activeHero.transform != transform)
-                {
-                    float distance = Vector3.Distance(transform.position, activeHero.transform.position);
-                    if (distance > 15.0f)
-                    {
-                        var cc = GetComponent<CharacterController>();
-                        if (cc != null) cc.enabled = false;
-                        
-                        Vector3 randomOffset = UnityEngine.Random.insideUnitSphere * 2f;
-                        randomOffset.y = 0;
-                        transform.position = activeHero.transform.position + randomOffset;
-                        
-                        if (cc != null) cc.enabled = true;
-                        
-                        GetComponent<IEntityController>()?.StopMove();
-                    }
-                }
+                RegroupTo(leader.transform.position);
             }
 
             // Ở chế độ độc lập (isFollowEnabled == false), Active Hero không chạy AI combat hay tự động bắn
@@ -112,32 +100,25 @@ namespace Game.Gameplay.Controllers
 
         private void ScanForNearestTarget()
         {
-            Collider[] colliders = enemyLayerMask.value != 0 
-                ? Physics.OverlapSphere(transform.position, detectionRadius, enemyLayerMask)
-                : Physics.OverlapSphere(transform.position, detectionRadius);
-
-            ITargetable nearestTarget = null;
-            float minSqrDist = float.MaxValue;
-
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                if (colliders[i] != null && colliders[i].TryGetComponent<ITargetable>(out var targetable))
-                {
-                    if (targetable.IsDead || targetable.Transform == transform) continue;
-
-                    float sqrDist = (targetable.Transform.position - transform.position).sqrMagnitude;
-                    if (sqrDist < minSqrDist && sqrDist <= detectionRadius * detectionRadius)
-                    {
-                        minSqrDist = sqrDist;
-                        nearestTarget = targetable;
-                    }
-                }
-            }
-
+            ITargetable nearestTarget = TargetQuery.FindNearest(transform.position, detectionRadius, enemyLayerMask, transform);
             if (nearestTarget != null)
             {
                 SetTargetEnemy(nearestTarget);
             }
+        }
+
+        /// <summary>Dịch chuyển về gần một điểm, dùng khi tụt lại quá xa hoặc khi người chơi ra lệnh tập hợp.</summary>
+        public void RegroupTo(Vector3 point)
+        {
+            var characterController = GetComponent<CharacterController>();
+            if (characterController != null) characterController.enabled = false;
+
+            Vector2 offset = UnityEngine.Random.insideUnitCircle * RegroupSpreadRadius;
+            transform.position = point + new Vector3(offset.x, 0f, offset.y);
+
+            if (characterController != null) characterController.enabled = true;
+
+            GetComponent<IEntityController>()?.StopMove();
         }
 
         public void SetTargetEnemy(Transform enemy, bool broadcast = true)
