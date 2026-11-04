@@ -18,8 +18,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float FalloffRadius = 3f;
         public float MinDamagePercent = 0.3f;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (target == null) return;
 
             float finalDamage = BaseDamage;
@@ -37,7 +38,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             }
 
             // Phát sự kiện sát thương qua EventBus để cập nhật UI và hiển thị số nhảy
-            ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, Element, point);
+            ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, context.ResolveElement(Element), point);
             
         }
     }

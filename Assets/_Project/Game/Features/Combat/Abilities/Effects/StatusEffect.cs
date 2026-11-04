@@ -1,3 +1,4 @@
+using Game.Combat;
 using System;
 using System.Collections;
 using Dylanng.Gameplay.RPG.Stats;
@@ -14,8 +15,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float Duration = 3.0f;
         [Range(0f, 1f)] public float Chance = 1.0f;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (target == null || UnityEngine.Random.value > Chance) return;
 
             if (target.TryGetComponent<StatController>(out var targetStats))

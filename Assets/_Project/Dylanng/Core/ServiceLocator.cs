@@ -14,6 +14,7 @@ namespace Dylanng
     public static class ServiceLocator
     {
         private static readonly object _lock = new object();
+        private static bool _isShutDown;
         
         private static readonly Dictionary<Type, IService> _globalServices = new Dictionary<Type, IService>(32);
         private static readonly Dictionary<Scene, Dictionary<Type, IService>> _localServicesByScene = new Dictionary<Scene, Dictionary<Type, IService>>(4);
@@ -139,7 +140,7 @@ namespace Dylanng
                     }
                 }
 
-                GameLogger.LogError($"[ServiceLocator] Service {type.Name} not found in Local (Scene '{activeScene.name}') or Global scope. Are you sure it's registered?");
+                if (!_isShutDown) GameLogger.LogError($"[ServiceLocator] Service {type.Name} not found in Local (Scene '{activeScene.name}') or Global scope. Are you sure it's registered?");
                 return default;
             }
         }
@@ -187,6 +188,7 @@ namespace Dylanng
                 }
                 _globalServices.Clear();
 
+                _isShutDown = true;
                 GameLogger.Log("[ServiceLocator] Cleared all Global and Local services.");
             }
         }

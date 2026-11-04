@@ -15,8 +15,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public PoolableObject BuffVFXPrefab;
         public PoolableObject HitVFXPrefab;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
 
             // Remove existing handler if any

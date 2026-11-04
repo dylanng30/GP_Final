@@ -1,3 +1,4 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,9 @@ namespace Dylanng.Gameplay.RPG.Abilities
         public float EnergyCost = 20.0f;
         public float StaminaCost = 0.0f;
 
+        [Tooltip("Cấp tối thiểu của hero để mở khóa skill này.")]
+        public int UnlockLevel = 1;
+
         [Header("--- Animation & Timings ---")]
         [Tooltip("Tên Trigger trong Animator (ví dụ: Skill_0). Tự động tính hash khi runtime.")]
         public string AnimationTriggerName = "";
@@ -28,6 +32,9 @@ namespace Dylanng.Gameplay.RPG.Abilities
         [HideInInspector] public int AnimationTriggerHash;
 
         public float TotalCastDuration = 1.2f;
+
+        [Tooltip("Khóa di chuyển trong lúc cast.")]
+        public bool LocksMovement = true;
 
         [Header("--- Aiming Config ---")]
         public float Range = 8.0f;
@@ -52,12 +59,12 @@ namespace Dylanng.Gameplay.RPG.Abilities
             return AnimationTriggerHash;
         }
 
-        public void ExecuteEffects(GameObject caster, GameObject target, Vector3 point)
+        public void ExecuteEffects(in AbilityContext context)
         {
             if (Effects == null) return;
             for (int i = 0; i < Effects.Count; i++)
             {
-                Effects[i]?.Execute(caster, target, point);
+                Effects[i]?.Execute(context);
             }
         }
     }

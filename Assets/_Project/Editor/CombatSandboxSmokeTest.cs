@@ -60,6 +60,7 @@ namespace Game.Editor.Combat
         private static int _damageBaseline;
         private static bool _hasSeenFireDamage;
         private static bool _hasCastSkill;
+        private static float _energyBaseline;
         private static Vector3 _positionBaseline;
 
         private static HeroInstance ActiveHero => _party != null ? _party.GetActiveHero() : null;
@@ -177,6 +178,18 @@ namespace Game.Editor.Combat
                 },
                 new Step
                 {
+                    Name = "Khiên chặn sát thương và bị trừ",
+                    Timeout = 1d,
+                    Verify = VerifyShieldAbsorbs
+                },
+                new Step
+                {
+                    Name = "Hồi máu không vượt quá máu tối đa",
+                    Timeout = 1d,
+                    Verify = VerifyHealClamped
+                },
+                new Step
+                {
                     Name = "Auto combat gây sát thương",
                     Timeout = 30d,
                     Begin = MarkDamageBaseline,
@@ -218,7 +231,7 @@ namespace Game.Editor.Combat
                     Name = "Đánh thường gây sát thương",
                     Timeout = 6d,
                     Begin = StartBasicAttack,
-                    Verify = VerifyDamageIncreased
+                    Verify = VerifyBasicAttackResult
                 },
                 new Step
                 {
@@ -335,7 +348,40 @@ namespace Game.Editor.Combat
         private static void StartBasicAttack()
         {
             MarkDamageBaseline();
+            _energyBaseline = ActiveHero.CurrentEnergy;
             ActiveHero.Attack(FindNearestDummy());
+        }
+
+        private static string VerifyBasicAttackResult()
+        {
+            string damageFailure = VerifyDamageIncreased();
+            if (damageFailure != null) return damageFailure;
+
+            return ActiveHero.CurrentEnergy > _energyBaseline ? null : "Đánh trúng nhưng không tăng Nộ";
+        }
+
+        private static string VerifyShieldAbsorbs()
+        {
+            HeroInstance hero = ActiveHero;
+            float health = hero.Health.Current;
+            object source = new object();
+            hero.Health.Shields.Add(source, ProbeDamage * 10f);
+
+            ServiceLocator.Get<CombatResolver>()
+                .Deal(null, hero.gameObject, ProbeDamage, GameElement.Physical, hero.transform.position, canCrit: false);
+
+            float shieldLeft = hero.Health.Shields.Total;
+            hero.Health.Shields.RemoveSource(source);
+
+            if (hero.Health.Current < health) return "Máu vẫn bị trừ";
+            return shieldLeft < ProbeDamage * 10f ? null : "Khiên không bị trừ";
+        }
+
+        private static string VerifyHealClamped()
+        {
+            HeroInstance hero = ActiveHero;
+            ServiceLocator.Get<CombatResolver>().Heal(null, hero.gameObject, hero.Health.Max * 10f);
+            return Mathf.Approximately(hero.Health.Current, hero.Health.Max) ? null : "Máu vượt giới hạn";
         }
 
         private static void StartSkill()

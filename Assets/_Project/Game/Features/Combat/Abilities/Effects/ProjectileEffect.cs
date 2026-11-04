@@ -1,3 +1,4 @@
+using Game.Combat;
 using System;
 using System.Collections.Generic;
 using Dylanng.Gameplay.RPG.Abilities.Projectiles;
@@ -20,8 +21,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         [SerializeReference]
         public List<IAbilityEffect> CollisionEffects = new List<IAbilityEffect>();
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
 
             var poolManager = ServiceLocator.Get<PoolManager>();
@@ -42,16 +44,10 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
 
             if (!string.IsNullOrEmpty(SpawnPointName))
             {
-                Transform spawnPoint = null;
-                if (caster.TryGetComponent<Game.Gameplay.Entities.HeroInstance>(out var heroInstance))
-                {
-                    spawnPoint = heroInstance.GetBone(SpawnPointName);
-                }
-                else
-                {
-                    spawnPoint = FindChildRecursive(caster.transform, SpawnPointName);
-                }
-                
+                Transform spawnPoint = caster.TryGetComponent<Game.Gameplay.Entities.HeroInstance>(out var heroInstance)
+                    ? heroInstance.GetBone(SpawnPointName)
+                    : AttachPoints.FindDeep(caster.transform, SpawnPointName);
+
                 if (spawnPoint != null)
                 {
                     spawnPos = spawnPoint.position;
@@ -79,19 +75,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             var projectileObj = poolManager.Spawn<PoolableObject>(ProjectilePoolKey, spawnPos, spawnRot);
             if (projectileObj != null && projectileObj is IAbilityProjectile abilityProjectile)
             {
-                abilityProjectile.InitializeProjectile(caster, target, point, CollisionEffects);
+                abilityProjectile.InitializeProjectile(context, CollisionEffects);
             }
         }
 
-        private Transform FindChildRecursive(Transform parent, string name)
-        {
-            if (parent.name == name) return parent;
-            foreach (Transform child in parent)
-            {
-                Transform result = FindChildRecursive(child, name);
-                if (result != null) return result;
-            }
-            return null;
-        }
     }
 }

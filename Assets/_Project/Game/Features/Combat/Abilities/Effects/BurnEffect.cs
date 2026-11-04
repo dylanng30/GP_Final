@@ -15,19 +15,20 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float TickInterval = 1.0f;
         public GameElement Element = GameElement.Fire;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (target == null) return;
 
             // Chạy Coroutine gây sát thương thiêu đốt trên đối tượng nhận hiệu ứng (hoặc caster nếu đối tượng không phải MonoBehaviour)
             var targetMono = target.GetComponent<MonoBehaviour>();
             if (targetMono != null && targetMono.isActiveAndEnabled)
             {
-                targetMono.StartCoroutine(ApplyDotCoroutine(caster, target));
+                targetMono.StartCoroutine(ApplyDotCoroutine(caster, target, context.ResolveElement(Element)));
             }
         }
 
-        private IEnumerator ApplyDotCoroutine(GameObject caster, GameObject target)
+        private IEnumerator ApplyDotCoroutine(GameObject caster, GameObject target, GameElement element)
         {
             float elapsed = 0f;
             while (elapsed < Duration)
@@ -36,7 +37,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
                 if (target == null) break;
 
                 // Gây sát thương theo từng Tick qua EventBus
-                ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, DamagePerTick, Element, target.transform.position, canCrit: false);
+                ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, DamagePerTick, element, target.transform.position, canCrit: false);
                 elapsed += TickInterval;
             }
         }

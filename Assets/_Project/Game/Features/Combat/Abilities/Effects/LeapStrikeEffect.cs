@@ -18,17 +18,18 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public float StopDistance = 1.5f;
         public GameElement Element = GameElement.Physical;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
             var mono = caster.GetComponent<MonoBehaviour>();
             if (mono != null)
             {
-                mono.StartCoroutine(LeapCoroutine(caster, target, point));
+                mono.StartCoroutine(LeapCoroutine(caster, target, point, context.ResolveElement(Element)));
             }
         }
 
-        private IEnumerator LeapCoroutine(GameObject caster, GameObject target, Vector3 point)
+        private IEnumerator LeapCoroutine(GameObject caster, GameObject target, Vector3 point, GameElement element)
         {
             var cc = caster.GetComponent<CharacterController>();
             if (cc == null) yield break;
@@ -98,7 +99,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
 
                 float finalDamage = atk * DamageMultiplier;
                 
-                ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, Element, target.transform.position);
+                ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, element, target.transform.position);
             }
 
             // Restore controllers

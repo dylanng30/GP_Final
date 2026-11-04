@@ -1,6 +1,6 @@
 using Dylanng;
 using Dylanng.Gameplay.RPG.Stats;
-using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat.Domain;
 using Game.Data.Hero;
 using UnityEngine;
 
@@ -18,56 +18,19 @@ namespace Game.Gameplay.Entities
         public Transform Transform => TransformCache;
         public StatController Stats { get; private set; }
         public GameElement Element => element;
-        public bool IsDead { get; private set; }
+        public HealthPool Health { get; } = new HealthPool();
+        public bool IsDead => Health.IsDead;
+        public bool IsInvulnerable => false;
 
         protected override void Awake()
         {
             base.Awake();
             selectionIndicator.SetActive(false);
-            SetupStats();
-        }
 
-        private void SetupStats()
-        {
             Stats = GetComponent<StatController>();
-            if (Stats == null)
-            {
-                Stats = gameObject.GetComponent<StatController>();
-            }
-
             Stats.InitializeStat(StatType.MaxHP, initialMaxHp);
             Stats.InitializeStat(StatType.DEF, initialDef);
-            IsDead = false;
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            EventBus.Subscribe<DamageDealtEvent>(OnDamageReceived);
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            EventBus.Unsubscribe<DamageDealtEvent>(OnDamageReceived);
-        }
-
-        private void OnDamageReceived(DamageDealtEvent evt)
-        {
-            if (evt.Target == GameObjectCache)
-            {
-                float currentHp = Stats.GetStatValue(StatType.MaxHP);
-                float newHp = Mathf.Max(0f, currentHp - evt.Damage);
-                Stats.InitializeStat(StatType.MaxHP, newHp);
-
-                //Debug.Log($"[DummyBot] Nhận {evt.Damage} sát thương hệ {evt.Element} từ {evt.Caster?.name}. HP còn lại: {newHp}/{initialMaxHp}");
-
-                if (newHp <= 0f && !IsDead)
-                {
-                    IsDead = true;
-                    Debug.Log($"[DummyBot] {GameObjectCache.name} đã bị tiêu diệt!");
-                }
-            }
+            Health.Restore(initialMaxHp);
         }
 
         public void OnTargeted(bool isTargeted)
@@ -80,9 +43,7 @@ namespace Game.Gameplay.Entities
 
         public void ResetDummy()
         {
-            IsDead = false;
-            Stats.InitializeStat(StatType.MaxHP, initialMaxHp);
-            Debug.Log("[DummyBot] Đã khôi phục đầy máu.");
+            Health.Restore(initialMaxHp);
         }
     }
 }

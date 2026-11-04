@@ -1,3 +1,4 @@
+using Game.Combat;
 using System.Collections.Generic;
 using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Gameplay.Entities;
@@ -17,6 +18,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
         [SerializeField] private PoolableObject explosionVFXPrefab;
         [SerializeField] private string explosionVFXPoolKey = "VFX_Fireball_Explosion";
 
+        private AbilityContext _context;
         private GameObject _caster;
         private List<IAbilityEffect> _collisionEffects;
 
@@ -29,17 +31,18 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
 
         public GameObject Caster => _caster;
 
-        public void InitializeProjectile(GameObject caster, GameObject target, Vector3 targetPoint, List<IAbilityEffect> collisionEffects = null)
+        public void InitializeProjectile(in AbilityContext context, List<IAbilityEffect> collisionEffects = null)
         {
-            _caster = caster;
-            _target = target;
-            _targetPoint = targetPoint;
+            _context = context;
+            _caster = context.Caster;
+            _target = context.Target;
+            _targetPoint = context.Point;
             _collisionEffects = collisionEffects;
             _startPosition = transform.position;
             _timeElapsed = 0f;
             _isExploded = false;
 
-            if (enemyLayer.value == 0 && caster != null && caster.TryGetComponent<HeroInstance>(out var heroInst))
+            if (enemyLayer.value == 0 && _caster != null && _caster.TryGetComponent<HeroInstance>(out var heroInst))
             {
                 LayerMask casterMask = heroInst.GetTargetLayerMask();
                 if (casterMask.value != 0)
@@ -148,7 +151,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
                     {
                         foreach (var effect in _collisionEffects)
                         {
-                            effect?.Execute(_caster, hit.gameObject, hitPoint);
+                            effect?.Execute(_context.WithHit(hit.gameObject, hitPoint));
                         }
                     }
                 }

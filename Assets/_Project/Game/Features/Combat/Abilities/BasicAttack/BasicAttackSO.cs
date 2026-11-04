@@ -35,6 +35,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
         [Tooltip("Thời gian giãn cách giữa các đòn đánh thường (giây)")]
         public float AttackCooldown = 1.0f;
 
+        [Tooltip("Lượng Nộ nhận được mỗi đòn đánh thường trúng mục tiêu")]
+        public float EnergyPerHit = 15f;
+
         [Tooltip("Offset vị trí xuất hiện viên đạn tính từ tâm Hero")]
         public Vector3 SpawnOffset = new Vector3(0f, 1.2f, 0.8f);
 

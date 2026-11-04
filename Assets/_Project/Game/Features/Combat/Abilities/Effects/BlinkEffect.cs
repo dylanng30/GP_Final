@@ -1,3 +1,4 @@
+using Game.Combat;
 using System;
 using UnityEngine;
 
@@ -10,8 +11,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public PoolableObject BlinkVFXPrefab;
         public bool BlinkToTarget = false;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
 
             Vector3 destination = point;

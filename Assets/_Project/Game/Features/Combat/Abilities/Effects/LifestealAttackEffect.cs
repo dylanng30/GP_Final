@@ -15,8 +15,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public PoolableObject HitVFXPrefab;
         public PoolableObject HealVFXPrefab;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null || target == null) return;
             if (target.GetComponent<Game.Gameplay.Entities.ITargetable>()?.IsDead == true) return;
 
@@ -25,15 +26,12 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             float finalDamage = atk * DamageMultiplier;
 
             // Deal Damage
-            float dealtDamage = ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, Element, target.transform.position).Amount ?? 0f;
+            float dealtDamage = ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, context.ResolveElement(Element), target.transform.position).Amount ?? 0f;
 
             // Heal Caster
             if (casterStats != null)
             {
-                float healAmount = dealtDamage * LifestealRatio;
-                float currentHp = casterStats.GetStatValue(StatType.MaxHP);
-                casterStats.InitializeStat(StatType.MaxHP, currentHp + healAmount);
-                Debug.Log($"[LifestealAttackEffect] {caster.name} hút {healAmount} máu từ {target.name}.");
+                ServiceLocator.Get<CombatResolver>()?.Heal(caster, caster, dealtDamage * LifestealRatio);
             }
 
             var poolManager = ServiceLocator.Get<PoolManager>();

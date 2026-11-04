@@ -1,105 +1,83 @@
-using System;
 using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Animation.Hero;
+using Game.Combat;
 using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.States
 {
+    /// <summary>Thi triển một skill: chạy animation, kích hoạt effect tại animation event hoặc khi hết thời gian cast.</summary>
     public class AbilityCastState : StateBase
     {
         private readonly MonoBehaviourBase _caster;
-        private readonly AbilitySO _abilitySO;
-        private readonly GameObject _target;
-        private readonly Vector3 _targetPoint;
-        private readonly Action _onCompleted;
+        private readonly AbilitySO _ability;
+        private readonly AbilityContext _context;
 
         private float _timer;
-        private bool _hasTriggeredEffect;
-        private bool _isFinished;
+        private bool _hasTriggeredEffects;
 
-        public AbilityCastState(MonoBehaviourBase caster, AbilitySO abilitySO, GameObject target = null, Vector3 targetPoint = default, Action onCompleted = null)
+        public bool IsFinished { get; private set; }
+        public bool LocksMovement => _ability.LocksMovement;
+
+        public AbilityCastState(MonoBehaviourBase caster, AbilitySO ability, in AbilityContext context)
         {
             _caster = caster;
-            _abilitySO = abilitySO;
-            _target = target;
-            _targetPoint = targetPoint;
-            _onCompleted = onCompleted;
+            _ability = ability;
+            _context = context;
         }
 
         public override void Enter()
         {
             base.Enter();
-            _timer = 0f;
-            _hasTriggeredEffect = false;
-            _isFinished = false;
-
-            if (_caster == null || _abilitySO == null)
-            {
-                _isFinished = true;
-                _onCompleted?.Invoke();
-                return;
-            }
-
-            // Delegate animation qua HeroAnimatorController nếu có (tách biệt View/Controller)
-            int animHash = _abilitySO.GetAnimationHash();
-            if (animHash != 0)
-            {
-                if (_caster.TryGetComponent<Game.Animation.Hero.HeroAnimatorController>(out var animCtrl))
-                {
-                    animCtrl.PlaySkillByHash(animHash);
-                }
-                else if (_caster.TryGetComponent<Animator>(out var animator))
-                {
-                    // Fallback: entity không phải Hero (ví dụ: Boss, NPC)
-                    animator.SetTrigger(animHash);
-                }
-            }
-
-            EventBus.Publish(new AbilityCastStartedEvent(_caster.gameObject, _abilitySO));
-            Debug.Log($"[AbilityCastState] {_caster.name} bắt đầu thi triển {_abilitySO.AbilityName} (Thời gian: {_abilitySO.TotalCastDuration}s)");
+            PlayAnimation();
+            EventBus.Publish(new AbilityCastStartedEvent(_caster.gameObject, _ability));
         }
 
         public override void Update()
         {
             base.Update();
-            if (_isFinished) return;
+            if (IsFinished) return;
 
             _timer += Time.deltaTime;
+            if (_timer < _ability.TotalCastDuration) return;
 
-            if (_timer >= _abilitySO.TotalCastDuration)
-            {
-                if (!_hasTriggeredEffect)
-                {
-                    TriggerAbilityEffects();
-                }
-
-                _isFinished = true;
-                _onCompleted?.Invoke();
-            }
+            TriggerEffects();
+            IsFinished = true;
         }
 
         public override void OnAnimationTransitionEvent()
         {
             base.OnAnimationTransitionEvent();
-            if (!_hasTriggeredEffect && !_isFinished)
+            if (!IsFinished) TriggerEffects();
+        }
+
+        /// <summary>Hủy cast. Effect đã kích hoạt thì không hoàn tác.</summary>
+        public void Cancel()
+        {
+            IsFinished = true;
+        }
+
+        private void PlayAnimation()
+        {
+            int animationHash = _ability.GetAnimationHash();
+            if (animationHash == 0) return;
+
+            if (_caster.TryGetComponent<HeroAnimatorController>(out var animatorController))
             {
-                TriggerAbilityEffects();
+                animatorController.PlaySkillByHash(animationHash);
+            }
+            else if (_caster.TryGetComponent<Animator>(out var animator))
+            {
+                animator.SetTrigger(animationHash);
             }
         }
 
-        private void TriggerAbilityEffects()
+        private void TriggerEffects()
         {
-            _hasTriggeredEffect = true;
-            if (_abilitySO != null && _caster != null)
-            {
-                _abilitySO.ExecuteEffects(_caster.gameObject, _target, _targetPoint);
-                EventBus.Publish(new AbilityExecutedEvent(_caster.gameObject, _abilitySO, _targetPoint));
-            }
-        }
+            if (_hasTriggeredEffects || _caster == null) return;
 
-        public override void Exit()
-        {
-            base.Exit();
-            Debug.Log($"[AbilityCastState] {_caster?.name} kết thúc thi triển {_abilitySO?.AbilityName}.");
+            _hasTriggeredEffects = true;
+            _ability.ExecuteEffects(_context);
+            EventBus.Publish(new AbilityExecutedEvent(_caster.gameObject, _ability, _context.Point));
         }
     }
 }

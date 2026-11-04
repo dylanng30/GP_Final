@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
+using Game.Combat;
+using Game.Gameplay.Entities;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Stats;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Effects
 {
@@ -13,63 +14,54 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public PoolableObject ShieldVFXPrefab;
         public bool ShieldSelf = false;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
-            if (caster == null) return;
+            if (context.Caster == null) return;
 
-            GameObject targetToShield = target;
-            if (ShieldSelf || targetToShield == null)
+            GameObject shieldTarget = ShieldSelf || context.Target == null ? context.Caster : context.Target;
+            var targetable = shieldTarget.GetComponentInParent<ITargetable>();
+            if (targetable is MonoBehaviour owner && owner.isActiveAndEnabled)
             {
-                targetToShield = caster;
-            }
-
-            var stats = targetToShield.GetComponent<StatController>();
-            if (stats == null) return;
-
-            var mono = targetToShield.GetComponent<MonoBehaviour>();
-            if (mono != null)
-            {
-                mono.StartCoroutine(ShieldCoroutine(targetToShield, stats));
+                owner.StartCoroutine(ShieldRoutine(targetable));
             }
         }
 
-        private IEnumerator ShieldCoroutine(GameObject target, StatController stats)
+        private IEnumerator ShieldRoutine(ITargetable target)
         {
-            var shieldMod = new StatModifier(ShieldAmount, StatModType.Flat, this);
-            stats.AddModifier(StatType.Shield, shieldMod);
+            // Mỗi lần dùng là một lớp khiên riêng, nên cần một source riêng.
+            object shieldSource = new object();
+            target.Health.Shields.Add(shieldSource, ShieldAmount);
 
-            Debug.Log($"[ShieldEffect] Cấp {ShieldAmount} Khiên cho {target.name} trong {Duration}s.");
-
-            PoolableObject vfx = null;
-            string vfxKey = null;
-            var poolManager = ServiceLocator.Get<PoolManager>();
-
-            if (ShieldVFXPrefab != null && poolManager != null)
-            {
-                vfxKey = ShieldVFXPrefab.name;
-                poolManager.CreatePool(vfxKey, ShieldVFXPrefab, 3);
-                vfx = poolManager.Spawn<PoolableObject>(vfxKey, target.transform.position, Quaternion.identity);
-                
-                if (vfx != null)
-                {
-                    vfx.transform.SetParent(target.transform);
-                    vfx.transform.localPosition = Vector3.up * 1f;
-                }
-            }
+            PoolableObject vfx = SpawnVfx(target.Transform, out string vfxKey);
 
             yield return new WaitForSeconds(Duration);
 
-            if (stats != null)
-            {
-                stats.RemoveModifier(StatType.Shield, shieldMod);
-                Debug.Log($"[ShieldEffect] Khiên của {target.name} đã hết hạn.");
-            }
+            target.Health.Shields.RemoveSource(shieldSource);
 
-            if (vfx != null && poolManager != null)
+            if (vfx != null)
             {
                 vfx.transform.SetParent(null);
-                poolManager.Despawn(vfxKey, vfx);
+                ServiceLocator.Get<PoolManager>()?.Despawn(vfxKey, vfx);
             }
+        }
+
+        private PoolableObject SpawnVfx(Transform target, out string vfxKey)
+        {
+            vfxKey = null;
+
+            var poolManager = ServiceLocator.Get<PoolManager>();
+            if (ShieldVFXPrefab == null || poolManager == null) return null;
+
+            vfxKey = ShieldVFXPrefab.name;
+            poolManager.CreatePool(vfxKey, ShieldVFXPrefab, 3);
+
+            var vfx = poolManager.Spawn<PoolableObject>(vfxKey, target.position, Quaternion.identity);
+            if (vfx != null)
+            {
+                vfx.transform.SetParent(target);
+                vfx.transform.localPosition = Vector3.up;
+            }
+            return vfx;
         }
     }
 }

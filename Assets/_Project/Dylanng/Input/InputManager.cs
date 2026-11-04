@@ -27,7 +27,7 @@ namespace Dylanng
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            ServiceLocator.Get<ITickSystem>().Unregister(this);
+            ServiceLocator.Get<ITickSystem>()?.Unregister(this);
         }
 
         public void OnUpdate(float deltaTime)

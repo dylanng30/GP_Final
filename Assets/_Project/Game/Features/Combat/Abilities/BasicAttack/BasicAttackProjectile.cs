@@ -13,6 +13,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
         private ITargetable _target;
         private float _damage;
         private GameElement _element;
+        private float _energyPerHit;
         private string _poolKey;
 
         private float _speed;
@@ -40,6 +41,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 _maxLifetime = config.MaxLifetime;
                 _isInvisibleVisual = config.IsInvisibleVisual;
                 _element = config.Element;
+                _energyPerHit = config.EnergyPerHit;
             }
             else
             {
@@ -49,6 +51,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 _maxLifetime = 2f;
                 _isInvisibleVisual = false;
                 _element = GameElement.Physical;
+                _energyPerHit = 0f;
             }
 
             if (config != null && config.TargetLayerMask.value != 0)
@@ -168,6 +171,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
             {
                 GameObject casterGo = _caster != null ? _caster.gameObject : null;
                 ServiceLocator.Get<CombatResolver>()?.Deal(casterGo, _target.Transform.gameObject, _damage, _element, transform.position);
+                if (_caster != null) _caster.GainEnergy(_energyPerHit);
             }
             ReturnToPool();
         }
@@ -194,6 +198,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
 
                 GameObject casterGo = _caster != null ? _caster.gameObject : null;
                 ServiceLocator.Get<CombatResolver>()?.Deal(casterGo, other.gameObject, _damage, _element, transform.position);
+                if (_caster != null) _caster.GainEnergy(_energyPerHit);
 
                 ReturnToPool();
             }

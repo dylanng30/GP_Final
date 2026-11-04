@@ -48,17 +48,7 @@ namespace Game.Gameplay.AI.Controllers
         public float DistanceToTarget => _currentTarget != null ? Vector3.Distance(transform.position, _currentTarget.Transform.position) : float.MaxValue;
         public float DistanceToSpawn => Vector3.Distance(transform.position, _spawnPosition);
         public float MaxDistanceFromSpawn => maxDistanceFromSpawn;
-        public float HealthPercentage
-        {
-            get
-            {
-                if (_statController == null) return 1f;
-                float maxHp = _statController.GetStatValue(StatType.MaxHP);
-                if (maxHp <= 0) return 1f;
-                float curHp = maxHp;
-                return curHp / maxHp;
-            }
-        }
+        public float HealthPercentage => _heroInstance != null ? _heroInstance.Health.Ratio : 1f;
 
         public AIWorldState WorldState
         {

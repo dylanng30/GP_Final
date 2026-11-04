@@ -162,9 +162,9 @@ namespace Game.Managers.Hero
 
         private void SaveLocalData()
         {
-            if (SaveData != null)
+            var storageService = ServiceLocator.Get<IDataStorageService>();
+            if (SaveData != null && storageService != null)
             {
-                var storageService = ServiceLocator.Get<IDataStorageService>();
                 storageService.Save(Constants.HERO_KEY, SaveData, StorageType.PlayerPrefs);
             }
         }

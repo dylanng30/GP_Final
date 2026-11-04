@@ -37,7 +37,7 @@ namespace Game.Combat
             if (target == null) return DamageResult.None;
 
             var targetable = target.GetComponentInParent<ITargetable>();
-            if (targetable == null || targetable.IsDead) return DamageResult.None;
+            if (targetable == null || targetable.IsDead || targetable.IsInvulnerable) return DamageResult.None;
 
             StatController sourceStats = source != null ? source.GetComponent<StatController>() : null;
             StatController targetStats = targetable.Stats;
@@ -54,10 +54,31 @@ namespace Game.Combat
 
             DamageResult result = _damagePipeline.Run(request);
 
+            targetable.Health.TakeDamage(result.Amount);
+
             EventBus.Publish(new DamageDealtEvent(
                 source, targetable.Transform.gameObject, result.Amount, element, hitPoint, result.IsCritical, result.Relation));
 
             return result;
+        }
+
+        /// <summary>Hồi máu có tính HealingBonus của nguồn và trả về lượng máu thực nhận.</summary>
+        public float Heal(GameObject source, GameObject target, float amount)
+        {
+            if (target == null) return 0f;
+
+            var targetable = target.GetComponentInParent<ITargetable>();
+            if (targetable == null) return 0f;
+
+            StatController sourceStats = source != null ? source.GetComponent<StatController>() : null;
+            float bonus = sourceStats != null ? sourceStats.GetStatValue(StatType.HealingBonus) : 0f;
+
+            float healed = targetable.Health.Heal(amount * (1f + bonus));
+            if (healed > 0f)
+            {
+                EventBus.Publish(new HealAppliedEvent(source, targetable.Transform.gameObject, healed));
+            }
+            return healed;
         }
     }
 }

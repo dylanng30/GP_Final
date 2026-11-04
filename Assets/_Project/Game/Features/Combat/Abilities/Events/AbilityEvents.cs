@@ -56,6 +56,30 @@ namespace Dylanng.Gameplay.RPG.Abilities.Events
         }
     }
 
+    public struct HealAppliedEvent : IEvent
+    {
+        public GameObject Source;
+        public GameObject Target;
+        public float Amount;
+
+        public HealAppliedEvent(GameObject source, GameObject target, float amount)
+        {
+            Source = source;
+            Target = target;
+            Amount = amount;
+        }
+    }
+
+    public struct ActorDiedEvent : IEvent
+    {
+        public GameObject Actor;
+
+        public ActorDiedEvent(GameObject actor)
+        {
+            Actor = actor;
+        }
+    }
+
     public struct AbilityCastStartedEvent : IEvent
     {
         public GameObject Caster;

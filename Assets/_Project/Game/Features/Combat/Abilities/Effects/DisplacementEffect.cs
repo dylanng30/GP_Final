@@ -1,3 +1,4 @@
+using Game.Combat;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -21,8 +22,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         [Range(0f, 1f)] public float Chance = 1.0f;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (target == null || caster == null || UnityEngine.Random.value > Chance) return;
 
             var mono = target.GetComponent<MonoBehaviour>();

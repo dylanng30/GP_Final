@@ -1,3 +1,4 @@
+using Game.Combat;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -17,8 +18,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public ScienceFictionShield ShieldVFXPrefab;
         public bool ApplyToSelf = true;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
 
             GameObject targetToBuff = target;

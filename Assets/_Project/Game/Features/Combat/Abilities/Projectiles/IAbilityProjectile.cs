@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
+using Game.Combat;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Projectiles
 {
     public interface IAbilityProjectile
     {
-        void InitializeProjectile(GameObject caster, GameObject target, Vector3 targetPoint, List<IAbilityEffect> collisionEffects = null);
+        void InitializeProjectile(in AbilityContext context, List<IAbilityEffect> collisionEffects = null);
     }
 }

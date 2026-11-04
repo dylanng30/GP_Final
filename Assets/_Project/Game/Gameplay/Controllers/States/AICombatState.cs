@@ -101,7 +101,6 @@ namespace Game.Gameplay.Controllers.States
                     else
                     {
                         _heroInstance.Attack(_target);
-                        _heroInstance.GainEnergy(15f); // Tích +15 Energy mỗi đòn đánh thường trúng
                         _attackCooldownTimer = _heroInstance.GetAttackCooldown(); // Cooldown giữa các đòn đánh thường lấy từ cấu hình Hero
                     }
                 }

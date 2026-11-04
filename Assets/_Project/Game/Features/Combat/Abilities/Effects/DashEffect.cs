@@ -1,3 +1,4 @@
+using Game.Combat;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -14,8 +15,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public bool StopAtTarget = false;
         public float StopDistance = 1.5f;
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
             var mono = caster.GetComponent<MonoBehaviour>();
             if (mono != null)

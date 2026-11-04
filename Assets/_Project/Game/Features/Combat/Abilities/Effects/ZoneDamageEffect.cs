@@ -1,3 +1,4 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System;
 using UnityEngine;
@@ -17,8 +18,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public ZoneDamageInstance ZoneVFXPrefab;
         public bool IsAura = false; // If true, it follows the caster. If false, it spawns at 'point'.
 
-        public void Execute(GameObject caster, GameObject target, Vector3 point)
+        public void Execute(in AbilityContext context)
         {
+            var (caster, target, point) = context;
             if (caster == null) return;
 
             Vector3 spawnPos = point;
@@ -56,7 +58,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
 
             if (zoneInstance != null)
             {
-                zoneInstance.Initialize(caster, Radius, Duration, TickInterval, finalDamagePerTick, Element, IsAura);
+                zoneInstance.Initialize(caster, Radius, Duration, TickInterval, finalDamagePerTick, context.ResolveElement(Element), IsAura);
             }
         }
     }
