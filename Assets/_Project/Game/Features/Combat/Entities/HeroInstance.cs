@@ -60,6 +60,15 @@ namespace Game.Gameplay.Entities
         private bool _isDashing;
         private bool _isDashInvincible;
 
+        // Pending Basic Attack state
+        private bool _isPendingBasicAttack;
+        private ITargetable _pendingAttackTarget;
+        private float _pendingAttackTime;
+        private float _pendingAttackFinalDamage;
+
+        // Cache xương/transform để không phải tìm kiếm đệ quy nhiều lần
+        private Dictionary<string, Transform> _cachedBones = new Dictionary<string, Transform>();
+
         // ─── Exposed state (dùng bởi HeroAnimatorController) ─────────────────────
         public Vector2 CurrentMoveInput => _currentMoveInput;
         public bool IsGrounded => characterController != null && characterController.isGrounded;
@@ -238,6 +247,11 @@ namespace Game.Gameplay.Entities
 
             ApplyMovementAndGravity();
             _skillStateMachine?.Update();
+
+            if (_isPendingBasicAttack && Time.time - _pendingAttackTime > 1.0f)
+            {
+                ExecutePendingBasicAttack();
+            }
         }
 
         private void OnDamageReceived(DamageDealtEvent evt)
@@ -484,11 +498,38 @@ namespace Game.Gameplay.Entities
             float damageMultiplier = basicAttackConfig != null ? basicAttackConfig.DamageMultiplier : 1.0f;
             float finalDamage = atkDamage * damageMultiplier;
 
-            Vector3 spawnOffset =
-                basicAttackConfig != null ? basicAttackConfig.SpawnOffset : new Vector3(0f, 1.2f, 0.8f);
-            Vector3 spawnPos = transform.TransformPoint(spawnOffset);
+            _isPendingBasicAttack = true;
+            _pendingAttackTarget = target;
+            _pendingAttackFinalDamage = finalDamage;
+            _pendingAttackTime = Time.time;
 
+            if (animatorController == null)
+            {
+                ExecutePendingBasicAttack();
+            }
+        }
+
+        private void ExecutePendingBasicAttack()
+        {
+            if (!_isPendingBasicAttack) return;
+            _isPendingBasicAttack = false;
+
+            ITargetable target = _pendingAttackTarget;
+            float finalDamage = _pendingAttackFinalDamage;
+
+            Vector3 spawnPos = transform.TransformPoint(basicAttackConfig != null ? basicAttackConfig.SpawnOffset : new Vector3(0f, 1.2f, 0.8f));
             Quaternion spawnRot = transform.rotation;
+
+            if (basicAttackConfig != null && !string.IsNullOrEmpty(basicAttackConfig.SpawnPointName))
+            {
+                Transform spawnPoint = GetBone(basicAttackConfig.SpawnPointName);
+                if (spawnPoint != null)
+                {
+                    spawnPos = spawnPoint.position;
+                    spawnRot = spawnPoint.rotation;
+                }
+            }
+
             if (target != null && target.Transform != null)
             {
                 Vector3 dir = (target.Transform.position + Vector3.up * 1f - spawnPos).normalized;
@@ -524,6 +565,34 @@ namespace Game.Gameplay.Entities
                         target.Transform.position, isCrit));
                 }
             }
+        }
+
+        public Transform GetBone(string boneName)
+        {
+            if (string.IsNullOrEmpty(boneName)) return null;
+
+            if (_cachedBones.TryGetValue(boneName, out Transform bone))
+            {
+                if (bone != null) return bone;
+            }
+
+            bone = FindChildRecursive(transform, boneName);
+            if (bone != null)
+            {
+                _cachedBones[boneName] = bone;
+            }
+            return bone;
+        }
+
+        private Transform FindChildRecursive(Transform parent, string name)
+        {
+            if (parent.name == name) return parent;
+            foreach (Transform child in parent)
+            {
+                Transform result = FindChildRecursive(child, name);
+                if (result != null) return result;
+            }
+            return null;
         }
 
         public void UseSkill(int skillIndex, GameObject target = null)
@@ -741,7 +810,14 @@ namespace Game.Gameplay.Entities
         #region --- Animation Event Callbacks ---
 
         /// <summary>Được gọi bởi HeroAnimatorController khi AnimationEvent 'Transition' kích hoạt.</summary>
-        public void NotifyAnimationTransition() => _skillStateMachine?.OnAnimationTransitionEvent();
+        public void NotifyAnimationTransition()
+        {
+            _skillStateMachine?.OnAnimationTransitionEvent();
+            if (_isPendingBasicAttack)
+            {
+                ExecutePendingBasicAttack();
+            }
+        }
 
         /// <summary>Được gọi bởi HeroAnimatorController khi AnimationEvent 'Enter' kích hoạt.</summary>
         public void NotifyAnimationEnter() => _skillStateMachine?.OnAnimationEnterEvent();

@@ -13,6 +13,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
         public PoolableObject ProjectilePrefab;
         public Vector3 SpawnOffset = new Vector3(0, 1.5f, 1f);
 
+        [Tooltip("Tên của Transform con (như FirePoint) để spawn đạn. Nếu trống, sẽ dùng SpawnOffset.")]
+        public string SpawnPointName = "";
+
         [Header("--- Collision Effects (Polymorphic) ---")]
         [SerializeReference]
         public List<IAbilityEffect> CollisionEffects = new List<IAbilityEffect>();
@@ -37,6 +40,25 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             Vector3 spawnPos = caster.transform.TransformPoint(SpawnOffset);
             Quaternion spawnRot = caster.transform.rotation;
 
+            if (!string.IsNullOrEmpty(SpawnPointName))
+            {
+                Transform spawnPoint = null;
+                if (caster.TryGetComponent<Game.Gameplay.Entities.HeroInstance>(out var heroInstance))
+                {
+                    spawnPoint = heroInstance.GetBone(SpawnPointName);
+                }
+                else
+                {
+                    spawnPoint = FindChildRecursive(caster.transform, SpawnPointName);
+                }
+                
+                if (spawnPoint != null)
+                {
+                    spawnPos = spawnPoint.position;
+                    spawnRot = spawnPoint.rotation;
+                }
+            }
+
             if (target != null)
             {
                 Vector3 dir = (target.transform.position - spawnPos).normalized;
@@ -59,6 +81,17 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             {
                 abilityProjectile.InitializeProjectile(caster, target, point, CollisionEffects);
             }
+        }
+
+        private Transform FindChildRecursive(Transform parent, string name)
+        {
+            if (parent.name == name) return parent;
+            foreach (Transform child in parent)
+            {
+                Transform result = FindChildRecursive(child, name);
+                if (result != null) return result;
+            }
+            return null;
         }
     }
 }

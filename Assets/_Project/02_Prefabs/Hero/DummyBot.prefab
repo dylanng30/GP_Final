@@ -378,6 +378,7 @@ GameObject:
   - component: {fileID: 7252144501856714513}
   - component: {fileID: 8034290753757248953}
   - component: {fileID: 8756454595538911220}
+  - component: {fileID: 8711658281141635294}
   m_Layer: 6
   m_Name: DummyBot
   m_TagString: Untagged
@@ -438,3 +439,15 @@ MonoBehaviour:
   initialMaxHp: 10000
   initialDef: 100
   selectionIndicator: {fileID: 3175585269668394380}
+--- !u!114 &8711658281141635294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022341960426268905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64bc14edea897004a96d288e0e57808b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
