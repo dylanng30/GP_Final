@@ -1,4 +1,5 @@
 using Dylanng.Gameplay.RPG.Stats;
+using Game.Data.Hero;
 using UnityEngine;
 
 namespace Game.Gameplay.Entities
@@ -7,6 +8,7 @@ namespace Game.Gameplay.Entities
     {
         Transform Transform { get; }
         StatController Stats { get; }
+        GameElement Element { get; }
         bool IsDead { get; }
         void OnTargeted(bool isTargeted);
     }

@@ -1,5 +1,7 @@
 using System.Linq;
 using GAME;
+using Game.Data.Hero;
+using Game.Gameplay.Entities;
 using TCO_CustomSceneController;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -29,7 +31,11 @@ namespace Game.Editor.Combat
         private const string PortalObjectName = "Portal_A_Out";
         private const string GroundLayerName = "Ground";
 
-        private const int DummyCount = 5;
+        private static readonly GameElement[] DummyElements =
+        {
+            GameElement.Metal, GameElement.Wood, GameElement.Earth, GameElement.Water, GameElement.Fire
+        };
+
         private const float DummySpacing = 6f;
         private const float DummyRowZ = 12f;
         private const float GroundY = -1f;
@@ -46,7 +52,7 @@ namespace Game.Editor.Combat
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
             bool sceneExists = AssetDatabase.LoadAssetAtPath<SceneAsset>(SandboxScenePath) != null;
-            if (sceneExists && !EditorUtility.DisplayDialog(
+            if (sceneExists && !Application.isBatchMode && !EditorUtility.DisplayDialog(
                     "Combat Sandbox",
                     "Scene Sandbox đã tồn tại. Dựng lại sẽ xóa mọi chỉnh sửa tay trong scene này.",
                     "Dựng lại", "Hủy"))
@@ -160,13 +166,21 @@ namespace Game.Editor.Combat
                 return;
             }
 
-            float startX = -DummySpacing * (DummyCount - 1) * 0.5f;
-            for (int i = 0; i < DummyCount; i++)
+            float startX = -DummySpacing * (DummyElements.Length - 1) * 0.5f;
+            for (int i = 0; i < DummyElements.Length; i++)
             {
                 var dummy = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
-                dummy.name = $"Dummy_{i + 1}";
+                dummy.name = $"Dummy_{DummyElements[i]}";
                 dummy.transform.position = new Vector3(startX + i * DummySpacing, GroundY, DummyRowZ);
+                SetDummyElement(dummy, DummyElements[i]);
             }
+        }
+
+        private static void SetDummyElement(GameObject dummy, GameElement element)
+        {
+            var serializedDummy = new SerializedObject(dummy.GetComponent<DummyBotInstance>());
+            serializedDummy.FindProperty("element").intValue = (int)element;
+            serializedDummy.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void SpawnObstacles(Transform parent)

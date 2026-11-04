@@ -1,6 +1,6 @@
+using Game.Combat;
 using Game.Data.Hero;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Abilities.Events;
 using Game.Gameplay.Entities;
 using Dylanng.Gameplay.RPG.Abilities;
 using Dylanng;
@@ -94,8 +94,7 @@ namespace Game.Gameplay.RPG.Abilities.Effects
                     if (targetable.IsDead) continue;
                     if (_caster != null && targetable.Transform == _caster.transform) continue; // Don't damage self
                     
-                    bool isCrit = UnityEngine.Random.value <= 0.1f;
-                    EventBus.Publish(new DamageDealtEvent(_caster, targetable.Transform.gameObject, _damage, _element, targetable.Transform.position, isCrit));
+                    ServiceLocator.Get<CombatResolver>()?.Deal(_caster, targetable.Transform.gameObject, _damage, _element, targetable.Transform.position);
                 }
             }
         }

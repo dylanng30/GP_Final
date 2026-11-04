@@ -1,3 +1,4 @@
+using Game.Combat.Domain;
 using Game.Data.Hero;
 using UnityEngine;
 
@@ -41,8 +42,9 @@ namespace Dylanng.Gameplay.RPG.Abilities.Events
         public GameElement Element;
         public Vector3 HitPoint;
         public bool IsCritical;
+        public ElementRelation Relation;
 
-        public DamageDealtEvent(GameObject caster, GameObject target, float damage, GameElement element, Vector3 hitPoint, bool isCritical = false)
+        public DamageDealtEvent(GameObject caster, GameObject target, float damage, GameElement element, Vector3 hitPoint, bool isCritical = false, ElementRelation relation = ElementRelation.Neutral)
         {
             Caster = caster;
             Target = target;
@@ -50,6 +52,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Events
             Element = element;
             HitPoint = hitPoint;
             IsCritical = isCritical;
+            Relation = relation;
         }
     }
 

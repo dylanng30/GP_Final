@@ -1,7 +1,7 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System;
 using UnityEngine;
-using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Stats;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Effects
@@ -23,15 +23,14 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             var casterStats = caster.GetComponent<StatController>();
             float atk = casterStats != null ? casterStats.ATK : 50f;
             float finalDamage = atk * DamageMultiplier;
-            bool isCrit = UnityEngine.Random.value <= 0.2f;
 
             // Deal Damage
-            EventBus.Publish(new DamageDealtEvent(caster, target, finalDamage, Element, target.transform.position, isCrit));
+            float dealtDamage = ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, Element, target.transform.position).Amount ?? 0f;
 
             // Heal Caster
             if (casterStats != null)
             {
-                float healAmount = finalDamage * LifestealRatio;
+                float healAmount = dealtDamage * LifestealRatio;
                 float currentHp = casterStats.GetStatValue(StatType.MaxHP);
                 casterStats.InitializeStat(StatType.MaxHP, currentHp + healAmount);
                 Debug.Log($"[LifestealAttackEffect] {caster.name} hút {healAmount} máu từ {target.name}.");

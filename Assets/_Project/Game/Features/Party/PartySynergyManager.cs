@@ -53,10 +53,10 @@ namespace Game.Managers.Party
             {
                 if (hero != null && !hero.IsDead)
                 {
-                    if (!elementCounts.ContainsKey(hero.HeroElement))
-                        elementCounts[hero.HeroElement] = 0;
+                    if (!elementCounts.ContainsKey(hero.Element))
+                        elementCounts[hero.Element] = 0;
                     
-                    elementCounts[hero.HeroElement]++;
+                    elementCounts[hero.Element]++;
                 }
             }
 

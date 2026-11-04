@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using Dylanng;
 using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Combat;
+using Game.Data.Hero;
 using Game.Events;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;
@@ -29,6 +31,9 @@ namespace Game.Editor.Combat
         private const double GlobalTimeoutSeconds = 240d;
         private const int MinimumDummyCount = 5;
         private const float FullEnergy = 200f;
+        private const float ProbeDamage = 1000f;
+        private const float OvercomesMultiplier = 1.2f;
+        private const float OvercomedByMultiplier = 0.8f;
 
         private sealed class Step
         {
@@ -53,6 +58,8 @@ namespace Game.Editor.Combat
         private static InputManager _input;
         private static int _damageCount;
         private static int _damageBaseline;
+        private static bool _hasSeenFireDamage;
+        private static bool _hasCastSkill;
         private static Vector3 _positionBaseline;
 
         private static HeroInstance ActiveHero => _party != null ? _party.GetActiveHero() : null;
@@ -83,7 +90,11 @@ namespace Game.Editor.Combat
             }
         }
 
-        private static void OnDamageDealt(DamageDealtEvent evt) => _damageCount++;
+        private static void OnDamageDealt(DamageDealtEvent evt)
+        {
+            _damageCount++;
+            if (evt.Element == GameElement.Fire) _hasSeenFireDamage = true;
+        }
 
         private static void Tick()
         {
@@ -151,6 +162,18 @@ namespace Game.Editor.Combat
                     Name = "Sandbox đã tải đủ đối tượng",
                     Timeout = 5d,
                     Verify = VerifySceneContent
+                },
+                new Step
+                {
+                    Name = "Hero nhận hệ từ dữ liệu",
+                    Timeout = 1d,
+                    Verify = VerifyHeroElements
+                },
+                new Step
+                {
+                    Name = "Khắc hệ thay đổi sát thương",
+                    Timeout = 1d,
+                    Verify = VerifyElementMultipliers
                 },
                 new Step
                 {
@@ -229,6 +252,38 @@ namespace Game.Editor.Combat
             return null;
         }
 
+        private static string VerifyHeroElements()
+        {
+            IReadOnlyList<HeroInstance> heroes = _party.ActiveHeroes;
+            if (heroes[0].Element != GameElement.Fire) return $"Hero đầu có hệ {heroes[0].Element}";
+            if (heroes.Count > 1 && heroes[1].Element != GameElement.Wood) return $"Hero thứ hai có hệ {heroes[1].Element}";
+            return null;
+        }
+
+        private static string VerifyElementMultipliers()
+        {
+            float neutral = DealProbe(GameElement.Earth);
+            float overcomes = DealProbe(GameElement.Metal);
+            float overcomedBy = DealProbe(GameElement.Water);
+
+            if (neutral <= 0f) return "Không gây được sát thương thử";
+            if (!Mathf.Approximately(overcomes / neutral, OvercomesMultiplier)) return $"Khắc = {overcomes / neutral}";
+            if (!Mathf.Approximately(overcomedBy / neutral, OvercomedByMultiplier)) return $"Bị khắc = {overcomedBy / neutral}";
+            return null;
+        }
+
+        /// <summary>Gây sát thương hệ Hỏa lên DummyBot mang hệ chỉ định, không có nguồn nên không chí mạng.</summary>
+        private static float DealProbe(GameElement targetElement)
+        {
+            DummyBotInstance dummy = Object.FindObjectsOfType<DummyBotInstance>()
+                .FirstOrDefault(candidate => candidate.Element == targetElement);
+            if (dummy == null) return 0f;
+
+            return ServiceLocator.Get<CombatResolver>()
+                .Deal(null, dummy.gameObject, ProbeDamage, GameElement.Fire, dummy.transform.position, canCrit: false)
+                .Amount;
+        }
+
         private static void MarkDamageBaseline() => _damageBaseline = _damageCount;
 
         private static string VerifyDamageIncreased()
@@ -286,15 +341,23 @@ namespace Game.Editor.Combat
         private static void StartSkill()
         {
             MarkDamageBaseline();
+            _hasCastSkill = false;
             ActiveHero.GainEnergy(FullEnergy);
-            ActiveHero.UseSkill(0, FindNearestDummy()?.gameObject);
         }
 
         private static string VerifySkillResult()
         {
             if (ActiveHero.GetAbility(0) == null) return "Hero không có skill ở slot 0";
-            if (ActiveHero.GetSkillRemainingCooldown(0) <= 0f) return "Skill không vào cooldown";
-            return VerifyDamageIncreased();
+            if (_hasCastSkill) return _hasSeenFireDamage ? null : "Chưa có sát thương hệ Hỏa";
+
+            // AI có thể vừa dùng skill trước khi tắt auto, nên chờ hết cooldown rồi mới cast.
+            if (!ActiveHero.CanUseSkill(0)) return "Đang chờ hết cooldown";
+
+            _hasSeenFireDamage = false;
+            ActiveHero.UseSkill(0, FindNearestDummy()?.gameObject);
+            _hasCastSkill = true;
+
+            return ActiveHero.GetSkillRemainingCooldown(0) > 0f ? "Đang chờ skill trúng" : "Skill không vào cooldown";
         }
 
         private static void SwitchToNextHero()

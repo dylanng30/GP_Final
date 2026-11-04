@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Skill_FireBall
   m_EditorClassIdentifier: 
   AbilityID: 
-  AbilityName: 
+  AbilityName: Fireball
   Description: 
   Icon: {fileID: 21300000, guid: 2461ccc6acb6a784ab1d5773c44f4f44, type: 3}
   Type: 0
-  Element: 1
+  Element: 4
   Cooldown: 3
   EnergyCost: 0
   StaminaCost: 0
@@ -47,11 +47,11 @@ MonoBehaviour:
         Duration: 5
         DamagePerTick: 20
         TickInterval: 1
-        Element: 1
+        Element: 4
     - rid: 1273186520412979201
       type: {class: DamageEffect, ns: Dylanng.Gameplay.RPG.Abilities.Effects, asm: Assembly-CSharp}
       data:
-        Element: 1
+        Element: 4
         BaseDamage: 100
         AtkMultiplier: 1.5
         UseFalloff: 1

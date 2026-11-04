@@ -1,3 +1,4 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System;
 using UnityEngine;
@@ -73,7 +74,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
                 Debug.Log($"[EmpoweredAttack] Đòn đánh được cường hóa! Gây thêm {_bonusDamage} sát thương.");
 
                 // Deal bonus damage
-                EventBus.Publish(new DamageDealtEvent(gameObject, evt.Target, _bonusDamage, _element, evt.HitPoint, false));
+                ServiceLocator.Get<CombatResolver>()?.Deal(gameObject, evt.Target, _bonusDamage, _element, evt.HitPoint, canCrit: false);
 
                 // Spawn Hit VFX
                 var poolManager = ServiceLocator.Get<PoolManager>();

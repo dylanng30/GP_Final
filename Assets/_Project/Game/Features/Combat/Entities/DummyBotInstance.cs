@@ -1,6 +1,7 @@
 using Dylanng;
 using Dylanng.Gameplay.RPG.Stats;
 using Dylanng.Gameplay.RPG.Abilities.Events;
+using Game.Data.Hero;
 using UnityEngine;
 
 namespace Game.Gameplay.Entities
@@ -11,10 +12,12 @@ namespace Game.Gameplay.Entities
         [Header("--- DUMMY BOT CONFIG ---")]
         [SerializeField] private float initialMaxHp = 10000f;
         [SerializeField] private float initialDef = 100f;
+        [SerializeField] private GameElement element = GameElement.Physical;
         [SerializeField] private GameObject selectionIndicator;
 
         public Transform Transform => TransformCache;
         public StatController Stats { get; private set; }
+        public GameElement Element => element;
         public bool IsDead { get; private set; }
 
         protected override void Awake()

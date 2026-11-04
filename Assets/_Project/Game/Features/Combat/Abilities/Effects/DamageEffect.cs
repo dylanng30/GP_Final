@@ -1,6 +1,6 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System;
-using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Stats;
 using UnityEngine;
 
@@ -37,10 +37,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
             }
 
             // Phát sự kiện sát thương qua EventBus để cập nhật UI và hiển thị số nhảy
-            bool isCrit = UnityEngine.Random.value <= 0.2f;
-            EventBus.Publish(new DamageDealtEvent(caster, target, finalDamage, Element, point, isCrit));
+            ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, Element, point);
             
-            Debug.Log($"[DamageEffect] Gây {finalDamage} sát thương hệ {Element} lên {target.name} tại {point}");
         }
     }
 }

@@ -1,7 +1,7 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System;
 using System.Collections;
-using Dylanng.Gameplay.RPG.Abilities.Events;
 using UnityEngine;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Effects
@@ -36,7 +36,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
                 if (target == null) break;
 
                 // Gây sát thương theo từng Tick qua EventBus
-                EventBus.Publish(new DamageDealtEvent(caster, target, DamagePerTick, Element, target.transform.position));
+                ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, DamagePerTick, Element, target.transform.position, canCrit: false);
                 elapsed += TickInterval;
             }
         }

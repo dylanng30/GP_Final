@@ -1,3 +1,4 @@
+using Game.Combat;
 using Game.Data.Hero;
 using Dylanng;
 using Dylanng.Gameplay.RPG.Stats;
@@ -30,7 +31,11 @@ namespace Game.Gameplay.Entities
         [Header("--- UX ---")] [SerializeField]
         private GameObject controlledCircleSign;
 
-        [Header("--- COMBAT & ABILITIES ---")] [SerializeField]
+        [Header("--- COMBAT & ABILITIES ---")]
+        [Tooltip("Hệ của entity không có dữ liệu hero (ví dụ quái). Hero lấy từ BaseHeroData.Faction khi Setup.")]
+        [SerializeField] private GameElement element = GameElement.Physical;
+
+        [SerializeField]
         private float maxEnergyLimit = 200f; // Giới hạn tối đa không được vượt quá 200 Nộ
 
         [SerializeField] private BasicAttackSO basicAttackConfig;
@@ -91,7 +96,7 @@ namespace Game.Gameplay.Entities
         public bool IsDead { get; private set; }
         public float CurrentEnergy { get; private set; }
         public float MaxEnergyLimit => maxEnergyLimit;
-        public GameElement HeroElement { get; private set; }
+        public GameElement Element => element;
 
         [SerializeField] private PlayerInputController playerController;
         [SerializeField] private HeroAIController aiController;
@@ -155,6 +160,8 @@ namespace Game.Gameplay.Entities
             if (heroDataManager != null)
             {
                 var baseHeroData = heroDataManager.GetHeroData(heroId);
+                if (baseHeroData != null) element = baseHeroData.Faction;
+
                 int heroLevel = 1;
                 int heroStar = baseHeroData != null ? baseHeroData.HeroStarLevel : 1;
                 List<ItemDataInstance> heroItems = null;
@@ -273,9 +280,6 @@ namespace Game.Gameplay.Entities
             }
 
             float remainingDamage = evt.Damage;
-
-            float multiplier = Game.Gameplay.Combat.ElementalDamageCalculator.GetMultiplier(evt.Element, HeroElement);
-            remainingDamage *= multiplier;
 
             // Check Shield
             float shield = Stats.GetStatValue(StatType.Shield);
@@ -559,10 +563,9 @@ namespace Game.Gameplay.Entities
             {
                 if (target != null && target.Transform != null)
                 {
-                    bool isCrit = UnityEngine.Random.value <= 0.2f;
-                    EventBus.Publish(new DamageDealtEvent(gameObject, target.Transform.gameObject, finalDamage,
-                        basicAttackConfig != null ? basicAttackConfig.Element : GameElement.Physical,
-                        target.Transform.position, isCrit));
+                    GameElement attackElement = basicAttackConfig != null ? basicAttackConfig.Element : GameElement.Physical;
+                    ServiceLocator.Get<CombatResolver>()?.Deal(
+                        gameObject, target.Transform.gameObject, finalDamage, attackElement, target.Transform.position);
                 }
             }
         }

@@ -1,5 +1,5 @@
+using Game.Combat;
 using Game.Data.Hero;
-using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Abilities.Projectiles;
 using Game.Gameplay.Entities;
 using UnityEngine;
@@ -167,8 +167,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
             if (_target != null && !_target.IsDead)
             {
                 GameObject casterGo = _caster != null ? _caster.gameObject : null;
-                bool isCrit = UnityEngine.Random.value <= 0.2f;
-                EventBus.Publish(new DamageDealtEvent(casterGo, _target.Transform.gameObject, _damage, _element, transform.position, isCrit));
+                ServiceLocator.Get<CombatResolver>()?.Deal(casterGo, _target.Transform.gameObject, _damage, _element, transform.position);
             }
             ReturnToPool();
         }
@@ -194,8 +193,7 @@ namespace Dylanng.Gameplay.RPG.Abilities.BasicAttack
                 if (targetable.IsDead || (_caster != null && targetable == (ITargetable)_caster)) return;
 
                 GameObject casterGo = _caster != null ? _caster.gameObject : null;
-                bool isCrit = UnityEngine.Random.value <= 0.2f;
-                EventBus.Publish(new DamageDealtEvent(casterGo, other.gameObject, _damage, _element, transform.position, isCrit));
+                ServiceLocator.Get<CombatResolver>()?.Deal(casterGo, other.gameObject, _damage, _element, transform.position);
 
                 ReturnToPool();
             }

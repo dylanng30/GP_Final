@@ -1,9 +1,9 @@
+using Game.Combat;
 using Game.Data.Hero;
 using System;
 using System.Collections;
 using UnityEngine;
 using Game.Gameplay.Controllers;
-using Dylanng.Gameplay.RPG.Abilities.Events;
 using Dylanng.Gameplay.RPG.Stats;
 
 namespace Dylanng.Gameplay.RPG.Abilities.Effects
@@ -97,9 +97,8 @@ namespace Dylanng.Gameplay.RPG.Abilities.Effects
                 if (stats != null) atk = stats.ATK;
 
                 float finalDamage = atk * DamageMultiplier;
-                bool isCrit = UnityEngine.Random.value <= 0.2f;
                 
-                EventBus.Publish(new DamageDealtEvent(caster, target, finalDamage, Element, target.transform.position, isCrit));
+                ServiceLocator.Get<CombatResolver>()?.Deal(caster, target, finalDamage, Element, target.transform.position);
             }
 
             // Restore controllers

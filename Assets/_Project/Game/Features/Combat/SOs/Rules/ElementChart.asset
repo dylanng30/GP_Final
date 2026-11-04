@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82526df6c7f417dbf83c225ab6c8468, type: 3}
+  m_Name: ElementChart
+  m_EditorClassIdentifier: 
+  generationCycle: 0300000004000000050000000100000002000000
+  overcomingCycle: 0300000005000000020000000400000001000000
+  mutualOvercomes:
+  - First: 6
+    Second: 7
+  overcomesMultiplier: 1.2
+  overcomedByMultiplier: 0.8

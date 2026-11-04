@@ -18,7 +18,12 @@ namespace Dylanng.Gameplay.RPG.Stats
         
         // Defensive Buffs
         Shield = 10,
-        DamageImmunity = 11
+        DamageImmunity = 11,
+
+        // Element Bonuses
+        DamageBonus = 12,
+        HealingBonus = 13,
+        ControlDurationBonus = 14
     }
 
     // Retained for compatibility with older code referencing StatField

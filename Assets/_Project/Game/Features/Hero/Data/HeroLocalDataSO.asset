@@ -38,29 +38,29 @@ MonoBehaviour:
     HeroName: 
     HeroStarLevel: 1
     BaseRarity: 0
-    Faction: 0
+    Faction: 4
     Role: 0
   - HeroId: hero_000001
     HeroName: 
     HeroStarLevel: 1
     BaseRarity: 0
-    Faction: 0
+    Faction: 3
     Role: 0
   - HeroId: hero_000002
     HeroName: 
     HeroStarLevel: 2
     BaseRarity: 0
-    Faction: 0
+    Faction: 5
     Role: 0
   - HeroId: hero_000003
     HeroName: 
     HeroStarLevel: 2
     BaseRarity: 0
-    Faction: 0
+    Faction: 1
     Role: 0
   - HeroId: hero_000004
     HeroName: 
     HeroStarLevel: 3
     BaseRarity: 0
-    Faction: 0
+    Faction: 2
     Role: 0

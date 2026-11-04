@@ -1,5 +1,7 @@
 using System.Collections;
 using Dylanng;
+using Game.Combat;
+using Game.Combat.Domain;
 using Game.Managers;
 using Game.Managers.Hero;
 using Game.Managers.Item;
@@ -31,6 +33,9 @@ namespace GAME
         [SerializeField] private GameModeManager gameModeManager;
         [SerializeField] private AbilityVFXManager abilityVFXManager;
         
+        [Header("--- COMBAT ---")]
+        [SerializeField] private CombatRulesSO combatRules;
+
         [Header("--- SCENE SETTINGS ---")]
         [SerializeField] private SceneNavigationSO bootstrapSceneNavigationSO;
         
@@ -42,6 +47,7 @@ namespace GAME
         private TickSystem _tickSystem;
         private PauseSystem _pauseSystem;
         private DataStorageService _storageService;
+        private CombatResolver _combatResolver;
 
         protected override void Awake()
         {
@@ -69,7 +75,16 @@ namespace GAME
             
             _storageService = new DataStorageService();
             _storageService.Initialize();
-            
+
+            if (combatRules == null)
+            {
+                GameLogger.LogError("[GameManager] Cannot boot game because CombatRules is not assigned!");
+                yield break;
+            }
+
+            _combatResolver = new CombatResolver(combatRules);
+            _combatResolver.Initialize();
+
             yield return null;
 
             // 2. Initialize UIManager

@@ -498,6 +498,7 @@ MonoBehaviour:
   partyCombatManager: {fileID: 171193427}
   gameModeManager: {fileID: 1093393941}
   abilityVFXManager: {fileID: 344105505}
+  combatRules: {fileID: 11400000, guid: a49ec987958744b297ccfa8ee2bbde02, type: 2}
   bootstrapSceneNavigationSO: {fileID: 11400000, guid: f0721ca0a0bf1a04d9ef0058253793e6, type: 2}
 --- !u!4 &553929888
 Transform:
@@ -713,31 +714,31 @@ MonoBehaviour:
       HeroName: 
       HeroStarLevel: 0
       BaseRarity: 0
-      Faction: 0
+      Faction: 4
       Role: 0
     - HeroId: hero_000001
       HeroName: 
       HeroStarLevel: 0
       BaseRarity: 0
-      Faction: 0
+      Faction: 3
       Role: 0
     - HeroId: hero_000002
       HeroName: 
       HeroStarLevel: 0
       BaseRarity: 0
-      Faction: 0
+      Faction: 5
       Role: 0
     - HeroId: hero_000003
       HeroName: 
       HeroStarLevel: 0
       BaseRarity: 0
-      Faction: 0
+      Faction: 1
       Role: 0
     - HeroId: hero_000004
       HeroName: 
       HeroStarLevel: 0
       BaseRarity: 0
-      Faction: 0
+      Faction: 2
       Role: 0
 --- !u!1 &810113537
 GameObject:
