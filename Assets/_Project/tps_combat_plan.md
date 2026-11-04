@@ -33,7 +33,7 @@ Các giá trị này là mặc định được áp dụng khi bắt đầu Phas
 
 | Phase | Nội dung | Trạng thái |
 |---|---|---|
-| 0 | Chốt nền: nhánh, sandbox, checklist | Đang làm |
+| 0 | Chốt nền: nhánh, sandbox, checklist | Xong |
 | 1 | Domain và test: ElementChart, DamagePipeline, asmdef | Chưa làm |
 | 2 | Tách `HeroInstance` thành các component | Chưa làm |
 | 3 | Ability runtime: slot, Ultimate, Targeting, Delivery | Chưa làm |
@@ -45,14 +45,23 @@ Các giá trị này là mặc định được áp dụng khi bắt đầu Phas
 
 ## Sandbox
 
-1. Chạy `Tools/Combat/Build Sandbox Scene` một lần. Công cụ tạo scene, asset điều hướng và đăng ký Build Settings.
-2. Chạy `Tools/Combat/Play Sandbox`. Game khởi động qua Bootstrapper rồi vào `Combat_Sandbox`.
+- `Tools/Combat/Play Sandbox`: game khởi động qua Bootstrapper rồi vào `Combat_Sandbox`. Nút Play thường vẫn vào Scene_A.
+- `Tools/Combat/Run Smoke Test`: chạy tự động các bước chính, ghi kết quả vào `Logs/CombatSandboxSmoke.txt`.
+- `Tools/Combat/Build Sandbox Scene`: dựng lại scene từ Scene_A, xóa mọi chỉnh sửa tay trong Sandbox.
 
-Nút Play thường vẫn vào Scene_A. Sandbox dựng lại từ Scene_A, bỏ portal, thêm 5 DummyBot, một tường và một dốc.
+Sandbox gồm 8 DummyBot (3 có sẵn từ Scene_A và 5 thêm mới), bỏ portal, thêm một tường và một dốc.
+
+Chạy smoke test bằng dòng lệnh khi Editor không mở project này:
+
+```bash
+Unity -batchmode -projectPath <path> -executeMethod Game.Editor.Combat.CombatSandboxSmokeTest.Run -logFile smoke.log
+```
+
+Mã thoát: 0 là đạt, 1 là có mục lỗi, 2 là quá thời gian.
 
 ## Checklist chơi thử
 
-Chạy trong Sandbox sau mỗi phase. Cột "Hiện tại" ghi hành vi trước refactor, kể cả lỗi đã biết. Lần đầu chạy, hãy đối chiếu và ghi lại mọi khác biệt.
+Chạy trong Sandbox sau mỗi phase. Cột "Hiện tại" ghi hành vi trước refactor, kể cả lỗi đã biết. Smoke test phủ các mục 1–6, 8, 9 và 12. Hiện chưa kiểm chứng tự động: các mục lỗi đã biết 7, 10, 11, 13, phần hiển thị HUD, và việc bot đánh hero.
 
 | # | Thao tác | Hiện tại |
 |---|---|---|
@@ -69,6 +78,16 @@ Chạy trong Sandbox sau mỗi phase. Cột "Hiện tại" ghi hành vi trước
 | 11 | Hero không được điều khiển bị stun | Lỗi đã biết: hero đó có thể nhận input sau khi hết stun |
 | 12 | Đánh DummyBot | Trúng đòn, không tính khắc hệ |
 | 13 | Đánh hero bằng đòn có hệ | Lỗi đã biết: hệ số luôn 1.0 vì `HeroElement` chưa được gán |
+
+## Lỗi đã thấy khi chạy baseline
+
+Xử lý ở phase tương ứng:
+
+| Lỗi | Phase |
+|---|---|
+| `Skill_FireBall` đặt hệ Kim thay vì Hỏa, `AbilityName` trống | 1 |
+| Scene có 2 EventSystem, Unity cảnh báo mỗi frame | 7 |
+| Khi thoát Play Mode, service bị xóa trước các object còn cần nó, gây lỗi `ServiceLocator` và `NullReferenceException` | 2 |
 
 ## Quy tắc code
 

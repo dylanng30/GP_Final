@@ -79,6 +79,7 @@ namespace Game.Editor.Combat
 
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
+            RegisterSceneInBuildSettings();
             SessionState.SetString(GameManager.BootNavigationOverrideKey, SandboxNavigationPath);
             EditorSceneManager.playModeStartScene = bootstrapper;
             EditorApplication.isPlaying = true;
