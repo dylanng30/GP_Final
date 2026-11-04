@@ -34,6 +34,11 @@ namespace GAME
         [Header("--- SCENE SETTINGS ---")]
         [SerializeField] private SceneNavigationSO bootstrapSceneNavigationSO;
         
+#if UNITY_EDITOR
+        /// <summary>Khóa SessionState để công cụ Editor chọn scene khởi động (ví dụ Combat Sandbox).</summary>
+        public const string BootNavigationOverrideKey = "GameManager.BootNavigationOverride";
+#endif
+
         private TickSystem _tickSystem;
         private PauseSystem _pauseSystem;
         private DataStorageService _storageService;
@@ -124,11 +129,12 @@ namespace GAME
             {
                 SceneController.SceneTransitionPlan plan;
                 string loadedSceneName = "Scene_A";
+                SceneNavigationSO bootNavigation = ResolveBootNavigation();
 
-                if (bootstrapSceneNavigationSO != null)
+                if (bootNavigation != null)
                 {
-                    plan = SceneController.Instance.GetSceneTransitionPlan(bootstrapSceneNavigationSO);
-                    loadedSceneName = bootstrapSceneNavigationSO.ActiveScene.SceneName;
+                    plan = SceneController.Instance.GetSceneTransitionPlan(bootNavigation);
+                    loadedSceneName = bootNavigation.ActiveScene.SceneName;
                 }
                 else
                 {
@@ -153,6 +159,19 @@ namespace GAME
             {
                 GameLogger.LogError("[GameManager] SceneController is missing!");
             }
+        }
+
+        private SceneNavigationSO ResolveBootNavigation()
+        {
+#if UNITY_EDITOR
+            string overridePath = UnityEditor.SessionState.GetString(BootNavigationOverrideKey, string.Empty);
+            if (!string.IsNullOrEmpty(overridePath))
+            {
+                var overrideNavigation = UnityEditor.AssetDatabase.LoadAssetAtPath<SceneNavigationSO>(overridePath);
+                if (overrideNavigation != null) return overrideNavigation;
+            }
+#endif
+            return bootstrapSceneNavigationSO;
         }
 
         private void OnDestroy()
