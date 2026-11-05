@@ -31,7 +31,12 @@ namespace Game.Shaders.WorldProgressBar
             sRenderer.SetPropertyBlock(_propBlock);
         }
 
-        public void UpdateProgress(float percentage) 
+        public void SetVisible(bool isVisible)
+        {
+            if (sRenderer != null) sRenderer.enabled = isVisible;
+        }
+
+        public void UpdateProgress(float percentage)
         {
             if (sRenderer == null) return;
             

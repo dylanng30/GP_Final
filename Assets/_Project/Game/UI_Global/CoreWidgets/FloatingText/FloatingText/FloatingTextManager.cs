@@ -17,6 +17,12 @@ namespace Game.UIs.FloatingText
         [Header("Prefabs")]
         [SerializeField] private PoolableObject damageTextPrefab;
 
+        [Header("Vị trí chữ so với đỉnh collider của mục tiêu")]
+        [SerializeField] private float damageTextHeadPadding = 0.6f;
+        [SerializeField] private float labelHeadPadding = 1.1f;
+        [SerializeField] private float textScatterRadius = 0.3f;
+        [SerializeField] private float fallbackHeadHeight = 2f;
+
         [Header("--- Physical & Critical Gradients (SO) ---")]
         [SerializeField] private DamageGradientSO normalGradient;
         [SerializeField] private DamageGradientSO critGradient;
@@ -37,7 +43,6 @@ namespace Game.UIs.FloatingText
 
         private const string OvercomesText = "Khắc chế";
         private const string OvercomedByText = "Bị khắc";
-        private const float LabelHeight = 2.2f;
         private static readonly Color OvercomesColor = new Color(1f, 0.85f, 0.2f);
         private static readonly Color OvercomedByColor = new Color(0.65f, 0.65f, 0.65f);
         private static readonly Color HealColor = new Color(0.35f, 1f, 0.45f);
@@ -57,6 +62,9 @@ namespace Game.UIs.FloatingText
             EventBus.Subscribe<DamageDealtEvent>(OnDamageDealt);
             EventBus.Subscribe<HealAppliedEvent>(OnHealApplied);
             EventBus.Subscribe<ReactionTriggeredEvent>(OnReactionTriggered);
+
+            // GameManager phát GameBootedEvent trước khi load scene gameplay, nên manager nằm trong scene sẽ không nhận được.
+            InitializePool();
         }
 
         private void OnDestroy()
@@ -87,7 +95,9 @@ namespace Game.UIs.FloatingText
             return inst;
         }
 
-        private void OnGameBooted(GameBootedEvent evt)
+        private void OnGameBooted(GameBootedEvent evt) => InitializePool();
+
+        private void InitializePool()
         {
             var poolManager = ServiceLocator.Get<PoolManager>();
             if (poolManager != null && damageTextPrefab != null)
@@ -103,8 +113,7 @@ namespace Game.UIs.FloatingText
 
             InitializeDefaultGradientsIfNull();
 
-            // Randomize spawn position of damageText around target's position (offset upward slightly for better visibility)
-            Vector3 spawnPos = evt.Target.transform.position + Random.insideUnitSphere * 0.3f + Vector3.up * 1.5f;
+            Vector3 spawnPos = GetAboveHeadPosition(evt.Target, damageTextHeadPadding);
 
             DamageGradientSO chosenGradient = normalGradient;
 
@@ -156,31 +165,42 @@ namespace Game.UIs.FloatingText
             switch (evt.Relation)
             {
                 case ElementRelation.Overcomes:
-                    SpawnLabel(evt.Target.transform, OvercomesText, OvercomesColor);
+                    SpawnLabel(evt.Target, OvercomesText, OvercomesColor);
                     break;
                 case ElementRelation.OvercomedBy:
-                    SpawnLabel(evt.Target.transform, OvercomedByText, OvercomedByColor);
+                    SpawnLabel(evt.Target, OvercomedByText, OvercomedByColor);
                     break;
             }
         }
 
         private void OnHealApplied(HealAppliedEvent evt)
         {
-            SpawnLabel(evt.Target.transform, $"+{Mathf.RoundToInt(evt.Amount)}", HealColor);
+            SpawnLabel(evt.Target, $"+{Mathf.RoundToInt(evt.Amount)}", HealColor);
         }
 
         private void OnReactionTriggered(ReactionTriggeredEvent evt)
         {
-            SpawnLabel(evt.Target.transform, evt.Rule.DisplayName, ReactionColor);
+            SpawnLabel(evt.Target, evt.Rule.DisplayName, ReactionColor);
         }
 
-        private void SpawnLabel(Transform target, string text, Color color)
+        private void SpawnLabel(GameObject target, string text, Color color)
         {
             if (!isPoolInitialized || target == null) return;
 
-            Vector3 position = target.position + Vector3.up * LabelHeight + Random.insideUnitSphere * 0.3f;
+            Vector3 position = GetAboveHeadPosition(target, labelHeadPadding);
             var label = ServiceLocator.Get<PoolManager>()?.Spawn<DamageText>(poolKey, position, Quaternion.identity);
             if (label != null) label.SetupLabel(text, color);
+        }
+
+        /// <summary>Lấy điểm trên đỉnh collider của mục tiêu để chữ không bị model che, kèm lệch ngẫu nhiên để các số không chồng nhau.</summary>
+        private Vector3 GetAboveHeadPosition(GameObject target, float padding)
+        {
+            Vector3 position = target.transform.position;
+            Collider targetCollider = target.GetComponentInChildren<Collider>();
+            float headHeight = targetCollider != null ? targetCollider.bounds.max.y : position.y + fallbackHeadHeight;
+
+            Vector2 scatter = Random.insideUnitCircle * textScatterRadius;
+            return new Vector3(position.x + scatter.x, headHeight + padding, position.z + scatter.y);
         }
 
         private bool IsPlayerTarget(GameObject target)

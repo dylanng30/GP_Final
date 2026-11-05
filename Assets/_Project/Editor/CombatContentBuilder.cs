@@ -33,6 +33,7 @@ namespace Game.Editor.Combat
             UpdateCombatRules(reactions, synergies);
             BuildAbilities(statuses);
             BuildHud();
+            BuildHealthBar();
 
             AssetDatabase.SaveAssets();
             Debug.Log("[Content] Đã dựng xong dữ liệu combat.");

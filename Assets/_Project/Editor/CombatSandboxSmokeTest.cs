@@ -12,6 +12,8 @@ using Game.Events;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;
+using Game.UIs.FloatingText;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,6 +38,12 @@ namespace Game.Editor.Combat
         private const float ProbeDamage = 1000f;
         private const float OvercomesMultiplier = 1.2f;
         private const float OvercomedByMultiplier = 0.8f;
+        private const float DamageTextSearchRadius = 4f;
+        private const double DamageTextSettleSeconds = 0.35d;
+        private const float HealthBarProbeDamage = 12000f;
+        private const float HealthBarDroppedRatio = 0.5f;
+        private const float MinimumCameraTurnDegrees = 20f;
+        private const float HealthBarFacingToleranceDegrees = 2f;
 
         /// <summary>Nguồn input giả: Move giữ nguyên, Pending chỉ có tác dụng trong một lần đọc.</summary>
         private sealed class ScriptedIntentSource : IPlayerIntentSource
@@ -85,6 +93,8 @@ namespace Game.Editor.Combat
         private static float _energyBaseline;
         private static bool _hasToggledViewBack;
         private static int _castCursor;
+        private static DummyBotInstance _hitTarget;
+        private static Quaternion _thirdPersonCameraRotation;
         private static HeroInstance _fallenHero;
         private static readonly ScriptedIntentSource _scripted = new ScriptedIntentSource();
         private static Vector3 _positionBaseline;
@@ -317,8 +327,40 @@ namespace Game.Editor.Combat
                     Name = "Lock-on giữ mục tiêu",
                     Timeout = 3d,
                     Begin = StartLockOn,
-                    Verify = VerifyLockOn,
-                    End = () => _scripted.Pending.LockOn = true
+                    Verify = VerifyLockOn
+                },
+                new Step
+                {
+                    Name = "Số sát thương hiện trên đầu mục tiêu",
+                    Timeout = 2d,
+                    Begin = HitLockedTarget,
+                    Verify = VerifyDamageTextShown,
+                    End = () => CaptureCamera("sandbox_hit.png")
+                },
+                new Step
+                {
+                    Name = "Thanh máu giảm theo máu và không dùng Canvas",
+                    Timeout = 2d,
+                    Begin = HitTargetHard,
+                    Verify = VerifyHealthBarMatchesHealth,
+                    End = () =>
+                    {
+                        CaptureCamera("sandbox_health_bar.png");
+                        _thirdPersonCameraRotation = Camera.main.transform.rotation;
+                        _scripted.Pending.LockOn = true;
+                    }
+                },
+                new Step
+                {
+                    Name = "Thanh máu quay theo camera khi đổi góc nhìn",
+                    Timeout = 4d,
+                    Begin = () => _scripted.Pending.ToggleView = true,
+                    Verify = VerifyHealthBarFacesCamera,
+                    End = () =>
+                    {
+                        CaptureCamera("sandbox_health_bar_top_down.png");
+                        _scripted.Pending.ToggleView = true;
+                    }
                 },
                 new Step
                 {
@@ -537,6 +579,64 @@ namespace Game.Editor.Combat
         {
             var targeting = ActiveHero.GetComponent<PlayerTargetingSystem>();
             return targeting.IsHardLocked && targeting.CurrentTarget != null ? null : "Chưa hard-lock";
+        }
+
+        private static void HitLockedTarget()
+        {
+            _hitTarget = (DummyBotInstance)ActiveHero.GetComponent<PlayerTargetingSystem>().CurrentTarget;
+            ServiceLocator.Get<CombatResolver>().Deal(
+                null, _hitTarget.gameObject, ProbeDamage, GameElement.Fire, _hitTarget.transform.position, canCrit: false);
+        }
+
+        private static string VerifyDamageTextShown()
+        {
+            Vector3 targetPosition = _hitTarget.transform.position;
+            float targetTop = _hitTarget.GetComponent<Collider>().bounds.max.y;
+
+            DamageText text = Object.FindObjectsOfType<DamageText>()
+                .FirstOrDefault(candidate => Vector3.Distance(candidate.transform.position, targetPosition) < DamageTextSearchRadius);
+
+            if (text == null) return "Không có DamageText nào gần mục tiêu";
+            if (!text.GetComponent<TMP_Text>().text.StartsWith("-")) return "DamageText không hiện số";
+            if (text.transform.position.y < targetTop) return $"DamageText bị che trong model, y = {text.transform.position.y}";
+
+            // Chờ hiệu ứng phóng to xong để ảnh chụp thấy rõ chữ.
+            return StepElapsed >= DamageTextSettleSeconds ? null : "Đang chờ";
+        }
+
+        private static void HitTargetHard()
+        {
+            ServiceLocator.Get<CombatResolver>().Deal(
+                null, _hitTarget.gameObject, HealthBarProbeDamage, GameElement.Fire, _hitTarget.transform.position, canCrit: false);
+        }
+
+        private static string VerifyHealthBarMatchesHealth()
+        {
+            ActorHealthBar bar = _hitTarget.GetComponentInChildren<ActorHealthBar>();
+            if (bar == null) return "DummyBot chưa có thanh máu";
+            if (bar.GetComponentInParent<Canvas>() != null) return "Thanh máu đang dùng Canvas";
+
+            var barRenderer = bar.GetComponent<MeshRenderer>();
+            if (!barRenderer.enabled) return "Thanh máu đang ẩn";
+
+            var block = new MaterialPropertyBlock();
+            barRenderer.GetPropertyBlock(block);
+            float displayed = -block.GetVector("_ProgressPercentage").x;
+            float ratio = _hitTarget.Health.Ratio;
+
+            if (ratio >= HealthBarDroppedRatio) return $"Máu chưa giảm đủ, còn {ratio}";
+            return Mathf.Abs(displayed - ratio) < 0.001f ? null : $"Thanh hiện {displayed}, máu thật {ratio}";
+        }
+
+        private static string VerifyHealthBarFacesCamera()
+        {
+            Transform cameraTransform = Camera.main.transform;
+            float cameraTurn = Quaternion.Angle(cameraTransform.rotation, _thirdPersonCameraRotation);
+            if (cameraTurn < MinimumCameraTurnDegrees) return $"Camera mới xoay {cameraTurn} độ";
+
+            Transform bar = _hitTarget.GetComponentInChildren<ActorHealthBar>().transform;
+            float offset = Quaternion.Angle(bar.rotation, cameraTransform.rotation);
+            return offset <= HealthBarFacingToleranceDegrees ? null : $"Thanh máu lệch camera {offset} độ";
         }
 
         private static void StartRegroup()

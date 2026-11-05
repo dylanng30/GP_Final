@@ -79,8 +79,12 @@ Mặc định chơi tay ở góc nhìn thứ 3. Nút Auto trên HUD chỉ đổi
 | Luật tương khắc | `Combat/SOs/Reactions/`, rồi thêm vào `CombatRules` |
 | Liên kết tương sinh | `Combat/SOs/Synergies/`, rồi thêm vào `CombatRules` |
 | Skill, combo, đánh thường | `Combat/SOs/Abilities/Heroes/` |
+| Màu, kích thước thanh máu | `02_Prefabs/Combat/ActorHealthBar.prefab` |
+| Độ cao số sát thương | Inspector của `FloatingTextManager` trong từng scene |
 
-`Tools/Combat/Build Combat Content` ghi đè dữ liệu trên theo giá trị trong `Editor/CombatContentBuilder*.cs`. Sau khi chỉnh tay trong Inspector, đừng chạy lại lệnh này, hoặc sửa luôn trong builder.
+`Tools/Combat/Build Combat Content` ghi đè dữ liệu trên theo giá trị trong `Editor/CombatContentBuilder*.cs`, trừ phần `FloatingTextManager`. Sau khi chỉnh tay trong Inspector, đừng chạy lại lệnh này, hoặc sửa luôn trong builder.
+
+Thanh máu vẽ bằng quad và shader `WorldProgressBar`, không dùng Canvas, và luôn quay theo camera. Muốn thêm cho actor khác, kéo `ActorHealthBar.prefab` làm con của actor có `ITargetable` rồi chỉnh độ cao. Hiện mới gắn vào `DummyBot`.
 
 ## Sandbox và kiểm thử
 
