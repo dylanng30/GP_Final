@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bbcaa50025452142af24e2bd3cf5090, type: 3}
+  m_Name: Crab_Basic_Earth
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Combat.Abilities.BasicAttack.BasicAttackSO
+  ProjectilePoolKey: BasicAttack_Melee_Invisible
+  ProjectilePrefab: {fileID: 0}
+  IsInvisibleVisual: 0
+  ProjectileSpeed: 25
+  MaxRange: 8
+  MaxLifetime: 3
+  DamageMultiplier: 1
+  Element: 5
+  AttackCooldown: 1.6
+  EnergyPerHit: 0
+  SpawnOffset: {x: 0, y: 1.2, z: 0.8}
+  SpawnPointName: 
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  MuzzleFlashPrefab: {fileID: 0}
+  MuzzleFlashScale: 1
+  ShootSoundKey: 
+  ShootShake: 0
+  IsMelee: 1
+  Combo:
+  - DamageMultiplier: 1
+    Range: 2.4
+    ArcAngle: 110
+    LungeDistance: 0.3
+    SlashRoll: 0
+    MirrorSlash: 0
+    IsFinisher: 0
+  ComboResetTime: 0

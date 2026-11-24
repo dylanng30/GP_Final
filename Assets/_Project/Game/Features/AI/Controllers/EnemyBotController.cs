@@ -103,6 +103,15 @@ namespace Game.Gameplay.AI.Controllers
             return true;
         }
 
+        /// <summary>Bỏ mục tiêu hiện tại, ví dụ khi quái chết hoặc hồi sinh.</summary>
+        public void ClearTarget()
+        {
+            _currentTarget = null;
+            _worldState.SetState(AIWorldStateKey.TargetExists, false);
+            _worldState.SetState(AIWorldStateKey.TargetInMeleeRange, false);
+            _worldState.SetState(AIWorldStateKey.TargetInSpellRange, false);
+        }
+
         public void ScanAndValidateTarget(float deltaTime)
         {
             _scanTimer -= deltaTime;
@@ -120,10 +129,7 @@ namespace Game.Gameplay.AI.Controllers
                     Vector3.Distance(transform.position, _currentTarget.Transform.position) > detectionRadius * 1.5f || 
                     isOutsideLeash)
                 {
-                    _currentTarget = null;
-                    _worldState.SetState(AIWorldStateKey.TargetExists, false);
-                    _worldState.SetState(AIWorldStateKey.TargetInMeleeRange, false);
-                    _worldState.SetState(AIWorldStateKey.TargetInSpellRange, false);
+                    ClearTarget();
                 }
                 else
                 {

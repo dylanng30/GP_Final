@@ -156,6 +156,19 @@ namespace Game.Animation.Hero
             this.enabled = false; // Ngừng Update sau khi chết
         }
 
+        /// <summary>Đưa Animator về trạng thái đầu và bật lại controller sau khi actor hồi sinh.</summary>
+        public void ResetAnimator()
+        {
+            enabled = true;
+            _wasGrounded = true;
+            _currentSpeed = 0f;
+            _speedSmoothVelocity = 0f;
+            if (animator == null) return;
+
+            animator.Rebind();
+            animator.Update(0f);
+        }
+
         // ─── Animator Events (được gọi từ Animation Clip Events) ──────────────
 
         /// <summary>

@@ -1,0 +1,2 @@
+Tiến độ 1:
+Tách nhánh prototype hoàn chỉnh (bỏ hết GUI)

@@ -64,6 +64,7 @@ namespace Game.Gameplay.Entities
         private AttachPoints _attachPoints;
         private AbilityRunner _abilityRunner;
         private BasicAttackRunner _basicAttack;
+        private object _deathLock;
 
         public string HeroId { get; private set; }
         public StatController Stats { get; private set; }
@@ -265,8 +266,26 @@ namespace Game.Gameplay.Entities
         {
             animatorController?.PlayDeath();
             Status.Set.Clear();
-            Status.AddLock(ControlFlags.CannotMove | ControlFlags.CannotAct);
+            _deathLock = Status.AddLock(ControlFlags.CannotMove | ControlFlags.CannotAct);
             EventBus.Publish(new ActorDiedEvent(GameObjectCache));
+        }
+
+        /// <summary>Hồi sinh tại một vị trí với đầy máu, dùng cho quái tái xuất hiện.</summary>
+        public void Revive(Vector3 position, Quaternion rotation)
+        {
+            Status.RemoveLock(_deathLock);
+            _deathLock = null;
+            Status.Set.Clear();
+            Energy.Clear();
+
+            bool controllerEnabled = characterController != null && characterController.enabled;
+            if (characterController != null) characterController.enabled = false;
+            TransformCache.SetPositionAndRotation(position, rotation);
+            if (characterController != null) characterController.enabled = controllerEnabled;
+
+            StopMove();
+            Health.Restore(Stats != null ? Stats.MaxHP : Health.Max);
+            animatorController?.ResetAnimator();
         }
 
         public void OnTargeted(bool isTargeted)
