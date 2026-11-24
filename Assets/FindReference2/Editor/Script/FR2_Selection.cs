@@ -28,7 +28,7 @@ namespace vietlabs.fr2
 
 					foreach (Object item in HScene)
 					{
-						__cache.Add(item.GetInstanceID().ToString());
+						__cache.Add(item.GetEntityId().ToString());
 					}
 				}
 
@@ -73,7 +73,7 @@ namespace vietlabs.fr2
 			if (!h.Remove(guid))
 			{
 				dirty = true;
-				HScene.RemoveWhere(x => x.GetInstanceID().ToString() == guid);
+				HScene.RemoveWhere(x => x.GetEntityId().ToString() == guid);
 			}
 		}
 

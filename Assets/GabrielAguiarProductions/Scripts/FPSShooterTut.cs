@@ -27,7 +27,6 @@ public class FPSShooterTut : MonoBehaviour
     void ShootProjectile()
     {
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
         destination = ray.GetPoint(1000);
         InstantiateProjectile(firePoint);        
     }
@@ -35,7 +34,7 @@ public class FPSShooterTut : MonoBehaviour
     void InstantiateProjectile(Transform firePoint)
     {
         var projectileObj = Instantiate (projectile, firePoint.position, Quaternion.identity) as GameObject;
-        projectileObj.GetComponent<Rigidbody>().velocity = (destination - firePoint.position).normalized * projectileSpeed;
+        projectileObj.GetComponent<Rigidbody>().linearVelocity = (destination - firePoint.position).normalized * projectileSpeed;
 
         iTween.PunchPosition(projectileObj, new Vector3 (Random.Range(-arcRange, arcRange), Random.Range(-arcRange, arcRange), 0), Random.Range(0.5f, 2));
 

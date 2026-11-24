@@ -8,14 +8,14 @@ namespace ColorfulHierarchy
     {
         static ColorfulHierarchyDrawer()
         {
-            EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += OnHierarchyGUI;
         }
 
-        private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
+        private static void OnHierarchyGUI(EntityId instanceID, Rect selectionRect)
         {
             if (Event.current.type != EventType.Repaint) return;
 
-            GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+            GameObject go = EditorUtility.EntityIdToObject(instanceID) as GameObject;
             if (go == null) return;
 
             ColorfulHierarchyCategory category = go.GetComponent<ColorfulHierarchyCategory>();
