@@ -7,7 +7,6 @@ using Game.Combat.Domain;
 using Game.Data.Hero;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
-using Game.Combat.Abilities.Effects;
 using UnityEditor;
 using UnityEngine;
 
@@ -55,7 +54,7 @@ namespace Game.Editor.Combat
             AssignHero(0, GameElement.Fire, isMelee: false, BuildFireKit(statuses));
             AssignHero(1, GameElement.Wood, isMelee: true, BuildWoodKit(statuses));
             AssignHero(2, GameElement.Earth, isMelee: true, BuildEarthKit(statuses, wall));
-            AssignHero(3, GameElement.Metal, isMelee: true, BuildMetalKit(statuses, zone));
+            AssignHero(3, GameElement.Metal, isMelee: true, BuildMetalKit(statuses));
             AssignHero(4, GameElement.Water, isMelee: false, BuildWaterKit(statuses, zone));
         }
 
@@ -250,54 +249,66 @@ namespace Game.Editor.Combat
             return new[] { skill1, skill2, ultimate };
         }
 
-        private static AbilitySO[] BuildMetalKit(StatusCatalog statuses, ZoneDamageInstance zone)
+        private static AbilitySO[] BuildMetalKit(StatusCatalog statuses)
         {
+            // Mỗi mục tiêu trúng sét đều bị Phá Giáp, để tương khắc Kim khắc Mộc vẫn kích hoạt được.
             AbilitySO skill1 = CreateAbility(new AbilitySpec
             {
-                AssetName = "Metal_Skill1_Lance",
-                DisplayName = "Trường Thương",
-                Description = "Đâm thẳng, phá khiên và phá giáp.",
+                AssetName = "Metal_Skill1_ChainLightning",
+                DisplayName = "Lôi Xích",
+                Description = "Phóng tia sét vào một kẻ địch rồi nảy sang tối đa 4 kẻ địch gần đó, phá khiên và phá giáp.",
                 Element = GameElement.Metal,
                 Cooldown = 6f,
-                Range = 6f,
-                Indicator = SkillIndicatorType.Directional,
+                Range = 9f,
+                Radius = 3f,
+                CastDuration = 0.4f,
+                Indicator = SkillIndicatorType.AreaTarget,
                 Effects = new List<IAbilityEffect>
                 {
-                    Vfx("SwordSlashThickRed", EffectOrigin.Caster, 1.5f, 1.5f),
-                    Area(EffectOrigin.Caster, 6f, 50f,
-                        Damage(120f, 1.8f), new BreakShieldEffect(), Status(statuses.ArmorBreak))
+                    Vfx("LightningMuzzleYellow", EffectOrigin.Caster, 1f, 1f),
+                    new ChainEffect
+                    {
+                        FirstTargetRadius = 3f,
+                        MaxTargets = 5,
+                        BounceRadius = 6.5f,
+                        BounceInterval = 0.1f,
+                        FalloffPerBounce = 0.15f,
+                        MinimumPotency = 0.4f,
+                        ArcPrefab = BuildLightningArcPrefab(),
+                        ArcLifetime = 0.3f,
+                        ImpactVfx = LoadVfx("LightningSoftExplosionYellow"),
+                        ImpactScale = 0.5f,
+                        HitEffects = new List<IAbilityEffect>
+                        {
+                            Damage(110f, 1.5f), new BreakShieldEffect(), Status(statuses.ArmorBreak)
+                        }
+                    }
                 }
             });
 
             AbilitySO skill2 = CreateAbility(new AbilitySpec
             {
-                AssetName = "Metal_Skill2_Whirlwind",
-                DisplayName = "Lốc Thép",
-                Description = "Xoay quanh người, gây sát thương liên tục.",
+                AssetName = "Metal_Skill2_BladeWave",
+                DisplayName = "Kiếm Phong",
+                Description = "Chém ra sóng kiếm hình quạt về phía trước. Mục tiêu càng ít máu càng chịu thêm sát thương.",
                 Element = GameElement.Metal,
                 Cooldown = 9f,
-                Range = 3f,
-                Radius = 3f,
-                LocksMovement = false,
-                Indicator = SkillIndicatorType.None,
+                Range = 9f,
+                CastDuration = 0.5f,
+                Indicator = SkillIndicatorType.Directional,
                 Trigger = SkillTrigger2,
                 Effects = new List<IAbilityEffect>
                 {
-                    new VfxCueEffect
+                    new ConeWaveEffect
                     {
-                        Prefab = LoadVfx("SwordWhirlwindYellow"),
-                        Origin = EffectOrigin.Caster,
-                        Lifetime = 3f,
-                        FollowCaster = true
-                    },
-                    new ZoneDamageEffect
-                    {
-                        Radius = 3f,
-                        Duration = 3f,
-                        TickInterval = 0.5f,
-                        DamagePerTickMultiplier = 0.5f,
-                        ZoneVFXPrefab = zone,
-                        IsAura = true
+                        Range = 9f,
+                        ArcAngle = 60f,
+                        Speed = 20f,
+                        VisualPrefab = BuildConeWavePrefab(),
+                        HitEffects = new List<IAbilityEffect>
+                        {
+                            new DamageEffect { BaseDamage = 150f, AtkMultiplier = 2f, MissingHealthBonus = 1f }
+                        }
                     }
                 }
             });

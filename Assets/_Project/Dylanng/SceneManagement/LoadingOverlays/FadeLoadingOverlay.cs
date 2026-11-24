@@ -19,7 +19,7 @@ namespace TCO_CustomSceneController
         public override IEnumerator EndLoad()
         {
             // Fade Out
-            yield return FadeTo(0f, fadeInTime);
+            yield return FadeTo(0f, fadeOutTime);
         }
 
         private IEnumerator FadeTo(float targetAlpha, float duration)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using Dylanng;
 using Game.Combat.Domain;
 using Game.Events;
@@ -14,6 +15,7 @@ namespace Game.Combat
     {
         private readonly ITargetable _owner;
         private readonly Dictionary<StatusInstance, GameObject> _vfxInstances = new Dictionary<StatusInstance, GameObject>();
+        private Vector3? _targetScale;
 
         public StatusSet Set { get; } = new StatusSet();
         public ControlFlags Flags => Set.Flags;
@@ -45,14 +47,14 @@ namespace Game.Combat
         private void OnApplied(StatusInstance instance)
         {
             ApplyStatBuffs(instance);
-            ApplyScale(instance.Definition.ScaleMultiplier);
+            ApplyScale(instance.Definition.ScaleMultiplier, instance.Definition.ScaleTweenDuration);
             SpawnVfx(instance);
         }
 
         private void OnRemoved(StatusInstance instance)
         {
             _owner.Stats?.RemoveAllModifiersFromSource(instance);
-            ApplyScale(1f / instance.Definition.ScaleMultiplier);
+            ApplyScale(1f / instance.Definition.ScaleMultiplier, instance.Definition.ScaleTweenDuration);
 
             if (_vfxInstances.TryGetValue(instance, out GameObject vfx))
             {
@@ -77,7 +79,8 @@ namespace Game.Combat
                 instance.TickPower * instance.Stacks,
                 instance.Definition.Element,
                 _owner.Transform.position,
-                canCrit: false);
+                canCrit: false,
+                isPeriodic: true);
         }
 
         private void ApplyStatBuffs(StatusInstance instance)
@@ -92,9 +95,27 @@ namespace Game.Combat
             }
         }
 
-        private void ApplyScale(float multiplier)
+        /// <summary>
+        /// Đổi kích thước theo trạng thái. Phóng to bật quá đà rồi về đích, thu nhỏ thì mượt.
+        /// Lưu kích thước đích riêng để nhiều trạng thái chồng nhau không cộng sai khi tween chưa xong.
+        /// </summary>
+        private void ApplyScale(float multiplier, float duration)
         {
-            if (!Mathf.Approximately(multiplier, 1f)) _owner.Transform.localScale *= multiplier;
+            if (Mathf.Approximately(multiplier, 1f)) return;
+
+            Transform target = _owner.Transform;
+            Vector3 from = _targetScale ?? target.localScale;
+            Vector3 to = from * multiplier;
+            _targetScale = to;
+
+            target.DOKill();
+            if (duration <= 0f)
+            {
+                target.localScale = to;
+                return;
+            }
+
+            target.DOScale(to, duration).SetEase(multiplier > 1f ? Ease.OutBack : Ease.InOutQuad);
         }
 
         private void SpawnVfx(StatusInstance instance)

@@ -28,5 +28,15 @@ MonoBehaviour:
   TickDamage: 0
   TickAttackRatio: 0
   ScaleMultiplier: 1
-  LoopVfxPrefab: {fileID: 0}
+  LoopVfxPrefab: {fileID: 132274, guid: fe3d56eddfcbadb418d81896e5ec547c, type: 3}
   VfxOffset: {x: 0, y: 1, z: 0}
+  ScaleTweenDuration: 0.35
+  ApplyVfxPrefab: {fileID: 0}
+  ApplyVfxScale: 1
+  RemoveVfxPrefab: {fileID: 0}
+  RemoveVfxScale: 1
+  ApplySoundKey: 
+  RemoveSoundKey: 
+  RimColor: {r: 1, g: 0.8, b: 0.3, a: 0}
+  FootstepShake: 0
+  FootstepInterval: 0.38

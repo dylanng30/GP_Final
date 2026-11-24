@@ -31,5 +31,15 @@ MonoBehaviour:
   TickDamage: 0
   TickAttackRatio: 0
   ScaleMultiplier: 1.5
-  LoopVfxPrefab: {fileID: 0}
-  VfxOffset: {x: 0, y: 1, z: 0}
+  LoopVfxPrefab: {fileID: 181232, guid: b9cf594d1d8302e4a884738a176ead3a, type: 3}
+  VfxOffset: {x: 0, y: 0.05, z: 0}
+  ScaleTweenDuration: 0.45
+  ApplyVfxPrefab: {fileID: 134696, guid: b7e5be8cde65c7c42915ee6e2273d19b, type: 3}
+  ApplyVfxScale: 1.5
+  RemoveVfxPrefab: {fileID: 187952, guid: c05e92eaee7a00844867e5edc8e0dde1, type: 3}
+  RemoveVfxScale: 1.6
+  ApplySoundKey: titan_apply
+  RemoveSoundKey: titan_end
+  RimColor: {r: 1, g: 0.78, b: 0.3, a: 1}
+  FootstepShake: 0.06
+  FootstepInterval: 0.38

@@ -156,7 +156,7 @@ namespace Game.UIs.FloatingText
                 }
             }
 
-            SpawnText(spawnPos, evt.Damage, chosenGradient);
+            SpawnText(spawnPos, evt.Damage, chosenGradient, GetEmphasis(evt));
             SpawnRelationLabel(evt);
         }
 
@@ -214,7 +214,18 @@ namespace Game.UIs.FloatingText
             return false;
         }
 
-        private void SpawnText(Vector3 position, float damage, DamageGradientSO gradientSO)
+        /// <summary>Độ lớn của số: chí mạng và khắc chế to hơn, sát thương theo nhịp nhỏ hơn.</summary>
+        private static float GetEmphasis(DamageDealtEvent evt)
+        {
+            if (evt.IsPeriodic) return 0.75f;
+
+            float emphasis = 1f;
+            if (evt.IsCritical) emphasis *= 1.5f;
+            if (evt.Relation == ElementRelation.Overcomes) emphasis *= 1.15f;
+            return emphasis;
+        }
+
+        private void SpawnText(Vector3 position, float damage, DamageGradientSO gradientSO, float emphasis = 1f)
         {
             if (!isPoolInitialized) return;
 
@@ -224,7 +235,7 @@ namespace Game.UIs.FloatingText
                 var damageTextObj = poolManager.Spawn<DamageText>(poolKey, position, Quaternion.identity);
                 if (damageTextObj != null)
                 {
-                    damageTextObj.Setup(damage, gradientSO, overrideGlobalDirection, globalDirection, globalHorizontalMapping, globalVerticalMapping);
+                    damageTextObj.Setup(damage, gradientSO, overrideGlobalDirection, globalDirection, globalHorizontalMapping, globalVerticalMapping, emphasis);
                 }
             }
         }

@@ -13,13 +13,18 @@ namespace Game.Combat
         public readonly GameElement Element;
         public readonly AbilitySO Ability;
 
-        public AbilityContext(GameObject caster, GameObject target, Vector3 point, GameElement element, AbilitySO ability = null)
+        /// <summary>Hệ số nhân cho effect sát thương và hồi máu, ví dụ giảm dần qua mỗi lần nảy.</summary>
+        public readonly float Potency;
+
+        public AbilityContext(
+            GameObject caster, GameObject target, Vector3 point, GameElement element, AbilitySO ability = null, float potency = 1f)
         {
             Caster = caster;
             Target = target;
             Point = point;
             Element = element;
             Ability = ability;
+            Potency = potency;
         }
 
         /// <summary>Hướng từ người thi triển đến điểm mục tiêu trên mặt phẳng ngang.</summary>
@@ -37,7 +42,12 @@ namespace Game.Combat
 
         public AbilityContext WithHit(GameObject target, Vector3 point)
         {
-            return new AbilityContext(Caster, target, point, Element, Ability);
+            return new AbilityContext(Caster, target, point, Element, Ability, Potency);
+        }
+
+        public AbilityContext WithPotency(float potency)
+        {
+            return new AbilityContext(Caster, Target, Point, Element, Ability, potency);
         }
 
         /// <summary>Hệ của effect, Physical nghĩa là dùng hệ của skill.</summary>

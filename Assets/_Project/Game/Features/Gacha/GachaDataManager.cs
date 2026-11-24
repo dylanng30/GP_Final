@@ -14,7 +14,7 @@ namespace Game.Data.Gacha
             {
                 if (_instance == null)
                 {
-                    _instance = FindObjectOfType<GachaDataManager>();
+                    _instance = FindAnyObjectByType<GachaDataManager>();
                     
                     if (_instance == null)
                     {

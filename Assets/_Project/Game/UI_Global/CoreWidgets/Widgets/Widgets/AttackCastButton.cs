@@ -30,12 +30,17 @@ namespace Game.UIs.Widgets
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            HeroInstance activeHero = GetActiveHero();
-            if (activeHero == null || !activeHero.CanAttack()) return; // Don't hold or attack if on cooldown
+            // Đi chung đường với chuột trái: tự chọn mục tiêu, quay theo tâm ngắm và giữ để đánh liên tục.
+            SetAttackInput(true);
 
             _isPointerDown = true;
             _pointerDownTime = Time.time;
             _isIndicatorShown = false;
+        }
+
+        private static void SetAttackInput(bool isPressed)
+        {
+            ServiceLocator.Get<InputManager>()?.SetAttackInput(isPressed);
         }
 
         private void Update()
@@ -95,20 +100,14 @@ namespace Game.UIs.Widgets
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (!_isPointerDown) return;
-            
+            SetAttackInput(false);
             _isPointerDown = false;
             HideIndicator();
-
-            HeroInstance activeHero = GetActiveHero();
-            if (activeHero != null)
-            {
-                activeHero.Attack();
-            }
         }
 
         private void OnDisable()
         {
+            SetAttackInput(false);
             _isPointerDown = false;
             HideIndicator();
         }

@@ -2,7 +2,9 @@ using Dylanng;
 using Game.Combat;
 using Game.Data.Hero;
 using System;
+using Game.Combat.Domain;
 using Game.Combat.Stats;
+using Game.Gameplay.Entities;
 using UnityEngine;
 
 namespace Game.Combat.Abilities.Effects
@@ -19,6 +21,9 @@ namespace Game.Combat.Abilities.Effects
         public float FalloffRadius = 3f;
         public float MinDamagePercent = 0.3f;
 
+        [Tooltip("Mục tiêu càng mất nhiều máu càng nhận thêm sát thương. 1 nghĩa là gấp đôi khi gần hết máu.")]
+        public float MissingHealthBonus = 0f;
+
         public void Execute(in AbilityContext context)
         {
             var (caster, target, point) = context;
@@ -28,6 +33,13 @@ namespace Game.Combat.Abilities.Effects
             if (caster != null && caster.TryGetComponent<StatController>(out var casterStats))
             {
                 finalDamage += casterStats.ATK * AtkMultiplier;
+            }
+
+            finalDamage *= context.Potency;
+
+            if (MissingHealthBonus > 0f && target.TryGetComponent<ITargetable>(out var targetable))
+            {
+                finalDamage *= AbilityScaling.MissingHealthMultiplier(targetable.Health.Ratio, MissingHealthBonus);
             }
 
             if (UseFalloff && FalloffRadius > 0f)

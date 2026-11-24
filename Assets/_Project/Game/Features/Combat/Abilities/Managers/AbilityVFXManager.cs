@@ -49,7 +49,7 @@ namespace Game.Combat.Abilities.Managers
 
         private void OnPlayAudio(PlayAudioEvent evt)
         {
-            Debug.Log($"[AbilityVFXManager] Phát âm thanh '{evt.AudioKey}' tại {evt.Position}");
+            // Âm thanh do CombatAudioPlayer phát.
         }
 
         private IEnumerator AutoDespawnVFXCoroutine(string poolKey, PoolableObject obj, float delay)

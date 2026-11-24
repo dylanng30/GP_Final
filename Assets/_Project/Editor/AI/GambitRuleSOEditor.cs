@@ -25,14 +25,12 @@ namespace Dylanng.Editor.AI
             _conditionsProp = serializedObject.FindProperty("conditions");
             _actionProp = serializedObject.FindProperty("action");
 
-            _availableConditionTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(IGambitCondition).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+            _availableConditionTypes = TypeCache.GetTypesDerivedFrom<IGambitCondition>()
+                .Where(t => !t.IsInterface && !t.IsAbstract)
                 .ToList();
 
-            _availableActionTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(IGambitAction).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+            _availableActionTypes = TypeCache.GetTypesDerivedFrom<IGambitAction>()
+                .Where(t => !t.IsInterface && !t.IsAbstract)
                 .ToList();
         }
 

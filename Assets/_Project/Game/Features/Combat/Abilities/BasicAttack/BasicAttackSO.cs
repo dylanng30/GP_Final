@@ -50,6 +50,18 @@ namespace Game.Combat.Abilities.BasicAttack
         [Tooltip("LayerMask mục tiêu (Nếu để Nothing sẽ tự động lấy từ Hero/Bot bắn ra)")]
         public LayerMask TargetLayerMask;
 
+        [Header("--- Ranged Presentation ---")]
+        [Tooltip("Hiệu ứng lửa đầu nòng, gắn theo điểm bắn lúc đạn rời nòng")]
+        public GameObject MuzzleFlashPrefab;
+
+        public float MuzzleFlashScale = 1f;
+
+        [Tooltip("Key âm thanh trong CombatSoundBank phát lúc bắn. Để trống nếu prefab đạn đã có âm thanh riêng")]
+        public string ShootSoundKey = "";
+
+        [Tooltip("Độ giật camera mỗi phát bắn của hero người chơi đang điều khiển")]
+        public float ShootShake = 0.04f;
+
         [Header("--- Melee & Combo ---")]
         [Tooltip("Đòn cận chiến quét vùng trước mặt thay vì bắn đạn")]
         public bool IsMelee = false;
@@ -74,12 +86,22 @@ namespace Game.Combat.Abilities.BasicAttack
             DamageMultiplier = 1f,
             Range = 2.5f,
             ArcAngle = 120f,
-            LungeDistance = 0f
+            LungeDistance = 0f,
+            SlashRoll = 35f
         };
 
         public float DamageMultiplier;
         public float Range;
         public float ArcAngle;
         public float LungeDistance;
+
+        [Tooltip("Góc nghiêng của vệt chém quanh hướng nhìn (độ). Dương: chéo từ trên phải xuống, âm: chéo từ trên trái xuống, 0: ngang")]
+        public float SlashRoll;
+
+        [Tooltip("Đảo chiều quét của vệt chém")]
+        public bool MirrorSlash;
+
+        [Tooltip("Dùng vệt chém dày của đòn kết thúc")]
+        public bool IsFinisher;
     }
 }

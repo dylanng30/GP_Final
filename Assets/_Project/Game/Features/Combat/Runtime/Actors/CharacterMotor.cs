@@ -28,6 +28,7 @@ namespace Game.Combat
         private MotorSettings _settings;
         private float _velocityY;
         private bool _isJumping;
+        private bool _hasLanded;
 
         private Vector3 _dashDirection;
         private Vector3 _dashStart;
@@ -90,6 +91,24 @@ namespace Game.Combat
             IsDashing = true;
         }
 
+        /// <summary>Bị đẩy lùi khi trúng đòn. Không xoay nhân vật, không ghi đè cú dash đang chạy.</summary>
+        public void Push(Vector3 direction, float distance, float duration)
+        {
+            direction.y = 0f;
+            if (IsDashing || distance <= 0f || direction.sqrMagnitude < 0.0001f) return;
+
+            BeginDash(direction.normalized, distance, Mathf.Max(0.01f, duration));
+        }
+
+        /// <summary>Trả về true đúng một lần sau khi nhân vật chạm đất từ cú nhảy.</summary>
+        public bool ConsumeLanded()
+        {
+            if (!_hasLanded) return false;
+
+            _hasLanded = false;
+            return true;
+        }
+
         /// <summary>Lao ngắn về phía trước, không có miễn sát thương.</summary>
         public void Lunge(float distance, float duration)
         {
@@ -123,6 +142,7 @@ namespace Game.Combat
             if (_controller.isGrounded && _velocityY < 0f)
             {
                 _velocityY = GroundedVelocity;
+                if (_isJumping) _hasLanded = true;
                 _isJumping = false;
             }
 

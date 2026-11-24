@@ -124,6 +124,14 @@ namespace Game.Managers
 
             gameObject.AddComponent<CursorCaptureController>();
             gameObject.AddComponent<SingleEventSystemGuard>();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            gameObject.AddComponent<InputModeDebugOverlay>();
+            gameObject.AddComponent<Game.Managers.Party.HeroSwapDebugPanel>();
+#endif
+
+            // HUD thiết kế cho màn ngang 1920x1080.
+            Screen.autorotateToPortrait = false;
+            Screen.autorotateToPortraitUpsideDown = false;
 
             yield return null;
             gameModeManager.Initialize();
@@ -133,6 +141,7 @@ namespace Game.Managers
 
             yield return null;
             abilityVFXManager.Initialize();
+            gameObject.AddComponent<Game.Combat.Feedback.CombatFeedbackManager>();
 
             yield return null;
 

@@ -21,7 +21,7 @@ namespace Game.Combat
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            EventSystem[] systems = FindObjectsOfType<EventSystem>();
+            EventSystem[] systems = FindObjectsByType<EventSystem>();
             if (systems.Length <= 1) return;
 
             EventSystem keeper = SelectKeeper(systems, scene);

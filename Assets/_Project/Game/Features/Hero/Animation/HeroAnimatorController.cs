@@ -166,19 +166,19 @@ namespace Game.Animation.Hero
         public void OnAnimationTransitionEvent()
         {
             // Forward lên HeroInstance để nó có thể notify StateMachine
-            var heroInstance = GetComponent<Game.Gameplay.Entities.HeroInstance>();
+            var heroInstance = GetComponentInParent<Game.Gameplay.Entities.HeroInstance>();
             heroInstance?.NotifyAnimationTransition();
         }
 
         public void OnAnimationEnterEvent()
         {
-            var heroInstance = GetComponent<Game.Gameplay.Entities.HeroInstance>();
+            var heroInstance = GetComponentInParent<Game.Gameplay.Entities.HeroInstance>();
             heroInstance?.NotifyAnimationEnter();
         }
 
         public void OnAnimationExitEvent()
         {
-            var heroInstance = GetComponent<Game.Gameplay.Entities.HeroInstance>();
+            var heroInstance = GetComponentInParent<Game.Gameplay.Entities.HeroInstance>();
             heroInstance?.NotifyAnimationExit();
         }
     }

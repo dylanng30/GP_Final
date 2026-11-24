@@ -34,6 +34,9 @@ namespace Game.Combat.Abilities
 
         public float TotalCastDuration = 1.2f;
 
+        [Tooltip("Tốc độ animation cho tới lúc skill kích hoạt (< 1 kéo dài pha tụ lực). Sau khi kích hoạt trở về 1.")]
+        public float AnimationSpeed = 1f;
+
         [Tooltip("Khóa di chuyển trong lúc cast.")]
         public bool LocksMovement = true;
 
@@ -42,6 +45,21 @@ namespace Game.Combat.Abilities
         public float IndicatorRadius = 2.0f;
         public SkillIndicatorType IndicatorType = SkillIndicatorType.AreaTarget;
         public bool RequiresTarget = false;
+
+        [Header("--- Presentation ---")]
+        [Tooltip("VFX tụ lực trong lúc cast, gắn vào điểm CastVfxAttachPoint (tên xương) nếu có")]
+        public GameObject CastVfxPrefab;
+        public string CastVfxAttachPoint = "";
+        public float CastVfxScale = 1f;
+
+        [Tooltip("Thời gian giữ VFX tụ lực. 0 nghĩa là tới hết TotalCastDuration")]
+        public float CastVfxLifetime = 0f;
+        [Tooltip("Key trong CombatSoundBank, phát khi bắt đầu cast")]
+        public string CastSoundKey = "";
+        [Tooltip("Key trong CombatSoundBank, phát khi skill kích hoạt")]
+        public string ExecuteSoundKey = "";
+        [Tooltip("Để lại bóng mờ của người thi triển lúc bắt đầu cast")]
+        public bool CastAfterimage = false;
 
         [Header("--- Strategy Effects (Polymorphic) ---")]
         [SerializeReference]

@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae3868b9d7c63f4b880c7250a4d2574, type: 3}
+  m_Name: Metal_Skill1_ChainLightning
+  m_EditorClassIdentifier: 
+  AbilityID: Metal_Skill1_ChainLightning
+  AbilityName: "L\xF4i X\xEDch"
+  Description: "Ph\xF3ng tia s\xE9t v\xE0o m\u1ED9t k\u1EBB \u0111\u1ECBch r\u1ED3i n\u1EA3y sang t\u1ED1i \u0111a 4 k\u1EBB \u0111\u1ECBch g\u1EA7n \u0111\xF3, ph\xE1 khi\xEAn v\xE0 ph\xE1 gi\xE1p."
+  Icon: {fileID: 0}
+  Type: 1
+  Element: 1
+  Cooldown: 6
+  EnergyCost: 0
+  StaminaCost: 0
+  UnlockLevel: 1
+  AnimationTriggerName: Skill_0
+  AnimationTriggerHash: 0
+  TotalCastDuration: 0.4
+  LocksMovement: 1
+  Range: 9
+  IndicatorRadius: 3
+  IndicatorType: 2
+  RequiresTarget: 0
+  CastVfxPrefab: {fileID: 162722, guid: 1fc71432c1bd537489e1be6246b56973, type: 3}
+  CastVfxAttachPoint: shoulder_R.003_end
+  CastVfxScale: 0.35
+  CastSoundKey: lightning_charge
+  ExecuteSoundKey: 
+  CastAfterimage: 0
+  Effects:
+  - rid: 4882420197032198203
+  - rid: 4882420197032198204
+  references:
+    version: 2
+    RefIds:
+    - rid: 4882420197032198203
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 173556, guid: 2b51c58abe6c8a9448349f2b39e25bb8, type: 3}
+        Origin: 0
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 1
+        Lifetime: 1
+        FollowCaster: 0
+    - rid: 4882420197032198204
+      type: {class: ChainEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        FirstTargetRadius: 3
+        MaxTargets: 5
+        BounceRadius: 6.5
+        BounceInterval: 0.1
+        FalloffPerBounce: 0.15
+        MinimumPotency: 0.4
+        ArcPrefab: {fileID: 8986182393819900572, guid: b540c2fc462aef24daa3167a70121130, type: 3}
+        ArcLifetime: 0.3
+        ImpactVfx: {fileID: 1938031414114752, guid: d616c4de34d1bda439766b6dab9b9609, type: 3}
+        ImpactScale: 0.5
+        ImpactLifetime: 1
+        OriginPointName: shoulder_R.003_end
+        BounceSoundKey: lightning_bounce
+        HitEffects:
+        - rid: 4882420197032198205
+        - rid: 4882420197032198206
+        - rid: 4882420197032198207
+    - rid: 4882420197032198205
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 110
+        AtkMultiplier: 1.5
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+        MissingHealthBonus: 0
+    - rid: 4882420197032198206
+      type: {class: BreakShieldEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data: 
+    - rid: 4882420197032198207
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: 27c092c39e8526c4b82736bad9d2a7a0, type: 2}
+        Chance: 1
+        ApplyToCaster: 0

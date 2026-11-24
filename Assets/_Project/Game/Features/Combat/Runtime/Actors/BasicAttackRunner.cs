@@ -113,6 +113,10 @@ namespace Game.Combat
             if (target != null) _owner.FaceTowards(target.Transform.position);
 
             _animator?.PlayAttack();
+            if (_config != null && _config.IsMelee)
+            {
+                EventBus.Publish(new Game.Combat.Abilities.Events.MeleeAttackStartedEvent(_owner.gameObject, _config.Element));
+            }
 
             ComboStep step = _config != null ? _config.GetComboStep(_comboIndex) : ComboStep.Default;
             float attack = _owner.Stats != null ? _owner.Stats.ATK : FallbackAttack;
@@ -170,6 +174,8 @@ namespace Game.Combat
             }
 
             if (hasHit) _owner.GainEnergy(_config.EnergyPerHit);
+
+            EventBus.Publish(new Game.Combat.Abilities.Events.MeleeSwingEvent(owner.gameObject, _config.Element, _pendingStep, hasHit));
         }
 
         private bool IsInsideArc(Transform owner, Vector3 point)
@@ -181,10 +187,11 @@ namespace Game.Combat
 
         private void ExecuteProjectile()
         {
-            ResolveSpawnPose(_pendingTarget, out Vector3 position, out Quaternion rotation);
+            Transform muzzle = ResolveSpawnPose(_pendingTarget, out Vector3 position, out Quaternion rotation);
 
             string poolKey = _config != null ? _config.ProjectilePoolKey : FallbackPoolKey;
             var projectile = ServiceLocator.Get<PoolManager>()?.Spawn<BasicAttackProjectile>(poolKey, position, rotation);
+            EventBus.Publish(new Game.Combat.Abilities.Events.RangedShotEvent(_owner.gameObject, _config, position, rotation, muzzle));
 
             if (projectile != null)
             {
@@ -209,7 +216,8 @@ namespace Game.Combat
             if (_config != null) _owner.GainEnergy(_config.EnergyPerHit);
         }
 
-        private void ResolveSpawnPose(ITargetable target, out Vector3 position, out Quaternion rotation)
+        /// <summary>Tính vị trí và hướng bắn. Trả về transform điểm bắn nếu có.</summary>
+        private Transform ResolveSpawnPose(ITargetable target, out Vector3 position, out Quaternion rotation)
         {
             Transform owner = _owner.transform;
             position = owner.TransformPoint(_config != null ? _config.SpawnOffset : FallbackSpawnOffset);
@@ -222,10 +230,11 @@ namespace Game.Combat
                 rotation = owner.rotation;
             }
 
-            if (target == null || target.Transform == null) return;
+            if (target == null || target.Transform == null) return spawnPoint;
 
             Vector3 direction = (target.Transform.position + AimHeightOffset - position).normalized;
             if (direction != Vector3.zero) rotation = Quaternion.LookRotation(direction);
+            return spawnPoint;
         }
     }
 }

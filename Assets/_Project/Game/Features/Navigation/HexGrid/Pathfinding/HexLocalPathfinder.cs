@@ -25,7 +25,7 @@ namespace Game.Navigation.HexGrid.Pathfinding
             // Try finding it on Awake, but don't error out if it's missing (e.g., in a Bootstrapper scene)
             if (hexGrid == null)
             {
-                hexGrid = FindObjectOfType<HexGrid>();
+                hexGrid = FindAnyObjectByType<HexGrid>();
             }
         }
 
@@ -34,7 +34,7 @@ namespace Game.Navigation.HexGrid.Pathfinding
             // If we still don't have a grid (or moved to a new scene), try finding it again
             if (hexGrid == null)
             {
-                hexGrid = FindObjectOfType<HexGrid>();
+                hexGrid = FindAnyObjectByType<HexGrid>();
                 if (hexGrid == null)
                 {
                     Debug.LogWarning("HexLocalPathfinder: Cannot SetDestination because no HexGrid is present in the current scene.");

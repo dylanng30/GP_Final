@@ -33,12 +33,21 @@ MonoBehaviour:
     Range: 2.6
     ArcAngle: 120
     LungeDistance: 0.4
+    SlashRoll: 35
+    MirrorSlash: 0
+    IsFinisher: 0
   - DamageMultiplier: 1.1
     Range: 2.6
     ArcAngle: 120
     LungeDistance: 0.4
+    SlashRoll: -35
+    MirrorSlash: 0
+    IsFinisher: 0
   - DamageMultiplier: 1.6
     Range: 3
     ArcAngle: 180
     LungeDistance: 0.8
+    SlashRoll: 8
+    MirrorSlash: 0
+    IsFinisher: 1
   ComboResetTime: 1.5

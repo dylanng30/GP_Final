@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityID: Metal_Ultimate_TitanForm
   AbilityName: "C\u1EF1 Nh\xE2n Th\xE9p"
-  Description: "Bi\u1EBFn th\xE0nh d\u1EA1ng kh\u1ED5ng l\u1ED3, t\u0103ng m\u1EA1nh
-    c\xF4ng v\xE0 th\u1EE7."
+  Description: "Bi\u1EBFn th\xE0nh d\u1EA1ng kh\u1ED5ng l\u1ED3, t\u0103ng m\u1EA1nh c\xF4ng v\xE0 th\u1EE7."
   Icon: {fileID: 0}
   Type: 2
   Element: 1
@@ -31,6 +30,12 @@ MonoBehaviour:
   IndicatorRadius: 2
   IndicatorType: 0
   RequiresTarget: 0
+  CastVfxPrefab: {fileID: 0}
+  CastVfxAttachPoint: 
+  CastVfxScale: 1
+  CastSoundKey: titan_cast
+  ExecuteSoundKey: 
+  CastAfterimage: 1
   Effects:
   - rid: 4882419973506465839
   - rid: 4882419973506465840

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dylanng;
 using Game.Data.Hero;
 using Game.Gameplay.Entities;
@@ -72,6 +73,10 @@ namespace Game.Managers.Hero
         /// <summary>Trả về toàn bộ HeroAsset (bao gồm AnimationConfig) theo heroId.</summary>
         public HeroAsset GetHeroAsset(string heroId)
             => _assetDic.TryGetValue(heroId, out var asset) ? asset : null;
+
+        /// <summary>Id các hero có model để đưa vào trận, sắp theo id.</summary>
+        public IReadOnlyList<string> GetPlayableHeroIds()
+            => _assetDic.Values.Where(asset => asset.HeroPrefab != null).Select(asset => asset.HeroId).OrderBy(id => id).ToList();
         #endregion
         
         #region ---Hero Data---
@@ -111,8 +116,10 @@ namespace Game.Managers.Hero
                 // Clear the current heroes list during testing so that changing testPartySize is reflected immediately on restart
                 SaveData.Heros.Clear();
 
-                int testPartySize = 3; // <--- THAY ĐỔI SỐ LƯỢNG HERO MUỐN TEST TẠI ĐÂY (Ví dụ: 2, 3, 4)
-                int addedCount = 0;
+                int testPartySize = 1; // <--- THAY ĐỔI SỐ LƯỢNG HERO MUỐN TEST TẠI ĐÂY (Ví dụ: 2, 3, 4)
+                string testLeadHeroId = "hero_000000"; // <--- Hero luôn có trong đội khi test (000000 = Fire, 000003 = Mental). Để trống thì lấy theo thứ tự.
+                bool hasLead = !string.IsNullOrEmpty(testLeadHeroId) && remoteData.HeroData.Exists(x => x.HeroId == testLeadHeroId);
+                int addedCount = hasLead ? 1 : 0;
 
                 foreach (var baseHero in remoteData.HeroData)
                 {
@@ -137,7 +144,8 @@ namespace Game.Managers.Hero
                     */
 
                     // --- LOGIC PHỤC VỤ TEST: Cho phép điền số lượng hero bất kỳ vào Party để kiểm tra đội hình ---
-                    bool isMember = addedCount < testPartySize;
+                    bool isLead = hasLead && baseHero.HeroId == testLeadHeroId;
+                    bool isMember = isLead || addedCount < testPartySize;
                     HeroDataInstance heroInstance = new HeroDataInstance()
                     {
                         HeroId = baseHero.HeroId,
@@ -147,7 +155,7 @@ namespace Game.Managers.Hero
                         HeroStarLevel = baseHero.HeroStarLevel
                     };
                     SaveData.Heros.Add(heroInstance);
-                    addedCount++;
+                    if (isMember && !isLead) addedCount++;
                     hasChanged = true;
                 }
             }

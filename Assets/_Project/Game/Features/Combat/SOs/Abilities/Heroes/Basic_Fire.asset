@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bbcaa50025452142af24e2bd3cf5090, type: 3}
   m_Name: Basic_Fire
   m_EditorClassIdentifier: 
-  ProjectilePoolKey: BasicAttack_Melee_Invisible
-  ProjectilePrefab: {fileID: 7511347521912373749, guid: 2e15bc3ce4620f8419117ccdd07f3374, type: 3}
+  ProjectilePoolKey: BasicAttack_Fire_Bullet
+  ProjectilePrefab: {fileID: 3001279824965540301, guid: 16699237e0017af4f83539339162ae71, type: 3}
   IsInvisibleVisual: 0
-  ProjectileSpeed: 20
+  ProjectileSpeed: 32
   MaxRange: 12
   MaxLifetime: 3
   DamageMultiplier: 1
@@ -23,10 +23,14 @@ MonoBehaviour:
   AttackCooldown: 0.8
   EnergyPerHit: 15
   SpawnOffset: {x: 0, y: 1.2, z: 0.8}
-  SpawnPointName: 
+  SpawnPointName: Muzzle
   TargetLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  MuzzleFlashPrefab: {fileID: 105160, guid: 8deb1def3de25b04b8371070fbb372fe, type: 3}
+  MuzzleFlashScale: 1.6
+  ShootSoundKey: 
+  ShootShake: 0.04
   IsMelee: 0
   Combo: []
   ComboResetTime: 1.5

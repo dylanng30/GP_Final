@@ -1,4 +1,5 @@
 using Dylanng;
+using Game.Gameplay.Controllers;
 using UnityEngine;
 
 namespace Game.Combat
@@ -54,9 +55,7 @@ namespace Game.Combat
 
         private static void ReadKeyboardAndMouse(ref PlayerIntent intent)
         {
-            bool isCursorCaptured = Cursor.lockState == CursorLockMode.Locked;
-
-            intent.Attack |= isCursorCaptured && Input.GetMouseButton(0);
+            intent.Attack |= CanClickToAttack() && Input.GetMouseButton(0);
             intent.LockOn = Input.GetMouseButtonDown(2);
             intent.Skill1 = Input.GetKeyDown(KeyCode.E);
             intent.Skill2 = Input.GetKeyDown(KeyCode.R);
@@ -69,6 +68,15 @@ namespace Game.Combat
             {
                 if (Input.GetKeyDown(HeroKeys[i])) intent.SwitchHeroIndex = i;
             }
+        }
+
+        /// <summary>Góc nhìn thứ 3 phải khóa chuột trước, top-down thì bấm vào đâu ngoài UI cũng được.</summary>
+        private static bool CanClickToAttack()
+        {
+            if (Cursor.lockState == CursorLockMode.Locked) return true;
+
+            CameraController camera = CameraController.Instance;
+            return camera != null && camera.Mode == CameraMode.TopDown && !CursorCaptureController.IsPointerOverUi;
         }
     }
 }

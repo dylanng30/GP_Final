@@ -33,11 +33,13 @@ namespace Game.UIs.FloatingText
         }
 
         private DamageGradientSO currentGradientSO;
+        private float _emphasis = 1f;
         private GradientDirection currentDirection;
         private float wordMinX, wordMaxX, wordMinY, wordMaxY;
 
-        public void Setup(float damageAmount, DamageGradientSO gradientSO, bool overrideGlobal = false, GradientDirection globalDir = GradientDirection.Vertical, TextureMappingOptions hMap = TextureMappingOptions.Line, TextureMappingOptions vMap = TextureMappingOptions.Line)
+        public void Setup(float damageAmount, DamageGradientSO gradientSO, bool overrideGlobal = false, GradientDirection globalDir = GradientDirection.Vertical, TextureMappingOptions hMap = TextureMappingOptions.Line, TextureMappingOptions vMap = TextureMappingOptions.Line, float emphasis = 1f)
         {
+            _emphasis = emphasis;
             if (damageText != null)
             {
                 damageText.text = $"-{Mathf.RoundToInt(damageAmount).ToString()}";
@@ -70,6 +72,7 @@ namespace Game.UIs.FloatingText
 
         public void SetupLabel(string text, Color color)
         {
+            _emphasis = 1f;
             currentGradientSO = null;
             if (damageText != null)
             {
@@ -84,6 +87,7 @@ namespace Game.UIs.FloatingText
 
         public void Setup(float damageAmount, Color color)
         {
+            _emphasis = 1f;
             currentGradientSO = null;
             if (damageText != null)
             {
@@ -180,12 +184,23 @@ namespace Game.UIs.FloatingText
 
         private void AnimateAndDespawn()
         {
-            // Move upward
+            transform.DOKill();
+
+            // Bay lên, lệch ngang một chút để các số không chồng nhau.
             transform.DOMoveY(transform.position.y + floatSpeed, aliveTime).SetEase(Ease.OutCubic);
- 
-            // Scale up slightly on spawn
+            float drift = Random.Range(-0.35f, 0.35f) * _emphasis;
+            Vector3 right = Camera.main != null ? Camera.main.transform.right : Vector3.right;
+            transform.DOBlendableMoveBy(right * drift, aliveTime).SetEase(Ease.OutCubic);
+
+            // Bật mạnh lên rồi thu về. Chạy theo thời gian thực để vẫn nảy trong lúc hitstop.
+            Vector3 finalScale = Vector3.one * _emphasis;
             transform.localScale = Vector3.zero;
-            transform.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack);
+            transform.rotation = Camera.main != null ? Camera.main.transform.rotation : transform.rotation;
+            DOTween.Sequence()
+                .Append(transform.DOScale(finalScale * 1.35f, 0.09f).SetEase(Ease.OutQuad))
+                .Append(transform.DOScale(finalScale, 0.14f).SetEase(Ease.OutBack))
+                .SetUpdate(true)
+                .SetTarget(transform);
  
             // Fade out near the end of lifetime
             if (damageText != null)

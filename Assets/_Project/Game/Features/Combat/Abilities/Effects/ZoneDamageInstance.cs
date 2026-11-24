@@ -95,7 +95,7 @@ namespace Game.Combat.Abilities.Effects
 
             foreach (ITargetable target in _hitTargets)
             {
-                ServiceLocator.Get<CombatResolver>()?.Deal(_caster, target.Transform.gameObject, _damage, _element, target.Transform.position);
+                ServiceLocator.Get<CombatResolver>()?.Deal(_caster, target.Transform.gameObject, _damage, _element, target.Transform.position, isPeriodic: true);
                 if (_appliedStatus != null) ServiceLocator.Get<CombatResolver>()?.ApplyStatus(_caster, target.Transform.gameObject, _appliedStatus);
             }
 

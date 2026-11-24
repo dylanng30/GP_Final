@@ -16,12 +16,31 @@ namespace Dylanng
         public bool RunInput { get; private set; }
         public bool IsJoystickActive { get; private set; }
 
-        public bool UsePCInput = true;
+        public bool UsePCInput { get; private set; } = true;
 
         public override void Initialize()
         {
             ServiceLocator.Register<InputManager>(this, ServiceScope.Global);
             ServiceLocator.Get<ITickSystem>().Register(this);
+
+            // UnityEngine.Device trả về thông tin của máy giả lập khi chạy trong Device Simulator.
+            SetUsePCInput(!UnityEngine.Device.Application.isMobilePlatform);
+        }
+
+        /// <summary>Đổi kiểu input và xóa giá trị đang giữ để không còn trôi sang kiểu mới.</summary>
+        public void SetUsePCInput(bool usePCInput)
+        {
+            UsePCInput = usePCInput;
+
+            MovementInput = Vector2.zero;
+            RotationInput = Vector2.zero;
+            ZoomInput = 0f;
+            JumpInput = false;
+            SprintInput = false;
+            AttackInput = false;
+            BlockInput = false;
+
+            EventBus.Publish(new InputModeChangedEvent(usePCInput));
         }
 
         protected override void OnDestroy()
@@ -32,14 +51,8 @@ namespace Dylanng
 
         public void OnUpdate(float deltaTime)
         {
-            if (UsePCInput)
-            {
-                PollPCKeyboardInput();
-            }
-            else
-            {
-                PollMobileGestures();
-            }
+            // Mobile không cần đọc ở đây: nút, joystick và LookSwipeArea tự đưa input vào.
+            if (UsePCInput) PollPCKeyboardInput();
         }
 
         private void PollPCKeyboardInput()
@@ -76,27 +89,6 @@ namespace Dylanng
 
             RotationInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             ZoomInput = Input.GetAxis("Mouse ScrollWheel");
-        }
-
-        private void PollMobileGestures()
-        {
-            // RotationInput ở Mobile được xử lý và truyền vào từ RotateInput.cs (UI) nên không cần đọc ở đây.
-
-            // Xử lý Pinch-to-zoom (Vuốt 2 ngón) cho Mobile
-            ZoomInput = 0f;
-            if (Input.touchCount >= 2)
-            {
-                Touch touch1 = Input.GetTouch(0);
-                Touch touch2 = Input.GetTouch(1);
-
-                Vector2 touch1PrevPos = touch1.position - touch1.deltaPosition;
-                Vector2 touch2PrevPos = touch2.position - touch2.deltaPosition;
-
-                float prevMagnitude = (touch1PrevPos - touch2PrevPos).magnitude;
-                float currentMagnitude = (touch1.position - touch2.position).magnitude;
-
-                ZoomInput = currentMagnitude - prevMagnitude;
-            }
         }
 
         //UI Mobile

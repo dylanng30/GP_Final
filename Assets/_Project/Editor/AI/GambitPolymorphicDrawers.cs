@@ -16,9 +16,8 @@ namespace Dylanng.Editor.AI
         private static void InitTypes()
         {
             if (_conditionTypes != null) return;
-            _conditionTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(IGambitCondition).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+            _conditionTypes = TypeCache.GetTypesDerivedFrom<IGambitCondition>()
+                .Where(t => !t.IsInterface && !t.IsAbstract)
                 .ToList();
             _conditionNames = new string[] { "None" }.Concat(_conditionTypes.Select(t => t.Name)).ToArray();
         }
@@ -87,9 +86,8 @@ namespace Dylanng.Editor.AI
         private static void InitTypes()
         {
             if (_actionTypes != null) return;
-            _actionTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(IGambitAction).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+            _actionTypes = TypeCache.GetTypesDerivedFrom<IGambitAction>()
+                .Where(t => !t.IsInterface && !t.IsAbstract)
                 .ToList();
             _actionNames = new string[] { "None" }.Concat(_actionTypes.Select(t => t.Name)).ToArray();
         }

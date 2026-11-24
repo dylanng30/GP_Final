@@ -23,19 +23,29 @@ Cả 9 phase đã có code và dữ liệu. Chưa có người chơi thử, xem 
 | Hành động | PC | Mobile |
 |---|---|---|
 | Di chuyển | WASD | Joystick |
-| Xoay camera | Chuột | Vuốt nửa phải màn hình |
+| Xoay camera | Chuột, sau khi khóa con trỏ | Vuốt vùng trống trên màn hình |
 | Zoom | Con lăn | Chụm hai ngón |
-| Đánh thường | Chuột trái, giữ để đánh liên tục | Nút đánh |
+| Đánh thường | Chuột trái, giữ để đánh liên tục | Giữ nút đánh |
 | Skill 1, Skill 2, Ultimate | E, R, Q | Nút skill |
-| Dash | Left Shift | Nút dash |
-| Nhảy | Space | Nút nhảy |
-| Lock-on | Chuột giữa | Chưa có nút |
+| Dash | Left Shift | Nút Dash |
+| Nhảy | Space | Nút Nhảy |
+| Lock-on | Chuột giữa | Nút Khóa |
 | Đổi hero | 1, 2, 3 | Chạm chân dung |
-| Tập hợp đội | G | Chưa có nút |
-| Đổi góc nhìn | V | Chưa có nút |
-| Hiện con trỏ để bấm UI | Giữ Left Alt | Không cần |
+| Tập hợp đội | G | Nút Tập hợp |
+| Đổi góc nhìn | V | Nút Đổi camera |
+| Khóa con trỏ | Bấm vùng trống, hoặc Left Alt | Không cần |
+| Hiện con trỏ để bấm UI | Left Alt hoặc Esc | Không cần |
 
-Mặc định chơi tay ở góc nhìn thứ 3. Nút Auto trên HUD chỉ đổi chế độ tự đánh, không đổi camera.
+Mặc định chơi tay ở góc nhìn thứ 3. Nút Auto trên HUD chỉ đổi chế độ tự đánh, không đổi camera. Các nút trên màn hình dùng được cả trên PC.
+
+### Test PC và mobile
+
+Game tự nhận nền tảng qua `UnityEngine.Device.Application.isMobilePlatform`. Dòng nhắc ở cuối màn hình cho biết đang ở chế độ nào, dòng này và phím F9 chỉ có trong Editor và Development Build.
+
+- **PC:** bấm Play, con trỏ vẫn hiện để bấm UI. Bấm vùng trống để khóa con trỏ và xoay camera.
+- **Mobile bằng Game view:** trong Play Mode bấm F9. Bàn phím bị tắt, dùng chuột thay ngón tay: kéo vùng trống để xoay, kéo joystick để đi, bấm các nút trên HUD. Không giả lập được hai ngón.
+- **Mobile bằng Device Simulator:** đổi Game view sang Simulator trước khi Play, game tự vào chế độ mobile.
+- **Đổi hero bất kỳ:** Tab thay hero đang điều khiển bằng hero kế tiếp chưa có trong đội. Bảng "Đổi hero" ở góc phải chọn thẳng một hero, bấm được bằng chuột hoặc chạm. Hero mới đứng đúng chỗ hero cũ, hai hero còn lại giữ nguyên máu và hồi chiêu. Chỉ có trong Editor và Development Build.
 
 ## Quyết định thiết kế
 
@@ -58,7 +68,7 @@ Mặc định chơi tay ở góc nhìn thứ 3. Nút Auto trên HUD chỉ đổi
 |---|---|
 | Quấn rễ là Trói hay Choáng | Root: không di chuyển, vẫn đánh được |
 | Skill gây Hóa Đá | Thổ Skill 2 |
-| Skill gây Phá Giáp | Kim Skill 1 |
+| Skill gây Phá Giáp | Kim Skill 1, áp lên mọi mục tiêu tia sét nảy trúng |
 | Thủy Skill 1 | Khiên. Hồi máu chuyển sang ultimate |
 | Kim sinh Thủy (game không có mana) | Tăng hồi máu |
 
@@ -80,6 +90,7 @@ Mặc định chơi tay ở góc nhìn thứ 3. Nút Auto trên HUD chỉ đổi
 | Liên kết tương sinh | `Combat/SOs/Synergies/`, rồi thêm vào `CombatRules` |
 | Skill, combo, đánh thường | `Combat/SOs/Abilities/Heroes/` |
 | Màu, kích thước thanh máu | `02_Prefabs/Combat/ActorHealthBar.prefab` |
+| Hình tia sét, màu sóng kiếm của hệ Kim | `02_Prefabs/Combat/LightningArc.prefab`, `ConeWave.prefab` |
 | Độ cao số sát thương | Inspector của `FloatingTextManager` trong từng scene |
 
 `Tools/Combat/Build Combat Content` ghi đè dữ liệu trên theo giá trị trong `Editor/CombatContentBuilder*.cs`, trừ phần `FloatingTextManager`. Sau khi chỉnh tay trong Inspector, đừng chạy lại lệnh này, hoặc sửa luôn trong builder.
@@ -121,7 +132,6 @@ Các mục này chưa thể kiểm chứng tự động:
 - VFX riêng cho Mộc Skill 2 và hai skill của Thổ: đang dùng tạm prefab Epic Toon FX.
 - Model dạng khổng lồ của Kim đang là phóng to model hiện có. Gọi pet chưa làm.
 - Hóa Đá, Trói, Choáng chưa có animation đứng yên riêng.
-- Nút mobile cho lock-on, tập hợp, đổi góc nhìn.
 - UI: `CombatInfoPanel` và nhãn liên kết dựng bằng code, chưa có icon trạng thái hay art.
 - VFX tạo bằng Instantiate, nên chuyển sang pool nếu thấy tụt khung hình.
 

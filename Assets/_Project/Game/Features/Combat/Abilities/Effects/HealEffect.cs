@@ -27,7 +27,7 @@ namespace Game.Combat.Abilities.Effects
             float attack = casterStats != null ? casterStats.ATK : FallbackAttack;
             float healAmount = BaseHeal + attack * HealScalingMultiplier;
 
-            ServiceLocator.Get<CombatResolver>()?.Heal(caster, healTarget, healAmount);
+            ServiceLocator.Get<CombatResolver>()?.Heal(caster, healTarget, healAmount * context.Potency);
             SpawnVfx(healTarget.transform);
         }
 

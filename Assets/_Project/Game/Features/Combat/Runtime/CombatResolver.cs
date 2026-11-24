@@ -42,7 +42,8 @@ namespace Game.Combat
             float amount,
             GameElement element,
             Vector3 hitPoint,
-            bool canCrit = true)
+            bool canCrit = true,
+            bool isPeriodic = false)
         {
             if (!TryGetLivingTarget(target, out ITargetable targetable) || targetable.IsInvulnerable)
             {
@@ -69,7 +70,7 @@ namespace Game.Combat
             targetable.Health.TakeDamage(result.Amount);
 
             EventBus.Publish(new DamageDealtEvent(
-                source, targetable.Transform.gameObject, result.Amount, element, hitPoint, result.IsCritical, result.Relation));
+                source, targetable.Transform.gameObject, result.Amount, element, hitPoint, result.IsCritical, result.Relation, isPeriodic));
 
             return result;
         }

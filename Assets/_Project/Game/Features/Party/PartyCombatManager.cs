@@ -58,11 +58,56 @@ namespace Game.Managers.Party
         private void OnPartyChanged()
         {
             var partyManager = ServiceLocator.Get<PartyManager>();
-            if (partyManager != null && _hasSpawnedHeroes)
+            if (partyManager == null || !_hasSpawnedHeroes) return;
+
+            if (TryReplaceChangedHeroes(partyManager.HeroIds))
             {
-                SyncHeroes(partyManager.HeroIds);
-                InitializeCombat();
+                EventBus.Publish(new PartyHeroesSpawnedEvent());
+                return;
             }
+
+            SyncHeroes(partyManager.HeroIds);
+            InitializeCombat();
+        }
+
+        /// <summary>
+        /// Chỉ thay những slot đổi hero, hero mới đứng đúng chỗ hero cũ và giữ quyền điều khiển nếu slot đó đang được điều khiển.
+        /// Trả về false khi đội đổi sĩ số hoặc có slot trống, lúc đó phải dựng lại cả đội.
+        /// </summary>
+        private bool TryReplaceChangedHeroes(string[] heroIds)
+        {
+            if (heroIds == null || heroIds.Length != _activeHeroes.Count) return false;
+
+            for (int slot = 0; slot < heroIds.Length; slot++)
+            {
+                if (string.IsNullOrEmpty(heroIds[slot]) || _activeHeroes[slot] == null) return false;
+            }
+
+            for (int slot = 0; slot < heroIds.Length; slot++)
+            {
+                if (_activeHeroes[slot].HeroId != heroIds[slot]) ReplaceHeroAt(slot, heroIds[slot]);
+            }
+            return true;
+        }
+
+        private void ReplaceHeroAt(int slot, string heroId)
+        {
+            HeroInstance prefab = ServiceLocator.Get<HeroDataManager>().GetHeroModel(heroId);
+            if (prefab == null) return;
+
+            HeroInstance oldHero = _activeHeroes[slot];
+            bool isControlled = slot == _currentActiveHeroIndex;
+            if (isControlled) oldHero.SetAsActive(false);
+
+            HeroInstance newHero = Instantiate(prefab, oldHero.transform.position, oldHero.transform.rotation);
+            newHero.Setup(heroId);
+            _activeHeroes[slot] = newHero;
+            Destroy(oldHero.gameObject);
+
+            if (!isControlled) return;
+
+            newHero.SetAsActive(true);
+            EventBus.Publish(new ActiveHeroChangedEvent(slot, heroId));
         }
 
         private void OnSceneLoaded(SceneLoadedEvent evt)

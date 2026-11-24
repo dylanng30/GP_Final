@@ -236,6 +236,7 @@ namespace Game.Gameplay.Entities
             bool canMove = Status.CanMove && !_abilityRunner.IsMovementLocked;
             _motor.Tick(Time.deltaTime, canMove);
             animatorController?.SetMovementSpeed(canMove ? _motor.MoveMagnitude : 0f);
+            if (_motor.ConsumeLanded()) EventBus.Publish(new HeroLandedEvent(GameObjectCache));
 
             Status.Tick(Time.deltaTime);
             _abilityRunner.Tick();
@@ -392,7 +393,18 @@ namespace Game.Gameplay.Entities
 
         public void Dash()
         {
-            if (!IsDead && Status.CanMove && _motor.TryDash()) animatorController?.PlayRoll();
+            if (IsDead || !Status.CanMove || !_motor.TryDash()) return;
+
+            animatorController?.PlayRoll();
+            EventBus.Publish(new HeroDashedEvent(GameObjectCache, dashDuration));
+        }
+
+        /// <summary>Đẩy lùi nhẹ khi trúng đòn. Bỏ qua nếu đã chết hoặc đang bị khóa di chuyển.</summary>
+        public void ApplyHitPush(Vector3 direction, float distance, float duration)
+        {
+            if (IsDead || !Status.CanMove) return;
+
+            _motor.Push(direction, distance, duration);
         }
 
         #endregion

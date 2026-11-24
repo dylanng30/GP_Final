@@ -27,7 +27,7 @@ namespace Game.Navigation.Components
 
         private void RegisterAllPortals()
         {
-            Portal[] portals = FindObjectsOfType<Portal>(true); // Tham số true để tìm cả các portal bị ẩn
+            Portal[] portals = FindObjectsByType<Portal>(FindObjectsInactive.Include); // Tham số true để tìm cả các portal bị ẩn
             foreach (var portal in portals)
             {
                 RegisterPortal(portal);

@@ -13,10 +13,14 @@ using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Managers.Party;
 using Game.UIs.FloatingText;
+using Game.UIs.Widgets;
+using Game.UIs.Screens;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Game.Editor.Combat
@@ -44,6 +48,27 @@ namespace Game.Editor.Combat
         private const float HealthBarDroppedRatio = 0.5f;
         private const float MinimumCameraTurnDegrees = 20f;
         private const float HealthBarFacingToleranceDegrees = 2f;
+        private const int MinimumChainTargets = 3;
+        private const float DummyRowMinimumZ = 6f;
+        private const float BladeWaveHalfAngle = 30f;
+        private const float BladeWaveAngleTolerance = 8f;
+        private const float BladeWaveRange = 9f;
+        private const float BladeWaveRangeTolerance = 1f;
+        private const double MetalCaptureAfterImpactSeconds = 0.3d;
+        private const double MetalObserveSeconds = 1.5d;
+        private const float SwapPositionTolerance = 0.5f;
+        private const float MetalCameraBack = 5f;
+        private const float MetalCameraHeight = 4f;
+        private const float MetalCameraLookAhead = 6f;
+        private static readonly Vector3 MetalStandOffset = new Vector3(0f, 0f, -5f);
+        private const float MinimumSwipeTurnDegrees = 5f;
+        private const float LookProbeX = 0.55f;
+        private const float LookProbeY = 0.6f;
+        private const int FirstFingerId = 1;
+        private const int SecondFingerId = 2;
+        private static readonly Vector2 SwipeDelta = new Vector2(200f, 0f);
+        private static readonly Vector2 PinchStart = new Vector2(100f, 0f);
+        private static readonly Vector2 PinchEnd = new Vector2(300f, 0f);
 
         /// <summary>Nguồn input giả: Move giữ nguyên, Pending chỉ có tác dụng trong một lần đọc.</summary>
         private sealed class ScriptedIntentSource : IPlayerIntentSource
@@ -95,6 +120,19 @@ namespace Game.Editor.Combat
         private static int _castCursor;
         private static DummyBotInstance _hitTarget;
         private static Quaternion _thirdPersonCameraRotation;
+        private static int _swapSlot;
+        private static string _swapOldHeroId;
+        private static Vector3 _swapOldPosition;
+        private static List<HeroInstance> _swapPartyBefore;
+        private static double _metalCastTime = -1d;
+        private static List<GameObject> _metalVictims;
+        private static Vector3 _metalCastOrigin;
+        private static Vector3 _metalCastDirection;
+        private static bool _hasCapturedMetalSkill;
+        private static Quaternion _cameraRotationBaseline;
+        private static float _cameraDistanceBaseline;
+        private static bool _isCursorFreeAtStart;
+        private static bool _isCursorRequestFlowCorrect;
         private static HeroInstance _fallenHero;
         private static readonly ScriptedIntentSource _scripted = new ScriptedIntentSource();
         private static Vector3 _positionBaseline;
@@ -131,6 +169,7 @@ namespace Game.Editor.Combat
         {
             _damageCount++;
             if (evt.Element == GameElement.Fire) _hasSeenFireDamage = true;
+            if (_metalVictims != null && evt.Caster == MetalHero.gameObject) _metalVictims.Add(evt.Target);
         }
 
         private static void Tick()
@@ -204,7 +243,7 @@ namespace Game.Editor.Combat
                 {
                     Name = "Chỉ còn một EventSystem",
                     Timeout = 3d,
-                    Verify = () => Object.FindObjectsOfType<UnityEngine.EventSystems.EventSystem>().Length == 1
+                    Verify = () => Object.FindObjectsByType<UnityEngine.EventSystems.EventSystem>().Length == 1
                         ? null
                         : "Có nhiều EventSystem"
                 },
@@ -398,6 +437,21 @@ namespace Game.Editor.Combat
                 },
                 new Step
                 {
+                    Name = "Kim skill 1: tia sét nảy qua nhiều mục tiêu",
+                    Timeout = 15d,
+                    Begin = BeginMetalSkillTest,
+                    Verify = VerifyChainLightning
+                },
+                new Step
+                {
+                    Name = "Kim skill 2: sóng quạt chỉ trúng phía trước",
+                    Timeout = 15d,
+                    Begin = () => _metalCastTime = -1d,
+                    Verify = VerifyBladeWave,
+                    End = EndMetalSkillTest
+                },
+                new Step
+                {
                     Name = "Hero ngã thì chuyển sang hero còn sống",
                     Timeout = 3d,
                     Begin = KillActiveHero,
@@ -413,6 +467,86 @@ namespace Game.Editor.Combat
                 },
                 new Step
                 {
+                    Name = "Mobile: không khóa chuột và vùng vuốt nhận được chạm",
+                    Timeout = 2d,
+                    Begin = () => _input.SetUsePCInput(false),
+                    Verify = VerifyMobileInputActive
+                },
+                new Step
+                {
+                    Name = "Mobile: vuốt màn hình xoay camera",
+                    Timeout = 2d,
+                    Begin = SwipeLookArea,
+                    Verify = () => Quaternion.Angle(Camera.main.transform.rotation, _cameraRotationBaseline) >= MinimumSwipeTurnDegrees
+                        ? null
+                        : "Camera chưa xoay"
+                },
+                new Step
+                {
+                    Name = "Mobile: hai ngón đổi độ zoom",
+                    Timeout = 1d,
+                    Begin = PinchLookArea,
+                    Verify = () => Mathf.Approximately(ReadCameraDistance(), _cameraDistanceBaseline) ? "Zoom chưa đổi" : null
+                },
+                new Step
+                {
+                    Name = "Mobile: nút trên màn hình đổi được camera",
+                    Timeout = 2d,
+                    Begin = ClickViewToggleButton,
+                    Verify = () => CameraController.Instance.Mode == CameraMode.TopDown ? null : "Camera chưa sang top-down",
+                    End = ClickViewToggleButton
+                },
+                new Step
+                {
+                    Name = "Mobile: giữ nút đánh để tấn công",
+                    Timeout = 3d,
+                    Begin = PressAttackButtonWithDeviceInput,
+                    Verify = () => !ActiveHero.CanAttack() ? null : "Hero chưa đánh",
+                    End = () => SendPointer(Object.FindAnyObjectByType<AttackCastButton>().gameObject, ExecuteEvents.pointerUpHandler)
+                },
+                new Step
+                {
+                    Name = "Mobile: nút khóa mục tiêu, nhảy và tập hợp",
+                    Timeout = 3d,
+                    Begin = PressMobileActionButtons,
+                    Verify = () => ActiveHero.GetComponent<PlayerTargetingSystem>().IsHardLocked ? null : "Chưa khóa mục tiêu",
+                    End = () =>
+                    {
+                        ClickHudButton("lockOnBtn");
+                        CaptureHud("sandbox_mobile_hud.png");
+                    }
+                },
+                new Step
+                {
+                    Name = "Quay lại PC: tắt vùng vuốt",
+                    Timeout = 2d,
+                    Begin = () => _input.SetUsePCInput(true),
+                    Verify = () => Object.FindAnyObjectByType<LookSwipeArea>().GetComponent<Graphic>().raycastTarget ? "Vùng vuốt vẫn bật" : null
+                },
+                new Step
+                {
+                    Name = "PC: vào game chuột vẫn hiện, khóa và thả được",
+                    Timeout = 2d,
+                    Begin = RunCursorCaptureRequests,
+                    Verify = VerifyCursorCaptureRequests
+                },
+                new Step
+                {
+                    Name = "Tab đổi hero đang điều khiển, giữ vị trí và hai hero còn lại",
+                    Timeout = 3d,
+                    Begin = CycleControlledHero,
+                    Verify = VerifyControlledHeroCycled,
+                    End = () => CaptureHud("sandbox_hero_swap.png")
+                },
+                new Step
+                {
+                    Name = "Chọn hero đã trong đội thì chỉ chuyển quyền điều khiển",
+                    Timeout = 2d,
+                    Begin = SelectExistingPartyMember,
+                    Verify = VerifyControlMovedWithoutRespawn
+                },
+                new Step
+                {
                     Name = "Chạy ổn định thêm 3 giây",
                     Timeout = 4d,
                     Verify = () => StepElapsed >= 3d ? null : "Đang chờ"
@@ -422,7 +556,7 @@ namespace Game.Editor.Combat
 
         private static string VerifySceneContent()
         {
-            int dummyCount = Object.FindObjectsOfType<DummyBotInstance>().Length;
+            int dummyCount = Object.FindObjectsByType<DummyBotInstance>().Length;
             if (dummyCount < MinimumDummyCount) return $"Chỉ có {dummyCount} DummyBot";
             if (GameObject.Find("Portal_A_Out") != null) return "Portal chưa bị gỡ";
             if (Camera.main == null) return "Không có Main Camera";
@@ -455,7 +589,7 @@ namespace Game.Editor.Combat
 
         private static string VerifyWaterExtinguishesBurn()
         {
-            DummyBotInstance dummy = Object.FindObjectsOfType<DummyBotInstance>()
+            DummyBotInstance dummy = Object.FindObjectsByType<DummyBotInstance>()
                 .First(candidate => candidate.Element == GameElement.Earth);
             StatusDefinitionSO burn = LoadStatus("Status_Burn");
             StatusDefinitionSO wet = LoadStatus("Status_Wet");
@@ -511,7 +645,7 @@ namespace Game.Editor.Combat
         /// <summary>Gây sát thương hệ Hỏa lên DummyBot mang hệ chỉ định, không có nguồn nên không chí mạng.</summary>
         private static float DealProbe(GameElement targetElement)
         {
-            DummyBotInstance dummy = Object.FindObjectsOfType<DummyBotInstance>()
+            DummyBotInstance dummy = Object.FindObjectsByType<DummyBotInstance>()
                 .FirstOrDefault(candidate => candidate.Element == targetElement);
             if (dummy == null) return 0f;
 
@@ -593,7 +727,7 @@ namespace Game.Editor.Combat
             Vector3 targetPosition = _hitTarget.transform.position;
             float targetTop = _hitTarget.GetComponent<Collider>().bounds.max.y;
 
-            DamageText text = Object.FindObjectsOfType<DamageText>()
+            DamageText text = Object.FindObjectsByType<DamageText>()
                 .FirstOrDefault(candidate => Vector3.Distance(candidate.transform.position, targetPosition) < DamageTextSearchRadius);
 
             if (text == null) return "Không có DamageText nào gần mục tiêu";
@@ -671,7 +805,7 @@ namespace Game.Editor.Combat
         private static DummyBotInstance FindNearestDummy()
         {
             Vector3 heroPosition = ActiveHero.transform.position;
-            return Object.FindObjectsOfType<DummyBotInstance>()
+            return Object.FindObjectsByType<DummyBotInstance>()
                 .Where(dummy => !dummy.IsDead)
                 .OrderBy(dummy => (dummy.transform.position - heroPosition).sqrMagnitude)
                 .FirstOrDefault();
@@ -781,6 +915,154 @@ namespace Game.Editor.Combat
             return links == 1 ? null : $"Có {links} liên kết thay vì 1";
         }
 
+        private static HeroInstance MetalHero => _party.ActiveHeroes.First(hero => hero.Element == GameElement.Metal);
+
+        /// <summary>Dummy giữa hàng sau, hai bên cách 6m nên tia sét nảy tiếp được.</summary>
+        private static DummyBotInstance RowCenterDummy => Object.FindObjectsByType<DummyBotInstance>()
+            .Where(dummy => !dummy.IsDead && dummy.transform.position.z > DummyRowMinimumZ)
+            .OrderBy(dummy => Mathf.Abs(dummy.transform.position.x))
+            .First();
+
+        /// <summary>
+        /// Đưa hero Kim đứng trước hàng dummy và tắt AI, để đòn đánh thường không làm lẫn số mục tiêu trúng skill.
+        /// Không đổi hero đang điều khiển để các bước sau chạy như cũ.
+        /// </summary>
+        private static void BeginMetalSkillTest()
+        {
+            HeroInstance metal = MetalHero;
+            metal.GetComponent<HeroAIController>().enabled = false;
+
+            Vector3 rowCenter = RowCenterDummy.transform.position;
+            var characterController = metal.GetComponent<CharacterController>();
+            characterController.enabled = false;
+            metal.transform.SetPositionAndRotation(rowCenter + MetalStandOffset, Quaternion.LookRotation(-MetalStandOffset));
+            characterController.enabled = true;
+            metal.StopMove();
+
+            _metalCastTime = -1d;
+        }
+
+        private static void EndMetalSkillTest()
+        {
+            MetalHero.GetComponent<HeroAIController>().enabled = true;
+            _metalVictims = null;
+        }
+
+        /// <summary>Chờ skill hồi xong rồi dùng, trả về true khi đã dùng và đủ thời gian quan sát.</summary>
+        private static bool TryCastMetalSkill(int slot, GameObject target, Vector3 point, out string waiting)
+        {
+            waiting = null;
+            HeroInstance metal = MetalHero;
+
+            if (_metalCastTime < 0d)
+            {
+                if (!metal.CanUseSkill(slot))
+                {
+                    waiting = "Đang chờ skill hồi";
+                    return false;
+                }
+
+                _metalVictims = new List<GameObject>();
+                _metalCastOrigin = metal.transform.position;
+                _metalCastDirection = Vector3.ProjectOnPlane(point - _metalCastOrigin, Vector3.up).normalized;
+                metal.UseSkill(slot, target, point);
+                _metalCastTime = EditorApplication.timeSinceStartup;
+                _hasCapturedMetalSkill = false;
+            }
+
+            double elapsed = EditorApplication.timeSinceStartup - _metalCastTime;
+            // Effect chỉ chạy khi hết thời gian cast, nên chụp sau mốc đó.
+            double impactTime = metal.GetAbility(slot).TotalCastDuration;
+            if (!_hasCapturedMetalSkill && elapsed >= impactTime + MetalCaptureAfterImpactSeconds)
+            {
+                _hasCapturedMetalSkill = true;
+                Vector3 eye = _metalCastOrigin - _metalCastDirection * MetalCameraBack + Vector3.up * MetalCameraHeight;
+                CaptureFromViewpoint(slot == AbilitySlot.Skill1 ? "metal_chain_lightning.png" : "metal_blade_wave.png",
+                    eye, _metalCastOrigin + _metalCastDirection * MetalCameraLookAhead);
+            }
+
+            if (elapsed < MetalObserveSeconds)
+            {
+                waiting = "Đang quan sát";
+                return false;
+            }
+            return true;
+        }
+
+        private static string VerifyChainLightning()
+        {
+            DummyBotInstance first = RowCenterDummy;
+
+            if (!TryCastMetalSkill(AbilitySlot.Skill1, first.gameObject, first.transform.position, out string waiting)) return waiting;
+
+            int distinctTargets = _metalVictims.Distinct().Count();
+            if (!_metalVictims.Contains(first.gameObject)) return "Tia sét không trúng mục tiêu đầu";
+            return distinctTargets >= MinimumChainTargets ? null : $"Tia sét chỉ trúng {distinctTargets} mục tiêu";
+        }
+
+        private static string VerifyBladeWave()
+        {
+            DummyBotInstance aimed = RowCenterDummy;
+
+            if (!TryCastMetalSkill(AbilitySlot.Skill2, null, aimed.transform.position, out string waiting)) return waiting;
+            if (!_metalVictims.Contains(aimed.gameObject)) return "Sóng kiếm không trúng dummy ngay phía trước";
+
+            foreach (GameObject victim in _metalVictims.Distinct())
+            {
+                Vector3 toVictim = Vector3.ProjectOnPlane(victim.transform.position - _metalCastOrigin, Vector3.up);
+                float angle = Vector3.Angle(_metalCastDirection, toVictim);
+                if (angle > BladeWaveHalfAngle + BladeWaveAngleTolerance) return $"Trúng {victim.name} lệch {angle:0} độ, ngoài vùng quạt";
+                if (toVictim.magnitude > BladeWaveRange + BladeWaveRangeTolerance) return $"Trúng {victim.name} xa {toVictim.magnitude:0.0}m, quá tầm";
+            }
+            return null;
+        }
+
+        private static void CycleControlledHero()
+        {
+            HeroInstance controlled = ActiveHero;
+            _swapSlot = _party.ActiveHeroes.ToList().IndexOf(controlled);
+            _swapOldHeroId = controlled.HeroId;
+            _swapOldPosition = controlled.transform.position;
+            _swapPartyBefore = _party.ActiveHeroes.ToList();
+
+            Object.FindAnyObjectByType<HeroSwapDebugPanel>().CycleControlledHero();
+        }
+
+        private static string VerifyControlledHeroCycled()
+        {
+            HeroInstance controlled = ActiveHero;
+            if (controlled == null) return "Không có hero đang điều khiển";
+            if (controlled.HeroId == _swapOldHeroId) return "Hero đang điều khiển chưa đổi";
+            if (_swapPartyBefore.Any(hero => hero != null && hero.HeroId == controlled.HeroId)) return "Hero mới vốn đã trong đội";
+            if (_party.ActiveHeroes.ToList().IndexOf(controlled) != _swapSlot) return "Hero mới không nằm đúng slot cũ";
+
+            float moved = Vector3.Distance(controlled.transform.position, _swapOldPosition);
+            if (moved > SwapPositionTolerance) return $"Hero mới đứng cách chỗ cũ {moved:0.0}m";
+
+            for (int slot = 0; slot < _swapPartyBefore.Count; slot++)
+            {
+                if (slot != _swapSlot && _party.ActiveHeroes[slot] != _swapPartyBefore[slot]) return $"Hero slot {slot} bị tạo lại";
+            }
+
+            bool isPortraitUpdated = Object.FindObjectsByType<HeroAvatarWidget>().Any(widget => widget.HeroId == controlled.HeroId);
+            return isPortraitUpdated ? null : "Chân dung trên HUD chưa đổi";
+        }
+
+        private static void SelectExistingPartyMember()
+        {
+            _swapPartyBefore = _party.ActiveHeroes.ToList();
+            HeroInstance target = _swapPartyBefore.First(hero => hero != null && !hero.IsDead && hero != ActiveHero);
+            _swapOldHeroId = target.HeroId;
+
+            Object.FindAnyObjectByType<HeroSwapDebugPanel>().SelectHero(target.HeroId);
+        }
+
+        private static string VerifyControlMovedWithoutRespawn()
+        {
+            if (ActiveHero == null || ActiveHero.HeroId != _swapOldHeroId) return "Chưa chuyển sang hero đã chọn";
+            return _party.ActiveHeroes.SequenceEqual(_swapPartyBefore) ? null : "Đội bị tạo lại";
+        }
+
         private static string CastNextPartySkill()
         {
             int totalCasts = _party.ActiveHeroes.Count * AbilitySlot.Count;
@@ -825,7 +1107,7 @@ namespace Game.Editor.Combat
 
         private static string VerifyCombatHud()
         {
-            var hud = Object.FindObjectOfType<Game.UIs.Screens.CombatHUD.Screen_CombatHUD>();
+            var hud = Object.FindAnyObjectByType<Game.UIs.Screens.CombatHUD.Screen_CombatHUD>();
             if (hud == null) return "Chưa mở HUD";
             if (hud.GetComponent<Game.UIs.Screens.CombatHUD.CombatInfoPanel>() == null) return "Thiếu CombatInfoPanel";
 
@@ -849,9 +1131,26 @@ namespace Game.Editor.Combat
 
         private static void CaptureCamera(string fileName)
         {
-            Camera camera = Camera.main;
-            if (camera == null) return;
+            if (Camera.main != null) RenderToFile(Camera.main, fileName);
+        }
 
+        /// <summary>Chụp từ một góc cố định bằng camera tạm, để ảnh không phụ thuộc vị trí camera theo người chơi.</summary>
+        private static void CaptureFromViewpoint(string fileName, Vector3 eye, Vector3 lookAt)
+        {
+            if (Camera.main == null) return;
+
+            var cameraObject = new GameObject("SmokeCaptureCamera");
+            var camera = cameraObject.AddComponent<Camera>();
+            camera.CopyFrom(Camera.main);
+            camera.enabled = false;
+            cameraObject.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(lookAt - eye));
+
+            RenderToFile(camera, fileName);
+            Object.DestroyImmediate(cameraObject);
+        }
+
+        private static void RenderToFile(Camera camera, string fileName)
+        {
             const int width = 1280;
             const int height = 720;
             RenderTexture renderTexture = RenderTexture.GetTemporary(width, height, 24);
@@ -871,6 +1170,124 @@ namespace Game.Editor.Combat
             File.WriteAllBytes(Path.Combine("Logs", fileName), texture.EncodeToPNG());
             Object.DestroyImmediate(texture);
             RenderTexture.ReleaseTemporary(renderTexture);
+        }
+
+        private static string VerifyMobileInputActive()
+        {
+            if (Cursor.lockState == CursorLockMode.Locked) return "Con trỏ vẫn bị khóa";
+
+            var area = Object.FindAnyObjectByType<LookSwipeArea>();
+            if (area == null) return "Không có vùng vuốt";
+            if (!area.GetComponent<Graphic>().raycastTarget) return "Vùng vuốt chưa bật";
+
+            var pointer = new PointerEventData(EventSystem.current)
+            {
+                position = new Vector2(Screen.width * LookProbeX, Screen.height * LookProbeY)
+            };
+            var hits = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointer, hits);
+
+            if (hits.Count == 0) return "Chạm vào màn hình không trúng UI nào";
+            return hits[0].gameObject == area.gameObject ? null : $"Vùng vuốt bị {hits[0].gameObject.name} che";
+        }
+
+        private static void SwipeLookArea()
+        {
+            GameObject area = Object.FindAnyObjectByType<LookSwipeArea>().gameObject;
+            _cameraRotationBaseline = Camera.main.transform.rotation;
+
+            ExecuteEvents.Execute(area, NewPointer(FirstFingerId, Vector2.zero, Vector2.zero), ExecuteEvents.pointerDownHandler);
+            ExecuteEvents.Execute(area, NewPointer(FirstFingerId, SwipeDelta, SwipeDelta), ExecuteEvents.dragHandler);
+            ExecuteEvents.Execute(area, NewPointer(FirstFingerId, SwipeDelta, Vector2.zero), ExecuteEvents.pointerUpHandler);
+        }
+
+        private static void PinchLookArea()
+        {
+            GameObject area = Object.FindAnyObjectByType<LookSwipeArea>().gameObject;
+            _cameraDistanceBaseline = ReadCameraDistance();
+
+            ExecuteEvents.Execute(area, NewPointer(FirstFingerId, Vector2.zero, Vector2.zero), ExecuteEvents.pointerDownHandler);
+            ExecuteEvents.Execute(area, NewPointer(SecondFingerId, PinchStart, Vector2.zero), ExecuteEvents.pointerDownHandler);
+            ExecuteEvents.Execute(area, NewPointer(SecondFingerId, PinchEnd, PinchEnd - PinchStart), ExecuteEvents.dragHandler);
+            ExecuteEvents.Execute(area, NewPointer(FirstFingerId, Vector2.zero, Vector2.zero), ExecuteEvents.pointerUpHandler);
+            ExecuteEvents.Execute(area, NewPointer(SecondFingerId, PinchEnd, Vector2.zero), ExecuteEvents.pointerUpHandler);
+        }
+
+        private static float ReadCameraDistance()
+        {
+            return new SerializedObject(CameraController.Instance).FindProperty("thirdPersonDistance").floatValue;
+        }
+
+        private static PointerEventData NewPointer(int fingerId, Vector2 position, Vector2 delta)
+        {
+            return new PointerEventData(EventSystem.current) { pointerId = fingerId, position = position, delta = delta };
+        }
+
+        private static void SendPointer<T>(GameObject target, ExecuteEvents.EventFunction<T> handler) where T : IEventSystemHandler
+        {
+            ExecuteEvents.Execute(target, NewPointer(FirstFingerId, Vector2.zero, Vector2.zero), handler);
+        }
+
+        /// <summary>Hero đầu đội vẫn giữ nguồn input giả từ bước chơi tay, phải trả về input thật để nút trên màn hình có tác dụng.</summary>
+        private static void PressAttackButtonWithDeviceInput()
+        {
+            ActiveHero.GetComponent<PlayerInputController>().SetIntentSource(new DeviceIntentSource(_input));
+            SendPointer(Object.FindAnyObjectByType<AttackCastButton>().gameObject, ExecuteEvents.pointerDownHandler);
+        }
+
+        private static void ClickViewToggleButton()
+        {
+            Object.FindAnyObjectByType<CameraViewToggleButton>().GetComponent<Button>().onClick.Invoke();
+        }
+
+        private static void ClickHudButton(string fieldName)
+        {
+            var hud = new SerializedObject(Object.FindAnyObjectByType<Game.UIs.Screens.CombatHUD.Screen_CombatHUD>());
+            ((Button)hud.FindProperty(fieldName).objectReferenceValue).onClick.Invoke();
+        }
+
+        private static void PressMobileActionButtons()
+        {
+            ActiveHero.GetComponent<PlayerTargetingSystem>().SetTarget(FindNearestDummy());
+
+            ClickHudButton("lockOnBtn");
+            ClickHudButton("jumpBtn");
+            ClickHudButton("regroupBtn");
+        }
+
+        private static void RunCursorCaptureRequests()
+        {
+            var cursor = Object.FindAnyObjectByType<CursorCaptureController>();
+
+            _isCursorFreeAtStart = !cursor.WantsCapture;
+            cursor.CaptureFromWorldClick();
+            bool capturedByClick = cursor.WantsCapture;
+            cursor.ToggleCapture();
+            bool releasedByToggle = !cursor.WantsCapture;
+            cursor.ToggleCapture();
+            bool capturedByToggle = cursor.WantsCapture;
+            cursor.ReleaseCapture();
+
+            _isCursorRequestFlowCorrect = capturedByClick && releasedByToggle && capturedByToggle && !cursor.WantsCapture;
+        }
+
+        private static string VerifyCursorCaptureRequests()
+        {
+            if (!_isCursorFreeAtStart) return "Vào game con trỏ đã bị khóa";
+            if (!_isCursorRequestFlowCorrect) return "Khóa và thả con trỏ không đúng thứ tự";
+            return Cursor.lockState == CursorLockMode.None && Cursor.visible ? null : "Con trỏ chưa hiện lại";
+        }
+
+        /// <summary>Canvas đang giữ camera của Bootstrapper đã bị hủy nên phải gán camera hiện tại để chụp được HUD.</summary>
+        private static void CaptureHud(string fileName)
+        {
+            Canvas canvas = Object.FindAnyObjectByType<LookSwipeArea>().GetComponentInParent<Canvas>();
+            Camera previousCamera = canvas.worldCamera;
+
+            canvas.worldCamera = Camera.main;
+            Canvas.ForceUpdateCanvases();
+            CaptureCamera(fileName);
+            canvas.worldCamera = previousCamera;
         }
 
         private static void Finish(int exitCode)

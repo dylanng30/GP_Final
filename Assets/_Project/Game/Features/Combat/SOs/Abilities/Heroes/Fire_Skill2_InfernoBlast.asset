@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae3868b9d7c63f4b880c7250a4d2574, type: 3}
+  m_Name: Fire_Skill2_InfernoBlast
+  m_EditorClassIdentifier: 
+  AbilityID: Fire_Skill2_InfernoBlast
+  AbilityName: "B\u1ED9c Ph\xE1 H\u1ECFa C\u1EA7u"
+  Description: "T\u1EE5 m\u1ED9t qu\u1EA3 c\u1EA7u l\u1EEDa l\u1EDBn gi\u1EEFa hai tay r\u1ED3i ph\xF3ng theo h\u01B0\u1EDBng ch\u1EC9 \u0111\u1ECBnh, n\u1ED5 th\xE0nh v\xF9ng l\u1EEDa l\u1EDBn khi tr\xFAng k\u1EBB \u0111\u1ECBch ho\u1EB7c t\u1EDBi \u0111i\u1EC3m cu\u1ED1i."
+  Icon: {fileID: 0}
+  Type: 1
+  Element: 4
+  Cooldown: 9
+  EnergyCost: 0
+  StaminaCost: 0
+  UnlockLevel: 1
+  AnimationTriggerName: Skill_1
+  AnimationTriggerHash: 0
+  TotalCastDuration: 1
+  AnimationSpeed: 0.3
+  LocksMovement: 1
+  Range: 10
+  IndicatorRadius: 3.5
+  IndicatorType: 1
+  RequiresTarget: 0
+  CastVfxPrefab: {fileID: 5845899033461526142, guid: c49ac8aaa785cc6429c8aee8f1aa6135, type: 3}
+  CastVfxAttachPoint: ChargePoint
+  CastVfxScale: 1
+  CastVfxLifetime: 0.8
+  CastSoundKey: 
+  ExecuteSoundKey: 
+  CastAfterimage: 0
+  Effects:
+  - rid: 4882420420411129932
+  references:
+    version: 2
+    RefIds:
+    - rid: 4882420420411129932
+      type: {class: ProjectileEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        ProjectilePoolKey: Fire_InfernoBlast
+        ProjectilePrefab: {fileID: 757143588195500917, guid: 0537d2e3c81946e428ddc43d51378043, type: 3}
+        SpawnOffset: {x: 0, y: 1.5, z: 1}
+        SpawnPointName: ChargePoint
+        CollisionEffects:
+        - rid: 4882420420411129933
+        - rid: 4882420420411129934
+        - rid: 4882420420411129935
+        - rid: 4882420420411129936
+        - rid: 4882420420411129937
+    - rid: 4882420420411129933
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 130848, guid: d16221e794fe16e4e8994a7f8c770561, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 2.2
+        Lifetime: 2.5
+        FollowCaster: 0
+        SnapToGround: 0
+    - rid: 4882420420411129934
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 115286, guid: ec1c5863f61e8ff4a84dbdb8a282a7ac, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0.1, z: 0}
+        Scale: 1.6
+        Lifetime: 2.5
+        FollowCaster: 0
+        SnapToGround: 1
+    - rid: 4882420420411129935
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 184608, guid: 9edc33f62cf3ae849badc4cc12fe5f8a, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0, z: 0}
+        Scale: 1.4
+        Lifetime: 3
+        FollowCaster: 0
+        SnapToGround: 1
+    - rid: 4882420420411129936
+      type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Prefab: {fileID: 1027697777517218, guid: 628d050c815a3a3448ce1dcdf0578f21, type: 3}
+        Origin: 1
+        Offset: {x: 0, y: 0.05, z: 0}
+        Scale: 2
+        Lifetime: 4
+        FollowCaster: 0
+        SnapToGround: 1
+    - rid: 4882420420411129937
+      type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Origin: 1
+        Team: 0
+        Radius: 3.5
+        ArcAngle: 360
+        IncludeCaster: 1
+        HitEffects:
+        - rid: 4882420420411129938
+        - rid: 4882420420411129939
+    - rid: 4882420420411129938
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 150
+        AtkMultiplier: 2.2
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+        MissingHealthBonus: 0
+    - rid: 4882420420411129939
+      type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Status: {fileID: 11400000, guid: fdf25618021e9a04f935892f09c61e7d, type: 2}
+        Chance: 1
+        ApplyToCaster: 0

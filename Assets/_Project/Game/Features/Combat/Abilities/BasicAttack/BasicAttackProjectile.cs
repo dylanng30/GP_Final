@@ -91,6 +91,14 @@ namespace Game.Combat.Abilities.BasicAttack
             _timer = 0f;
             _distanceTraveled = 0f;
 
+            // Đạn lấy lại từ pool: xoá vệt lửa còn sót ở chỗ cũ (particle mô phỏng trong World).
+            foreach (ParticleSystem particles in GetComponentsInChildren<ParticleSystem>(true))
+            {
+                particles.Clear(false);
+                particles.Play(false);
+            }
+            foreach (TrailRenderer trail in GetComponentsInChildren<TrailRenderer>(true)) trail.Clear();
+
             var tickSystem = ServiceLocator.Get<ITickSystem>();
             tickSystem?.Register(this);
         }

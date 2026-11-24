@@ -15,6 +15,7 @@ namespace Game.Combat.Abilities.States
 
         private float _timer;
         private bool _hasTriggeredEffects;
+        private Animator _slowedAnimator;
 
         public bool IsFinished { get; private set; }
         public bool LocksMovement => _ability.LocksMovement;
@@ -30,7 +31,24 @@ namespace Game.Combat.Abilities.States
         {
             base.Enter();
             PlayAnimation();
+            ApplyAnimationSpeed();
             EventBus.Publish(new AbilityCastStartedEvent(_caster.gameObject, _ability));
+            PublishTelegraph();
+        }
+
+        private void PublishTelegraph()
+        {
+            if (_ability.IndicatorType != SkillIndicatorType.AreaTarget || _ability.IndicatorRadius <= 0f) return;
+            if (_ability.TotalCastDuration <= 0f) return;
+
+            Vector3 point = _context.Point;
+            if (point == Vector3.zero)
+            {
+                point = _context.Target != null ? _context.Target.transform.position : _caster.transform.position;
+            }
+
+            EventBus.Publish(new AbilityTelegraphEvent(
+                _caster.gameObject, _ability, point, _ability.IndicatorRadius, _ability.TotalCastDuration));
         }
 
         public override void Update()
@@ -43,6 +61,13 @@ namespace Game.Combat.Abilities.States
 
             TriggerEffects();
             IsFinished = true;
+            RestoreAnimationSpeed();
+        }
+
+        public override void Exit()
+        {
+            base.Exit();
+            RestoreAnimationSpeed();
         }
 
         public override void OnAnimationTransitionEvent()
@@ -55,6 +80,24 @@ namespace Game.Combat.Abilities.States
         public void Cancel()
         {
             IsFinished = true;
+            RestoreAnimationSpeed();
+        }
+
+        /// <summary>Chạy chậm animation trong pha tụ lực để animation event rơi đúng lúc skill bắn ra.</summary>
+        private void ApplyAnimationSpeed()
+        {
+            if (Mathf.Approximately(_ability.AnimationSpeed, 1f) || _ability.AnimationSpeed <= 0f) return;
+
+            _slowedAnimator = _caster.GetComponentInChildren<Animator>();
+            if (_slowedAnimator != null) _slowedAnimator.speed = _ability.AnimationSpeed;
+        }
+
+        private void RestoreAnimationSpeed()
+        {
+            if (_slowedAnimator == null) return;
+
+            _slowedAnimator.speed = 1f;
+            _slowedAnimator = null;
         }
 
         private void PlayAnimation()
@@ -62,14 +105,16 @@ namespace Game.Combat.Abilities.States
             int animationHash = _ability.GetAnimationHash();
             if (animationHash == 0) return;
 
-            if (_caster.TryGetComponent<HeroAnimatorController>(out var animatorController))
+            // Animator nằm trên model con (Model/<mesh>), không nằm trên root của caster.
+            var animatorController = _caster.GetComponentInChildren<HeroAnimatorController>();
+            if (animatorController != null)
             {
                 animatorController.PlaySkillByHash(animationHash);
+                return;
             }
-            else if (_caster.TryGetComponent<Animator>(out var animator))
-            {
-                animator.SetTrigger(animationHash);
-            }
+
+            var animator = _caster.GetComponentInChildren<Animator>();
+            if (animator != null) animator.SetTrigger(animationHash);
         }
 
         private void TriggerEffects()
@@ -77,6 +122,8 @@ namespace Game.Combat.Abilities.States
             if (_hasTriggeredEffects || _caster == null) return;
 
             _hasTriggeredEffects = true;
+            // Phát bắn: phần giật súng còn lại chạy tốc độ thường cho có lực.
+            RestoreAnimationSpeed();
             _ability.ExecuteEffects(_context);
             EventBus.Publish(new AbilityExecutedEvent(_caster.gameObject, _ability, _context.Point));
         }

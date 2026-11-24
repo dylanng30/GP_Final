@@ -27,6 +27,7 @@ namespace Game.Data.Item
         [field: SerializeField] public List<LuckyBoxItemData> LuckyBoxItems { get; private set; }
     }
 
+    [Serializable]
     public abstract class BaseItemData
     {
         [Header("---GENERAL INFORMATION---")]

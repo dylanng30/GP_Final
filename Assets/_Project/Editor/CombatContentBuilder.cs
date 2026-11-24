@@ -34,6 +34,7 @@ namespace Game.Editor.Combat
             BuildAbilities(statuses);
             BuildHud();
             BuildHealthBar();
+            BuildPlayerControls();
 
             AssetDatabase.SaveAssets();
             Debug.Log("[Content] Đã dựng xong dữ liệu combat.");

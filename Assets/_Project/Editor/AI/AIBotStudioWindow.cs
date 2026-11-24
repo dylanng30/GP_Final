@@ -185,7 +185,7 @@ namespace Dylanng.Editor.AI
             _rightScroll = EditorGUILayout.BeginScrollView(_rightScroll);
 
             // Find all controllers in active scene
-            EnemyBotController[] controllers = Object.FindObjectsOfType<EnemyBotController>();
+            EnemyBotController[] controllers = Object.FindObjectsByType<EnemyBotController>();
             if (controllers.Length == 0)
             {
                 EditorGUILayout.HelpBox("No EnemyBotController or BossBotController found in the current Scene.", MessageType.Info);

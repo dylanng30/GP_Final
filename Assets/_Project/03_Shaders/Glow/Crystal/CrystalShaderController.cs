@@ -7,7 +7,6 @@ namespace Game.Shaders.Crystal
     {
         [SerializeField] private CrystalShaderSO crystalShaderData;
         
-        private MaterialPropertyBlock _propBlock;
         
         private static readonly int MetallicId = Shader.PropertyToID("_Metallic");
         private static readonly int SmoothnessId = Shader.PropertyToID("_Smoothness");

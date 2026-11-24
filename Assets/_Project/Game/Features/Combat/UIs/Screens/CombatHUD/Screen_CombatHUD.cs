@@ -1,6 +1,7 @@
 using System.Linq;
 using Dylanng;
 using Game.Events;
+using Game.Gameplay.Controllers;
 using Game.Managers.Party;
 using Game.Managers.Hero;
 using Game.Utilities;
@@ -30,6 +31,9 @@ namespace Game.UIs.Screens.CombatHUD
         [SerializeField] private SkillCastButton skill2Btn;
         [SerializeField] private SkillCastButton ultimateBtn;
         [SerializeField] private Button dashBtn;
+        [SerializeField] private Button jumpBtn;
+        [SerializeField] private Button lockOnBtn;
+        [SerializeField] private Button regroupBtn;
 
         private int _selectedWidgetId = 0;
         
@@ -51,6 +55,9 @@ namespace Game.UIs.Screens.CombatHUD
             
             // Setup Action Buttons
             if (dashBtn != null) dashBtn.onClick.AddListener(OnDashClicked);
+            if (jumpBtn != null) jumpBtn.onClick.AddListener(OnJumpClicked);
+            if (lockOnBtn != null) lockOnBtn.onClick.AddListener(OnLockOnClicked);
+            if (regroupBtn != null) regroupBtn.onClick.AddListener(OnRegroupClicked);
 
             UpdateActionButtonsVisibility(PartyCombatManager != null && PartyCombatManager.IsFollowModeEnabled);
             
@@ -73,6 +80,7 @@ namespace Game.UIs.Screens.CombatHUD
             base.Show();
             EventBus.Subscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged);
+            EventBus.Subscribe<PartyHeroesSpawnedEvent>(OnPartyHeroesSpawned);
             RefreshWidgets();
             UpdateSkillButtonsForActiveHero();
         }
@@ -121,6 +129,7 @@ namespace Game.UIs.Screens.CombatHUD
             base.Hide();
             EventBus.Unsubscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             EventBus.Unsubscribe<EntityDamagedEvent>(OnEntityDamaged);
+            EventBus.Unsubscribe<PartyHeroesSpawnedEvent>(OnPartyHeroesSpawned);
 
         }
 
@@ -170,6 +179,22 @@ namespace Game.UIs.Screens.CombatHUD
             PartyCombatManager?.GetActiveHero()?.Dash();
         }
 
+        private void OnJumpClicked()
+        {
+            PartyCombatManager?.GetActiveHero()?.Jump();
+        }
+
+        private void OnLockOnClicked()
+        {
+            var hero = PartyCombatManager?.GetActiveHero();
+            if (hero != null && hero.TryGetComponent<PlayerTargetingSystem>(out var targeting)) targeting.ToggleHardLock();
+        }
+
+        private void OnRegroupClicked()
+        {
+            PartyCombatManager?.RegroupFollowers();
+        }
+
         #region --- GAMEPLAY EVENT ---
         private void OnActiveHeroChanged(ActiveHeroChangedEvent evt)
         {
@@ -187,6 +212,13 @@ namespace Game.UIs.Screens.CombatHUD
                 heroAvatarWidgetGrid.enabled = true;
             }
 
+            UpdateSkillButtonsForActiveHero();
+        }
+
+        /// <summary>Đổi hero trong đội thì cập nhật chân dung và nút skill.</summary>
+        private void OnPartyHeroesSpawned(PartyHeroesSpawnedEvent evt)
+        {
+            RefreshWidgets();
             UpdateSkillButtonsForActiveHero();
         }
 

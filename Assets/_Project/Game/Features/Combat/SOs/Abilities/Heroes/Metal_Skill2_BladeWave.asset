@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae3868b9d7c63f4b880c7250a4d2574, type: 3}
+  m_Name: Metal_Skill2_BladeWave
+  m_EditorClassIdentifier: 
+  AbilityID: Metal_Skill2_BladeWave
+  AbilityName: "Ki\u1EBFm Phong"
+  Description: "Ch\xE9m ra s\xF3ng ki\u1EBFm h\xECnh qu\u1EA1t v\u1EC1 ph\xEDa tr\u01B0\u1EDBc. M\u1EE5c ti\xEAu c\xE0ng \xEDt m\xE1u c\xE0ng ch\u1ECBu th\xEAm s\xE1t th\u01B0\u01A1ng."
+  Icon: {fileID: 0}
+  Type: 1
+  Element: 1
+  Cooldown: 9
+  EnergyCost: 0
+  StaminaCost: 0
+  UnlockLevel: 1
+  AnimationTriggerName: Skill_1
+  AnimationTriggerHash: 0
+  TotalCastDuration: 0.5
+  LocksMovement: 1
+  Range: 9
+  IndicatorRadius: 2
+  IndicatorType: 1
+  RequiresTarget: 0
+  CastVfxPrefab: {fileID: 0}
+  CastVfxAttachPoint: 
+  CastVfxScale: 1
+  CastSoundKey: 
+  ExecuteSoundKey: blade_wave
+  CastAfterimage: 1
+  Effects:
+  - rid: 4882420197032198191
+  references:
+    version: 2
+    RefIds:
+    - rid: 4882420197032198191
+      type: {class: ConeWaveEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Range: 9
+        ArcAngle: 60
+        Speed: 20
+        VisualPrefab: {fileID: 4782446643536433930, guid: abd43599f36faaa44922d2905c73a955, type: 3}
+        SlashPrefab: {fileID: 1691668335544622, guid: 25f0520c9ecef6641af6ea648e95a88d, type: 3}
+        SlashCount: 3
+        SlashHeight: 0.9
+        SlashScale: 0.9
+        SlashRolls:
+        - 25
+        - 0
+        - -25
+        FloorTrailPrefab: {fileID: 125638, guid: 36c40fe19a4447d468678ecd395846df, type: 3}
+        FloorTrailScale: 0.8
+        HitEffects:
+        - rid: 4882420197032198192
+    - rid: 4882420197032198192
+      type: {class: DamageEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
+      data:
+        Element: 0
+        BaseDamage: 150
+        AtkMultiplier: 2
+        UseFalloff: 0
+        FalloffRadius: 3
+        MinDamagePercent: 0.3
+        MissingHealthBonus: 1

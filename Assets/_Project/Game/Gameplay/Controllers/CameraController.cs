@@ -22,6 +22,7 @@ namespace Game.Gameplay.Controllers
     {
         private const float MouseLookScale = 10f;
         private const float TouchLookScale = 0.5f;
+        private const float PinchZoomScale = 0.01f;
         private const float DefaultPitch = 15f;
         private const float HeroSwitchBlendDuration = 0.25f;
         private const float CollisionSkin = 0.2f;
@@ -130,9 +131,15 @@ namespace Game.Gameplay.Controllers
             _lockOnTarget = evt.Target;
         }
 
+        /// <summary>Rung camera, lấy mức mạnh nhất nếu đang rung.</summary>
+        public void AddShake(float strength)
+        {
+            _shakeStrength = Mathf.Max(_shakeStrength, strength);
+        }
+
         private void OnDamageDealt(DamageDealtEvent evt)
         {
-            if (_target == null || evt.Caster != _target.gameObject) return;
+            if (_target == null || evt.IsPeriodic || evt.Caster != _target.gameObject) return;
 
             _shakeStrength = Mathf.Max(_shakeStrength, evt.IsCritical ? CritShake : HitShake);
         }
@@ -164,20 +171,22 @@ namespace Game.Gameplay.Controllers
             if (Cursor.lockState == CursorLockMode.Locked && _input != null)
             {
                 ApplyLook(_input.RotationInput * (swipeSensitivity * MouseLookScale));
-                return;
             }
+        }
 
-            for (int i = 0; i < Input.touchCount; i++)
-            {
-                Touch touch = Input.GetTouch(i);
-                if (touch.position.x <= Screen.width * 0.5f) continue;
+        /// <summary>Xoay camera theo cú vuốt trên màn hình, tính bằng pixel.</summary>
+        public void AddSwipeLook(Vector2 screenDelta)
+        {
+            if (Mode == CameraMode.ThirdPerson) ApplyLook(screenDelta * (swipeSensitivity * TouchLookScale));
+        }
 
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    ApplyLook(touch.deltaPosition * (swipeSensitivity * TouchLookScale));
-                }
-                return;
-            }
+        /// <summary>Zoom theo khoảng cách hai ngón thay đổi, tính bằng pixel.</summary>
+        public void AddPinchZoom(float distanceDelta)
+        {
+            if (Mode != CameraMode.ThirdPerson) return;
+
+            float zoomDelta = distanceDelta * PinchZoomScale * zoomSpeed;
+            thirdPersonDistance = Mathf.Clamp(thirdPersonDistance - zoomDelta, minDistance, maxDistance);
         }
 
         private void ApplyLook(Vector2 delta)

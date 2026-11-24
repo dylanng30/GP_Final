@@ -37,6 +37,23 @@ namespace Game.Combat.Domain
         public float ScaleMultiplier = 1f;
         public GameObject LoopVfxPrefab;
         public Vector3 VfxOffset = Vector3.up;
+        [Tooltip("Thời gian phóng to/thu nhỏ theo ScaleMultiplier. 0 là đổi ngay")]
+        public float ScaleTweenDuration = 0.35f;
+
+        [Tooltip("VFX một lần khi trạng thái bắt đầu, đặt dưới chân")]
+        public GameObject ApplyVfxPrefab;
+        public float ApplyVfxScale = 1f;
+        [Tooltip("VFX một lần khi trạng thái kết thúc")]
+        public GameObject RemoveVfxPrefab;
+        public float RemoveVfxScale = 1f;
+        public string ApplySoundKey = "";
+        public string RemoveSoundKey = "";
+
+        [Tooltip("Viền phát sáng trên người mang trạng thái. Alpha = 0 là tắt")]
+        public Color RimColor = new Color(1f, 0.8f, 0.3f, 0f);
+        [Tooltip("Rung camera mỗi bước chân khi hero đang điều khiển mang trạng thái. 0 là tắt")]
+        public float FootstepShake = 0f;
+        public float FootstepInterval = 0.38f;
 
         public bool IsControl => ControlFlags != ControlFlags.None;
     }

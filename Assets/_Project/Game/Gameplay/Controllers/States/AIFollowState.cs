@@ -22,7 +22,7 @@ namespace Game.Gameplay.Controllers.States
         private const float MovementLerpSpeed = 5f; // Speed of lerping the move vector for smoothness
         
         // Hysteresis/Stability track for slot assignments
-        private static readonly Dictionary<int, int> _lastAssignedSlotIndices = new Dictionary<int, int>();
+        private static readonly Dictionary<EntityId, int> _lastAssignedSlotIndices = new Dictionary<EntityId, int>();
         
         public AIFollowState(IEntityController entityController, HeroInstance heroInstance)
         {
@@ -44,7 +44,7 @@ namespace Game.Gameplay.Controllers.States
         {
             EventBus.Unsubscribe<ActiveHeroChangedEvent>(OnActiveHeroChanged);
             _entityController.StopMove();
-            _lastAssignedSlotIndices.Remove(_heroInstance.GetInstanceID());
+            _lastAssignedSlotIndices.Remove(_heroInstance.GetEntityId());
         }
 
         public override void Update()
@@ -91,7 +91,7 @@ namespace Game.Gameplay.Controllers.States
                             if (pushDir.sqrMagnitude < 0.001f)
                             {
                                 // Use instance ID difference to generate a stable, deterministic push angle
-                                int idDiff = _heroInstance.GetInstanceID() - otherHero.GetInstanceID();
+                                int idDiff = _heroInstance.GetEntityId().GetHashCode() - otherHero.GetEntityId().GetHashCode();
                                 float angle = (idDiff * 45f) % 360f;
                                 pushDir = Quaternion.Euler(0, angle, 0) * Vector3.forward;
                             }
@@ -174,7 +174,7 @@ namespace Game.Gameplay.Controllers.States
             if (followers.Count == 0) return _targetToFollow.position;
 
             // Sort followers by InstanceID to ensure stable, identical order across all calculations
-            followers.Sort((a, b) => a.GetInstanceID().CompareTo(b.GetInstanceID()));
+            followers.Sort((a, b) => a.GetEntityId().CompareTo(b.GetEntityId()));
 
             // 2. Calculate the world space position of each raw slot index
             var slotPositions = new List<Vector3>();
@@ -195,7 +195,7 @@ namespace Game.Gameplay.Controllers.States
             // 4. Save assignments for the next frame's hysteresis check
             for (int i = 0; i < n; i++)
             {
-                _lastAssignedSlotIndices[followers[i].GetInstanceID()] = bestAssignment[i];
+                _lastAssignedSlotIndices[followers[i].GetEntityId()] = bestAssignment[i];
             }
 
             // 5. Retrieve the slot position for the current hero instance
@@ -337,7 +337,7 @@ namespace Game.Gameplay.Controllers.States
                     float sqrDist = Vector3.SqrMagnitude(followers[i].transform.position - slotPositions[currentAssignment[i]]);
                     
                     // Apply loyalty bonus to prevent jitter/flicker at midpoints
-                    int heroID = followers[i].GetInstanceID();
+                    EntityId heroID = followers[i].GetEntityId();
                     if (_lastAssignedSlotIndices.TryGetValue(heroID, out int lastSlot) && lastSlot == currentAssignment[i])
                     {
                         sqrDist -= 1.0f; // loyalty bonus (in units of distance squared)

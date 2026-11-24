@@ -20,9 +20,8 @@ namespace Dylanng.Editor
             if (_implementations != null) return;
 
             // Lấy tất cả các class C# thuần triển khai IAbilityEffect và có thể khởi tạo được
-            _implementations = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => typeof(IAbilityEffect).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+            _implementations = TypeCache.GetTypesDerivedFrom<IAbilityEffect>()
+                .Where(type => !type.IsInterface && !type.IsAbstract)
                 .ToList();
 
             // Thêm tùy chọn "None" vào đầu
