@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e9decf2374446af4483f26213d30b6ca
+timeCreated: 1565867972
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 88479
+  packageName: Fabulous Trees - Lowpoly Style
+  packageVersion: 2.0
+  assetPath: Assets/Fabulous Trees - Lowpoly Style/Models/Trees/fir_tree/Materials/fir_tree_needles.mat
+  uploadId: 619271

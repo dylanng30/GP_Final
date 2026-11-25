@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 69e1304824dfea842969dc12290b1b9f
+timeCreated: 1492683435
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 36300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 88479
+  packageName: Fabulous Trees - Lowpoly Style
+  packageVersion: 2.0
+  assetPath: Assets/Fabulous Trees - Lowpoly Style/Scene/Fabulous Trees - Lowpoly Style_2/OcclusionCullingData.asset
+  uploadId: 619271

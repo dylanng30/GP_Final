@@ -12,22 +12,26 @@ namespace Elementia.EditorTools
     public static partial class ElementiaMapBuilder
     {
         // ---------------- Layout ----------------
-        static readonly Vector2 Arena2C = new Vector2(196, 106);
+        // Boss Stage 1 sits on the north side of the mainland, behind the temple, reached from the north-east.
+        static readonly Vector2 Arena2C = new Vector2(14, 202);
         const float Arena2R = 19f, Arena2Y = 0.45f;
+        static readonly Vector2 BossApproach = new Vector2(52, 178);   // junction in front of the canyon entrance
+        static Vector2 Arena2Entry { get { return Arena2C + (BossApproach - Arena2C).normalized * (Arena2R + 2f); } }
         const int JungleClearStart = 5;
         static List<Island> jungleIslands = new List<Island>();
-        static readonly Vector3[] jungleLakes = { new Vector3(-101, 136, 11f), new Vector3(92, 88, 9f) };   // x, z, radius
+        static readonly Vector3[] jungleLakes = { new Vector3(-70, 163, 11f), new Vector3(100, 88, 9f) };   // x, z, radius (Mirror Lake NW, east lake)
         const float LakeWaterY = -0.6f;
-        static readonly Vector2 SwampC = new Vector2(-144, 86);   // Marsh Heart clearing sits on its eastern edge (a dry mud island among the pools)
-        const float SwampR = 24f, SwampWaterY = -0.45f;
+        static readonly Vector2 SwampC = new Vector2(-90, 76);   // south-west; Marsh Heart clearing sits on its eastern edge (a dry mud island among the pools)
+        const float SwampR = 20f, SwampWaterY = -0.45f;
         // x, z, radius, height
         static readonly Vector4[] junglePeaks =
         {
-            new Vector4(-146, 122, 17, 20), new Vector4(-78, 126, 10, 10), new Vector4(-104, 64, 11, 10),
-            new Vector4(140, 124, 16, 20), new Vector4(148, 70, 14, 15), new Vector4(78, 128, 10, 9),
+            new Vector4(-100, 128, 13, 14), new Vector4(-104, 100, 10, 10),                                   // west
+            new Vector4(-18, 190, 14, 18), new Vector4(-40, 198, 12, 13), new Vector4(44, 212, 12, 15),       // around the boss grove (north)
+            new Vector4(62, 142, 12, 11), new Vector4(108, 124, 10, 12),                                       // north-east / east
         };
         // flat pads kept free of relief: west camp, pre-boss shrine, giant tree behind the boss arena
-        static readonly Vector3[] jungleFlats = { new Vector3(-104, 90, 7.5f), new Vector3(150, 86, 6.5f), new Vector3(225, 106, 6f) };
+        static readonly Vector3[] jungleFlats = { new Vector3(-88, 108, 7.5f), new Vector3(75, 178, 6.5f), new Vector3(-10, 216, 6f) };
 
         // ---------------- Palette ----------------
         static readonly Cell C_JGrass = new Cell(6, 3, 0.4f, 0.72f);
@@ -62,6 +66,7 @@ namespace Elementia.EditorTools
             foreach (var lk in jungleLakes) m = Mathf.Min(m, Smooth(lk.z * 1.35f, lk.z * 1.35f + 9f, Vector2.Distance(p, new Vector2(lk.x, lk.y))));
             foreach (var f in jungleFlats) m = Mathf.Min(m, Smooth(f.z, f.z + 9f, Vector2.Distance(p, new Vector2(f.x, f.y))));
             m = Mathf.Min(m, Smooth(SwampR * 0.85f, SwampR + 8f, Vector2.Distance(p, SwampC)));
+            foreach (var f in fields) m = Mathf.Min(m, Smooth(2f, 14f, RectDist(p, f)));   // farmland stays flat
             return m;
         }
 
@@ -73,7 +78,7 @@ namespace Elementia.EditorTools
             {
                 float n = j.Norm(p);
                 if (n < 1.15f) inside = true;
-                ridge = Mathf.Max(ridge, Smooth(0.58f, 0.95f, n) * (1f - Smooth(1.0f, 1.12f, n)));
+                ridge = Mathf.Max(ridge, Smooth(0.7f, 0.97f, n) * (1f - Smooth(1.0f, 1.12f, n)));
             }
             if (!inside) return 0f;
             float vn = islands[0].Norm(p);
@@ -81,7 +86,7 @@ namespace Elementia.EditorTools
             if (fade <= 0f) return 0f;
             float mask = JungleOpenMask(p);
             if (mask <= 0f) return 0f;
-            ridge *= Smooth(1.05f, 1.45f, vn) * (0.55f + 0.6f * Perlin(p.x, p.y, 0.045f, 52.3f)) * 24f;   // mountains only on the outer rims
+            ridge *= Smooth(1.05f, 1.45f, vn) * (0.55f + 0.6f * Perlin(p.x, p.y, 0.045f, 52.3f)) * 14f;   // low hills on the outer rim (forest reaches the coast)
             float hills = 6.5f * Mathf.Max(0f, Fbm(p.x, p.y, 0.03f, 31.7f) + 0.12f);
             foreach (var pk in junglePeaks)
             {
@@ -439,9 +444,10 @@ namespace Elementia.EditorTools
             BuildBossStage1(root, flora);
 
             // ---- checkpoints + signposts at the village exits ----
-            BuildCheckpoint("JungleWestCamp", new Vector2(jungleFlats[0].x, jungleFlats[0].y), 30f, zW.transform, true);
+            Vector2 camp = new Vector2(jungleFlats[0].x, jungleFlats[0].y);
+            BuildCheckpoint("JungleWestCamp", camp, FaceYaw(camp, new Vector2(-77, 110)), zW.transform, true);
             Vector2 pre = new Vector2(jungleFlats[1].x, jungleFlats[1].y);
-            BuildCheckpoint("PreBossShrine_Stage1", pre, FaceYaw(pre, new Vector2(156, 100)), zE.transform, false);
+            BuildCheckpoint("PreBossShrine_Stage1", pre, FaceYaw(pre, new Vector2(72, 168)), zE.transform, false);
             Vector2 sW = PlaceNear(new Vector2(-53, 97f), 0.8f); Signpost("Signpost_JungleWest", Ground(sW), FaceYaw(sW, PlazaC), zW.transform);
             Vector2 sE = PlaceNear(new Vector2(60, 102.5f), 0.8f); Signpost("Signpost_JungleEast", Ground(sE), FaceYaw(sE, PlazaC), zE.transform);
 
@@ -499,7 +505,8 @@ namespace Elementia.EditorTools
             }
             {
                 var cl = clearings[10]; Vector2 c = new Vector2(cl.x, cl.y); var g = Group("CanopyHollow", zE.transform);
-                Vector2 entry = new Vector2(111, 114), back = (c - entry).normalized;
+                var hp = paths.Find(p => p.name == "Path_Jungle_East_Hollow").pts;
+                Vector2 entry = hp[Mathf.Max(0, hp.Count - 7)], back = (c - entry).normalized;
                 Vector2 chestP = c + back * (cl.z - 2f);
                 TreasureChest("TreasureChest_CanopyHollow", Ground(chestP), FaceYaw(chestP, c), g.transform); Occupy(chestP, 1f);
                 Marker("Treasure_CanopyHollow", chestP, gpE.transform);
@@ -550,9 +557,12 @@ namespace Elementia.EditorTools
             gwW.Flush(wW.transform); gwE.Flush(wE.transform);
 
             // ---- vegetation ----
-            JungleVegetation(jungleIslands[0], Group("Vegetation", zW.transform).transform, flora, 360);
-            JungleVegetation(jungleIslands[1], Group("Vegetation", zE.transform).transform, flora, 380);
-            JungleVegetation(jungleIslands[2], Group("Vegetation", root.Find("Zone_08_BossStage1_HeartOfTheGrove")).transform, flora, 110);
+            // one mainland, vegetation split into zones: boss grove (north), west half, east half
+            var main = jungleIslands[0];
+            System.Func<Vector2, bool> inGrove = p => Vector2.Distance(p, Arena2C) < 46f;
+            JungleVegetation(main, Group("Vegetation", zW.transform).transform, flora, 540, p => p.x < 0f && !inGrove(p), "Mainland_West");
+            JungleVegetation(main, Group("Vegetation", zE.transform).transform, flora, 500, p => p.x >= 0f && !inGrove(p), "Mainland_East");
+            JungleVegetation(main, Group("Vegetation", root.Find("Zone_08_BossStage1_HeartOfTheGrove")).transform, flora, 150, inGrove, "Mainland_Grove");
         }
         // water disc whose edge is pulled inside the island outline (never spills over the cliff)
         static GameObject BuildClippedDisc(string name, Vector2 c, float r, float y, Cell cell, Material mat, Transform parent, int seg)
@@ -576,21 +586,27 @@ namespace Elementia.EditorTools
         }
         static Vector2 Random2() { float a = Rand(0, Mathf.PI * 2f), r = Mathf.Sqrt(Rand(0, 1)); return new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r; }
 
-        static void JungleVegetation(Island isl, Transform parent, Flora fl, int fillTrees)
+        static void JungleVegetation(Island isl, Transform parent, Flora fl, int fillTrees, System.Func<Vector2, bool> zone, string tag)
         {
-            var trees = new Chunks(isl.name + "_Trees", matEnv);
-            var under = new Chunks(isl.name + "_Undergrowth", matEnv);
+            var trees = new Chunks(tag + "_Trees", matEnv);
+            var under = new Chunks(tag + "_Undergrowth", matEnv);
+            // sampling box = the zone's part of the island bounding box
+            float bx0 = isl.c.x - isl.rx * 1.1f, bx1 = isl.c.x + isl.rx * 1.1f, bz0 = isl.c.y - isl.rz * 1.1f, bz1 = isl.c.y + isl.rz * 1.1f;
+            { float ax0 = 1e9f, ax1 = -1e9f, az0 = 1e9f, az1 = -1e9f;
+              for (float x = bx0; x <= bx1; x += 4f) for (float z = bz0; z <= bz1; z += 4f) if (zone(new Vector2(x, z)) && isl.Norm(new Vector2(x, z)) < 1f) { ax0 = Mathf.Min(ax0, x); ax1 = Mathf.Max(ax1, x); az0 = Mathf.Min(az0, z); az1 = Mathf.Max(az1, z); }
+              if (ax1 > ax0) { bx0 = ax0 - 4f; bx1 = ax1 + 4f; bz0 = az0 - 4f; bz1 = az1 + 4f; } }
+            System.Func<Vector2> sample = () => new Vector2(Rand(bx0, bx1), Rand(bz0, bz1));
             var cols = Group("TreeColliders", parent);
             var prefabs = Group("Prefabs", parent);
             int dead = 0;
-            System.Func<Vector2, float, bool> ok = (p, r) => isl.Norm(p) < 0.97f && islands[0].Norm(p) > 1.04f && Free(p, r, 0.4f) && !InClearing(p, r * 0.6f);
+            System.Func<Vector2, float, bool> ok = (p, r) => zone(p) && isl.Norm(p) < 0.97f && islands[0].Norm(p) > 1.04f && Free(p, r, 0.4f) && !InClearing(p, r * 0.6f);
 
             System.Action<Vector2> tree = p =>
             {
                 float h = H(p.x, p.y); Vector3 g = new Vector3(p.x, h - 0.15f, p.y);
                 if (InSwamp(p))
                 {
-                    if (dead < 8 && Rand(0, 1) < 0.25f) { BuildDeadTree("SwampDeadTree_" + isl.name + "_" + dead, p, Rand(1f, 1.4f), prefabs.transform); dead++; return; }
+                    if (dead < 8 && Rand(0, 1) < 0.25f) { BuildDeadTree("SwampDeadTree_" + tag + "_" + dead, p, Rand(1f, 1.4f), prefabs.transform); dead++; return; }
                     float s = Rand(0.85f, 1.2f); trees.Add(Pick(fl.mangrove), g, Rand(0, 360), s); TrunkCollider(cols.transform, g, 0.35f * s, 4.5f * s); return;
                 }
                 float roll = Rand(0, 1);
@@ -631,7 +647,7 @@ namespace Elementia.EditorTools
             // 3) fill: dense forest over hills and ridges
             for (int made = 0, t = 0; made < fillTrees && t < fillTrees * 30; t++)
             {
-                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz)) * 1.1f;
+                Vector2 p = sample();
                 bool swamp = InSwamp(p);
                 if (!ok(p, swamp ? 2.6f : 1.9f) || (!swamp && !Dry(p))) continue;
                 tree(p); Occupy(p, swamp ? 2.6f : 1.9f); made++;
@@ -639,32 +655,32 @@ namespace Elementia.EditorTools
             // 4) understorey
             for (int made = 0, t = 0; made < fillTrees / 3 && t < fillTrees * 20; t++)
             {
-                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz)) * 1.1f;
+                Vector2 p = sample();
                 if (!ok(p, 1.1f) || !Dry(p)) continue;
                 Holotna("Bush01", prefabs.transform, Ground(p), Rand(0, 360), Rand(0.9f, 1.4f)); Occupy(p, 1.0f); made++;
             }
             for (int made = 0, t = 0; made < fillTrees / 12 && t < fillTrees * 10; t++)
             {
-                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz)) * 1.1f;
+                Vector2 p = sample();
                 if (!ok(p, 1.6f) || !Dry(p)) continue;
                 Kit("SM_Mossy_Rock_Group" + (1 + made % 14), prefabs.transform, Ground(p) + Vector3.down * 0.2f, Rand(0, 360), Rand(1.4f, 2.6f)); Occupy(p, 1.6f); made++;
             }
             for (int made = 0, t = 0; made < fillTrees * 2 && t < fillTrees * 16; t++)
             {
-                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz)) * 1.1f;
-                if (isl.Norm(p) > 0.97f || islands[0].Norm(p) < 1.04f || !Free(p, 0.6f, -0.1f) || InClearing(p, 0.2f) || !Dry(p)) continue;
+                Vector2 p = sample();
+                if (!zone(p) || isl.Norm(p) > 0.97f || islands[0].Norm(p) < 1.04f || !Free(p, 0.6f, -0.1f) || InClearing(p, 0.2f) || !Dry(p)) continue;
                 under.Add(Pick(fl.fern), Ground(p), Rand(0, 360), Rand(0.8f, 1.5f)); made++;
             }
             for (int made = 0, t = 0; made < fillTrees * 2 && t < fillTrees * 12; t++)
             {
-                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz)) * 1.1f;
-                if (isl.Norm(p) > 0.97f || islands[0].Norm(p) < 1.04f || !Free(p, 0.4f, -0.2f) || !Dry(p)) continue;
+                Vector2 p = sample();
+                if (!zone(p) || isl.Norm(p) > 0.97f || islands[0].Norm(p) < 1.04f || !Free(p, 0.4f, -0.2f) || !Dry(p)) continue;
                 Holotna("Grass01" + "ABC"[made % 3], prefabs.transform, Ground(p), Rand(0, 360), Rand(1.0f, 1.5f)); made++;
             }
             for (int made = 0, t = 0; made < fillTrees / 4 && t < fillTrees * 6; t++)
             {
-                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz)) * 1.1f;
-                if (isl.Norm(p) > 0.95f || islands[0].Norm(p) < 1.04f || !Free(p, 0.4f, -0.1f) || InClearing(p, 0.2f) || !Dry(p)) continue;
+                Vector2 p = sample();
+                if (!zone(p) || isl.Norm(p) > 0.95f || islands[0].Norm(p) < 1.04f || !Free(p, 0.4f, -0.1f) || InClearing(p, 0.2f) || !Dry(p)) continue;
                 Holotna(made % 2 == 0 ? "Flower01A" : "Flower01B", prefabs.transform, Ground(p), Rand(0, 360), Rand(0.9f, 1.3f)); made++;
             }
             trees.Flush(parent); under.Flush(parent);

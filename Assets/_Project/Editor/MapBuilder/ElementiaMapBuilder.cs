@@ -184,7 +184,7 @@ namespace Elementia.EditorTools
                 r.transform.localScale = Vector3.one * (heroHeight / hh);
             }
             string[] zones = { "Zone_01_StartingPoint", "Zone_02_Village", "Zone_03_ConnectingPath", "Zone_04_VolcanicArea", "Zone_05_BossArena", "Zone_06_JungleWest", "Zone_07_JungleEast", "Zone_08_BossStage1" };
-            Vector2[] zp = { PlazaC, PlazaC + new Vector2(0, 10), new Vector2(4, 15), new Vector2(0, -85), ArenaC, new Vector2(-104, 100), new Vector2(112, 100), Arena2C };
+            Vector2[] zp = { PlazaC, PlazaC + new Vector2(0, 10), new Vector2(4, 15), new Vector2(0, -85), ArenaC, new Vector2(-74, 104), new Vector2(84, 110), Arena2C };
             for (int i = 0; i < zones.Length; i++)
             {
                 var z = Group("Marker_" + zones[i], m.transform); z.transform.position = V3(zp[i], H(zp[i].x, zp[i].y) + 0.2f);
@@ -243,7 +243,7 @@ namespace Elementia.EditorTools
         {
             var sv = SceneView.lastActiveSceneView;
             if (sv == null) return;
-            sv.LookAt(new Vector3(0, 0, -10), Quaternion.Euler(45f, -35f, 0), 170f);
+            sv.LookAt(new Vector3(MainlandC.x, 0, MainlandC.y - 8f), Quaternion.Euler(90f, 0f, 0f), 150f);   // top-down on the round mainland
             sv.Repaint();
         }
     }
