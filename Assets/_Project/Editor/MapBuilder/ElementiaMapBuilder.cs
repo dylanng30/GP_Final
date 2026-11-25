@@ -37,6 +37,7 @@ namespace Elementia.EditorTools
             matLava = MakeMat("M_Env_Lava", tex, 0.15f, new Color(1.0f, 0.42f, 0.12f) * 1.7f, true);
             matWater = MakeMat("M_Env_Water", tex, 0.85f, new Color(0.1f, 0.3f, 0.45f) * 0.6f, true);
             matCrystal = MakeMat("M_Env_Crystal", tex, 0.8f, new Color(1f, 0.25f, 0.3f) * 1.8f, true);
+            matSwamp = MakeMat("M_Env_SwampWater", tex, 0.8f, new Color(0.05f, 0.14f, 0.1f), true);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DefineLayout();
@@ -52,13 +53,15 @@ namespace Elementia.EditorTools
             foreach (var st in streams)
             {
                 BuildRibbon(st, water.transform, 0.12f, matWater, false, 0.15f);
-                BuildWaterfall(st, water.transform);
+                Vector2 stEnd = st.pts[st.pts.Count - 1];
+                if (!(OnLand(stEnd, -4f) && IslandAt(stEnd).Norm(stEnd) < 0.9f)) BuildWaterfall(st, water.transform); // a stream ending in a lake has no fall
                 Vector2 s0 = st.pts[0];
                 BuildDisc(st.name + "_SpringRocks", s0, st.width * 1.6f, H(s0.x, s0.y) + 0.05f, C_Stone, matEnv, water.transform, 4.4f, 16);
                 BuildDisc(st.name + "_Spring", s0, st.width * 1.25f, H(s0.x, s0.y) + 0.25f, C_Water, matWater, water.transform, 5.1f, 16);
             }
 
             BuildVillage(root.transform);
+            BuildJungle(root.transform);
             BuildConnectingPath(root.transform);
             BuildVolcano(root.transform);
             SetupMarkers(root.transform);
@@ -180,8 +183,8 @@ namespace Elementia.EditorTools
                 float hh = 1.16f; var rr = r.GetComponentsInChildren<Renderer>(); if (rr.Length > 0) { var b = rr[0].bounds; foreach (var x in rr) b.Encapsulate(x.bounds); hh = Mathf.Max(0.1f, b.size.y); }
                 r.transform.localScale = Vector3.one * (heroHeight / hh);
             }
-            string[] zones = { "Zone_01_StartingPoint", "Zone_02_Village", "Zone_03_ConnectingPath", "Zone_04_VolcanicArea", "Zone_05_BossArena" };
-            Vector2[] zp = { PlazaC, PlazaC + new Vector2(0, 10), new Vector2(4, 15), new Vector2(0, -85), ArenaC };
+            string[] zones = { "Zone_01_StartingPoint", "Zone_02_Village", "Zone_03_ConnectingPath", "Zone_04_VolcanicArea", "Zone_05_BossArena", "Zone_06_JungleWest", "Zone_07_JungleEast", "Zone_08_BossStage1" };
+            Vector2[] zp = { PlazaC, PlazaC + new Vector2(0, 10), new Vector2(4, 15), new Vector2(0, -85), ArenaC, new Vector2(-104, 100), new Vector2(112, 100), Arena2C };
             for (int i = 0; i < zones.Length; i++)
             {
                 var z = Group("Marker_" + zones[i], m.transform); z.transform.position = V3(zp[i], H(zp[i].x, zp[i].y) + 0.2f);

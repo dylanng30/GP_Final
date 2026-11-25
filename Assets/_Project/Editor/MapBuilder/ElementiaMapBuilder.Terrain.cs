@@ -6,7 +6,7 @@ namespace Elementia.EditorTools
 {
     public static partial class ElementiaMapBuilder
     {
-        enum Region { Village, Strip, Volcano, Arena }
+        enum Region { Village, Strip, Volcano, Arena, Jungle }
 
         class Island
         {
@@ -63,7 +63,12 @@ namespace Elementia.EditorTools
                 new Island("Islet_West", Region.Strip, new Vector2(-24, 30), 5, 4, 0, 0.2f, 0.4f, 23.1f),
                 new Island("Islet_East", Region.Strip, new Vector2(34, 8), 4, 3.5f, 0, 0.2f, 0.35f, 25.7f),
                 new Island("Islet_SouthWest", Region.Volcano, new Vector2(-96, -118), 6, 5, 0, 0.2f, 0.45f, 27.2f),
+                // Jungle expansion grown out of the village island (contiguous land, no bridges)
+                new Island("Island_Jungle_West", Region.Jungle, new Vector2(-104, 102), 60, 50, 4, 0.10f, 1.15f, 33.3f),
+                new Island("Island_Jungle_East", Region.Jungle, new Vector2(108, 100), 60, 48, -6, 0.10f, 1.15f, 37.1f),
+                new Island("Island_Jungle_BossStage1", Region.Jungle, new Vector2(198, 106), 42, 35, 0, 0.08f, 1.2f, 41.9f),
             };
+            jungleIslands = islands.FindAll(i => i.region == Region.Jungle);
 
             paths = new List<Path>
             {
@@ -86,12 +91,20 @@ namespace Elementia.EditorTools
                 // Optional branches (rewards): Crystal Hollow (north-east) and the Lava Lake Overlook (south)
                 new Path("Path_Volcano_CrystalHollow", 4f, C_PathDark, new Vector2(-4, -55), new Vector2(10, -51), new Vector2(27, -51), new Vector2(43, -55), new Vector2(54, -60)),
                 new Path("Path_Volcano_Overlook", 3.5f, C_PathDark, new Vector2(-24, -104), new Vector2(-11, -113), new Vector2(3, -124), new Vector2(14, -131)),
+                // Jungle West (marsh + lake): village west lane -> Forest Edge -> camp -> Marsh Heart; spur to the Mirror Lake shore
+                new Path("Path_Jungle_West", 4.5f, C_Path, new Vector2(-39.5f, 98.5f), new Vector2(-50, 100.2f), new Vector2(-62, 101.5f), new Vector2(-74, 103), new Vector2(-84, 104),
+                         new Vector2(-96, 107), new Vector2(-106, 103), new Vector2(-116, 95), new Vector2(-124, 86), new Vector2(-130, 79)),
+                new Path("Path_Jungle_West_Lake", 3.5f, C_Path, new Vector2(-96, 107), new Vector2(-97, 112), new Vector2(-99, 117)),
+                // Jungle East (deep jungle): village east lane -> Jungle Trail -> Vine Ruins -> pre-boss shrine -> Boss Stage 1; spur to Canopy Hollow
+                new Path("Path_Jungle_East", 4.5f, C_Path, new Vector2(53, 106), new Vector2(66, 106), new Vector2(80, 109), new Vector2(96, 112), new Vector2(108, 106),
+                         new Vector2(118, 96), new Vector2(130, 90), new Vector2(144, 93), new Vector2(156, 100), new Vector2(166, 104), new Vector2(Arena2C.x - Arena2R - 2f, Arena2C.y)),
+                new Path("Path_Jungle_East_Hollow", 3.5f, C_Path, new Vector2(108, 106), new Vector2(111, 114), new Vector2(116, 121)),
             };
 
             streams = new List<Path>
             {
                 new Path("Stream_Village", 3.6f, C_Water, new Vector2(28, 160), new Vector2(36, 146), new Vector2(43, 128), new Vector2(47, 112),
-                         new Vector2(49, 100), new Vector2(54, 90), new Vector2(66, 82), new Vector2(74, 78)),
+                         new Vector2(49, 100), new Vector2(57, 96.5f), new Vector2(67, 93), new Vector2(77, 90), new Vector2(85, 88.5f)), // feeds the east jungle lake
             };
 
             // One main lava river born at the foot of Mt. Ignis, crossing the critical path once (bridge) and falling off the west cliff.
@@ -116,8 +129,17 @@ namespace Elementia.EditorTools
                 new Vector3(57, -61, 10),    // 2 Crystal Hollow: optional elite + treasure
                 new Vector3(15, -132, 7.5f), // 3 Lava Lake Overlook: optional treasure / vista
                 new Vector3(4, 15, 6.5f),    // 4 Wilds Skirmish (connecting path): first small fight outside the village
+                // Jungle (JungleClearStart = 5)
+                new Vector3(-84, 104, 8.5f), // 5 Forest Edge: first jungle fight (west)
+                new Vector3(-130, 79, 11f),  // 6 Marsh Heart: fight among swamp pools
+                new Vector3(-99, 119, 6.5f), // 7 Mirror Lake shore: optional elite + treasure
+                new Vector3(96, 112, 9f),    // 8 Jungle Trail: first jungle fight (east)
+                new Vector3(130, 90, 11f),   // 9 Vine Ruins: fight among overgrown ruins
+                new Vector3(117, 123, 7.5f), // 10 Canopy Hollow: optional elite + treasure
+                new Vector3(Arena2C.x, Arena2C.y, Arena2R), // 11 Boss Stage 1 arena
             };
-            clearingNames = new[] { "AshField", "ObsidianRuins", "CrystalHollow_Elite", "LavaLakeOverlook", "WildsSkirmish" };
+            clearingNames = new[] { "AshField", "ObsidianRuins", "CrystalHollow_Elite", "LavaLakeOverlook", "WildsSkirmish",
+                                    "Jungle_ForestEdge", "Jungle_MarshHeart", "Jungle_MirrorLake_Elite", "Jungle_Trail", "Jungle_VineRuins", "Jungle_CanopyHollow_Elite", "BossStage1_HeartOfTheGrove" };
 
             // 2x2 rice paddies, separated by the farm lanes (x=-39.5, z=88.25)
             fields = new List<Rect>
@@ -186,6 +208,8 @@ namespace Elementia.EditorTools
             volcano += 4.5f * Smooth(0.72f, 0.97f, e) * Perlin(x, z, 0.06f, 4.4f);
             float h = z > 56 ? village : Mathf.Lerp(volcano, strip, Smooth(-34f, -16f, z));
             float low = HLow(x, z);
+            h += JungleRelief(p);
+            h = SwampBlend(p, h);
 
             float flat = 0f; // 0..1 how much to flatten toward HLow
             foreach (var pa in paths) { Vector2 c; float d = DistToPolyline(p, pa.pts, out c); flat = Mathf.Max(flat, 1f - Smooth(pa.width * 0.5f + 0.5f, pa.width * 0.5f + 3.5f, d)); }
@@ -202,7 +226,7 @@ namespace Elementia.EditorTools
             h = Mathf.Lerp(0.12f, h, Smooth(PlazaR + 1.5f, PlazaR + 5f, dp));
             float da = Vector2.Distance(p, ArenaC);
             h = Mathf.Lerp(0.4f, h, Smooth(ArenaR + 7f, ArenaR + 12f, da));
-            return h;
+            return JungleFinal(p, h);
         }
         static float RectDist(Vector2 p, Rect r)
         {
@@ -225,6 +249,8 @@ namespace Elementia.EditorTools
             foreach (var b in buildings) if (Vector2.Distance(p, b.pos) < b.padR + r) return false;
             if (Vector2.Distance(p, ArenaC) < ArenaR + 7f + r) return false;
             if (Vector2.Distance(p, (BridgeA + BridgeB) * 0.5f) < 9f + r) return false;
+            foreach (var lk in jungleLakes) if (Vector2.Distance(p, new Vector2(lk.x, lk.y)) < lk.z * 1.3f + r) return false;
+            if (Vector2.Distance(p, Arena2C) < Arena2R + 3f + r) return false;
             foreach (var o in occupied) if (Vector2.Distance(p, new Vector2(o.x, o.y)) < o.z + r) return false;
             return true;
         }
@@ -323,6 +349,7 @@ namespace Elementia.EditorTools
         static int Priority(Island isl)
         {
             int p = isl.region == Region.Arena ? 400 : (isl.region == Region.Volcano || isl.region == Region.Village) ? 300 : 200;
+            if (isl.region == Region.Jungle) p = isl.name.Contains("Boss") ? 260 : 250;
             if (isl.name.StartsWith("Islet")) p = 100;
             return p - islands.IndexOf(isl);
         }
@@ -361,6 +388,9 @@ namespace Elementia.EditorTools
                         else cell = patch > 0.5f ? C_Ash : C_Volcanic;
                         break;
                     }
+                case Region.Jungle:
+                    cell = JungleGroundCell(p, a, b, c, patch, t);
+                    break;
                 default:
                     {
                         float e = isl.Norm(p);

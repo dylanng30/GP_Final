@@ -105,6 +105,15 @@ namespace Elementia.EditorTools
                     if (capTop && rTop > 0.001f) Tri(topC, t1, t0, UV(cap, 0.3f));
                 }
             }
+            // copy another builder's triangles, transformed (batches many small props into one mesh)
+            public void Append(MB o, Vector3 pos, Quaternion q, float s)
+            {
+                int b = v.Count;
+                foreach (var p in o.v) v.Add(pos + q * (p * s));
+                uv.AddRange(o.uv);
+                foreach (int i in o.t) t.Add(b + i);
+                foreach (int i in o.tLava) tLava.Add(b + i);
+            }
             public Mesh ToMesh(string name)
             {
                 var m = new Mesh { name = name };
@@ -118,7 +127,7 @@ namespace Elementia.EditorTools
         }
 
         // ---------- Materials ----------
-        static Material matEnv, matLava, matWater, matCrystal;
+        static Material matEnv, matLava, matWater, matCrystal, matSwamp;
         static Material MakeMat(string name, Texture tex, float smooth, Color emission, bool emissive)
         {
             string p = GenDir + "/" + name + ".mat";
