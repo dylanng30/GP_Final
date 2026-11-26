@@ -64,6 +64,7 @@ namespace Elementia.EditorTools
             BuildJungle(root.transform);
             BuildConnectingPath(root.transform);
             BuildVolcano(root.transform);
+            Debug.Log(ConvertTreesToPines(root.transform));   // pines only (Tree01A / Tree01B), all locked to LOD2
             SetupMarkers(root.transform);
             SetupLighting();
             MarkStatic(root);
