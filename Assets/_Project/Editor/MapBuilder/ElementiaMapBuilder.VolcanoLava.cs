@@ -94,6 +94,65 @@ namespace Elementia.EditorTools
             return go;
         }
 
+        // ---------------- Rock massif: a cluster of faceted, leaning spires of mixed size (stylized low-poly) ----------------
+        static GameObject BuildCrag(string name, Vector2 c, float R, float H0, bool hot, Transform parent, float seed)
+        {
+            var mb = new MB();
+            int spires = 3 + Mathf.RoundToInt(R / 3.5f);
+            for (int s = 0; s < spires; s++)
+            {
+                Vector2 o; float r, h;
+                if (s == 0) { o = new Vector2(Rand(-0.12f, 0.12f), Rand(-0.12f, 0.12f)) * R; r = R * Rand(0.5f, 0.62f); h = H0; }
+                else
+                {
+                    float a = (s * 137.5f + Rand(-25f, 25f)) * Mathf.Deg2Rad, dist = R * Rand(0.35f, 0.72f);
+                    o = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * dist;
+                    r = R * Rand(0.24f, 0.42f); h = H0 * Rand(0.3f, 0.72f) * (1f - 0.35f * dist / R);
+                }
+                int seg = RandI(5, 9);
+                float[] rf = { 1.0f, 0.66f, 0.34f }, hf = { -0.12f, 0.38f, 0.74f };
+                var ring = new Vector3[3, seg];
+                Vector3 lean = new Vector3(Rand(-0.14f, 0.14f), 0, Rand(-0.14f, 0.14f)) * r;
+                for (int l = 0; l < 3; l++)
+                    for (int i = 0; i < seg; i++)
+                    {
+                        float a = (i + Perlin(i * 1.7f, l * 2.9f, 1f, seed + s) * 0.35f) * Mathf.PI * 2f / seg;
+                        float rr = r * rf[l] * (0.8f + 0.4f * Perlin(i * 2.3f, l * 1.1f, 1f, seed + s * 3.1f));
+                        float yy = h * hf[l] + (l == 0 ? 0f : (Perlin(i * 3.1f, l * 0.7f, 1f, seed + s * 1.7f) - 0.5f) * h * 0.12f);
+                        ring[l, i] = new Vector3(o.x + Mathf.Cos(a) * rr, yy, o.y + Mathf.Sin(a) * rr) + lean * (hf[l] + 0.12f);
+                    }
+                Vector3 apex = new Vector3(o.x, h, o.y) + lean * 1.1f + new Vector3(Rand(-0.08f, 0.08f), 0, Rand(-0.08f, 0.08f)) * r;
+                int lavaFace = hot && s == 0 ? RandI(0, seg) : -1;
+                for (int i = 0; i < seg; i++)
+                {
+                    int i1 = (i + 1) % seg;
+                    if (i == lavaFace)
+                    {   // glowing fissure down the lower flank
+                        mb.Quad(ring[0, i], ring[1, i], ring[1, i1], ring[0, i1], UV(C_Crust, 0.3f));
+                        Vector3 m0 = Vector3.Lerp(ring[0, i], ring[0, i1], 0.5f), m1 = Vector3.Lerp(ring[1, i], ring[1, i1], 0.5f);
+                        Vector3 nrm = Vector3.Cross(ring[1, i] - ring[0, i], ring[0, i1] - ring[0, i]).normalized;
+                        if (Vector3.Dot(nrm, new Vector3(m0.x - o.x, 0, m0.z - o.y)) < 0) nrm = -nrm;
+                        Vector3 w0 = (ring[0, i1] - ring[0, i]) * 0.18f, w1 = (ring[1, i1] - ring[1, i]) * 0.1f, off = nrm * 0.12f;
+                        mb.lava = true;
+                        mb.Quad(m0 - w0 + off, m1 - w1 + off, m1 + w1 + off, m0 + w0 + off, UV(C_Lava, 0.35f), UV(C_Lava, 0.6f), UV(C_Lava, 0.6f), UV(C_Lava, 0.35f));
+                        mb.lava = false;
+                    }
+                    else mb.Quad(ring[0, i], ring[1, i], ring[1, i1], ring[0, i1], UV(C_ConeSide, 0.85f), UV(C_ConeSide, 0.45f), UV(C_ConeSide, 0.45f), UV(C_ConeSide, 0.85f));
+                    mb.Quad(ring[1, i], ring[2, i], ring[2, i1], ring[1, i1], UV(C_ConeSide, 0.45f), UV(C_ConeSide, 0.1f), UV(C_ConeSide, 0.1f), UV(C_ConeSide, 0.45f));
+                    mb.Tri(ring[2, i], apex, ring[2, i1], UV(C_Crust, 0.15f));
+                }
+            }
+            var go = MeshGO(name, mb.ToMesh(name), matEnv, parent, true);
+            go.transform.position = new Vector3(c.x, H(c.x, c.y) - 0.3f, c.y);
+            go.transform.rotation = Quaternion.Euler(0, Rand(0, 360), 0);
+            if (hot)
+            {
+                var sm = SpawnPrefab(FX + "Smoke/Dark/SmokeDarkSoft.prefab", go.transform, go.transform.position + Vector3.up * H0 * 0.6f, 0, 1.2f);
+                if (sm != null) sm.name = "FX_FissureSmoke";
+            }
+            return go;
+        }
+
         // ---------------- Lava channel: raised crust banks + lava bed (bright core, dark edges) ----------------
         static GameObject BuildLavaChannel(string name, List<Vector2> pts, float width, Transform parent)
         {

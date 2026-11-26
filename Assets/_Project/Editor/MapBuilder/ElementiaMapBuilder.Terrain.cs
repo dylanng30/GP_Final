@@ -67,11 +67,12 @@ namespace Elementia.EditorTools
                 new Island("Island_Strip_C", Region.Strip, new Vector2(4, 15), 14, 10, 25, 0.15f, 0.6f, 9.2f),
                 new Island("Island_Strip_D", Region.Strip, new Vector2(-6, 2), 12, 10, -15, 0.15f, 0.6f, 11.4f),
                 new Island("Island_Strip_E", Region.Strip, new Vector2(-2, -12), 15, 11, 10, 0.12f, 0.7f, 13.6f),
-                new Island("Island_Volcano", Region.Volcano, new Vector2(0, -92), 86, 66, -6, 0.09f, 1.25f, 17.9f),
+                // broad volcanic island: widened east/west and grown south (north coast stays at the connecting path)
+                new Island("Island_Volcano", Region.Volcano, new Vector2(0, -110), 122, 84, -4, 0.12f, 1.25f, 17.9f),
                 new Island("Island_BossArena", Region.Arena, ArenaC, 30, 28, 0, 0.08f, 1.1f, 21.3f),
                 new Island("Islet_West", Region.Strip, new Vector2(-24, 30), 5, 4, 0, 0.2f, 0.4f, 23.1f),
                 new Island("Islet_East", Region.Strip, new Vector2(34, 8), 4, 3.5f, 0, 0.2f, 0.35f, 25.7f),
-                new Island("Islet_SouthWest", Region.Volcano, new Vector2(-96, -118), 6, 5, 0, 0.2f, 0.45f, 27.2f),
+                new Island("Islet_SouthWest", Region.Volcano, new Vector2(-140, -128), 6, 5, 0, 0.2f, 0.45f, 27.2f),
                 // Mainland: one broad, roughly round island wrapped around the village in every direction.
                 // A shallow bay on the south side keeps the village gate + bridge to the connecting path on the coast.
                 new Island("Island_Mainland", Region.Jungle, MainlandC, 130, 118, 0, 0.09f, 1.2f, 33.3f) { bayAng = -90f, bayDepth = 0.5f, bayFull = 12f, bayFade = 45f },
@@ -97,8 +98,11 @@ namespace Elementia.EditorTools
                 new Path("Path_Volcano_Main", 5f, C_PathDark, new Vector2(3, -28), new Vector2(1, -40), new Vector2(-4, -55), new Vector2(-12, -68),
                          new Vector2(-18, -82), new Vector2(-22, -92), new Vector2(-26, -100), new Vector2(-29, -112), new Vector2(-34, -122), new Vector2(-39, -130)),
                 // Optional branches (rewards): Crystal Hollow (north-east) and the Lava Lake Overlook (south)
-                new Path("Path_Volcano_CrystalHollow", 4f, C_PathDark, new Vector2(-4, -55), new Vector2(10, -51), new Vector2(27, -51), new Vector2(43, -55), new Vector2(54, -60)),
-                new Path("Path_Volcano_Overlook", 3.5f, C_PathDark, new Vector2(-24, -104), new Vector2(-11, -113), new Vector2(3, -124), new Vector2(14, -131)),
+                new Path("Path_Volcano_CrystalHollow", 4f, C_PathDark, new Vector2(-4, -55), new Vector2(10, -51), new Vector2(27, -51), new Vector2(43, -55), new Vector2(56, -60), new Vector2(66, -62)),
+                new Path("Path_Volcano_Overlook", 3.5f, C_PathDark, new Vector2(-24, -104), new Vector2(-10, -112), new Vector2(2, -122), new Vector2(6, -136), new Vector2(8, -152)),
+                // loop through the widened east / south: Crystal Hollow -> ember ruins on the east ridge -> south of the lava lake -> Overlook
+                new Path("Path_Volcano_EastLoop", 3.5f, C_PathDark, new Vector2(66, -62), new Vector2(82, -76), new Vector2(94, -96), new Vector2(94, -118), new Vector2(86, -136),
+                         new Vector2(70, -152), new Vector2(52, -166), new Vector2(34, -172), new Vector2(16, -164), new Vector2(8, -152)),
                 // ---- Mainland roads: they leave the village in every direction and loop back ----
                 // West (Whispering Marsh): west lane -> Forest Edge -> south to the Marsh Heart (south-west swamp)
                 new Path("Path_Jungle_West", 4.5f, C_Path, new Vector2(-39.5f, 98.5f), new Vector2(-50, 100.2f), new Vector2(-62, 102), new Vector2(-74, 104),
@@ -129,15 +133,18 @@ namespace Elementia.EditorTools
             // One main lava river born at the foot of Mt. Ignis, crossing the critical path once (bridge) and falling off the west cliff.
             lavaRivers = new List<Path>
             {
-                new Path("Lava_River_Main", 3.6f, C_Lava, new Vector2(6, -90), new Vector2(-6, -84), new Vector2(-20, -80), new Vector2(-38, -84),
-                         new Vector2(-56, -90), new Vector2(-72, -95), new Vector2(-92, -98)),
-                new Path("Lava_River_East", 2.6f, C_Lava, new Vector2(54, -96), new Vector2(62, -100), new Vector2(66, -106)),
+                new Path("Lava_River_Main", 3.6f, C_Lava, new Vector2(22, -98), new Vector2(6, -90), new Vector2(-6, -84), new Vector2(-20, -80), new Vector2(-38, -84),
+                         new Vector2(-56, -90), new Vector2(-72, -95), new Vector2(-92, -98), new Vector2(-110, -100), new Vector2(-128, -102)),
+                new Path("Lava_River_East", 2.6f, C_Lava, new Vector2(69, -106), new Vector2(72, -116), new Vector2(74, -125)),
+                new Path("Lava_River_South", 2.8f, C_Lava, new Vector2(51, -128), new Vector2(46, -136), new Vector2(40, -143), new Vector2(35, -147)),   // feeds the lava lake
             };
             lavaPools = new List<Vector3>
             {
-                new Vector3(36, -132, 10),   // Lava lake below the overlook
-                new Vector3(67, -108, 4.5f), // fed by the east river
+                new Vector3(34, -150, 11),   // Lava lake beside the overlook
+                new Vector3(74, -128, 5f),   // fed by the east river
                 new Vector3(-64, -70, 4),
+                new Vector3(-90, -150, 5f),  // west, behind the arena
+                new Vector3(16, -180, 5f),   // south coast
             };
 
             // Encounter spaces, difficulty rising along the route
@@ -145,8 +152,8 @@ namespace Elementia.EditorTools
             {
                 new Vector3(-4, -55, 11),    // 0 Ash Field: first fight, open ground
                 new Vector3(-26, -100, 13),  // 1 Obsidian Ruins: fight among pillars
-                new Vector3(57, -61, 10),    // 2 Crystal Hollow: optional elite + treasure
-                new Vector3(15, -132, 7.5f), // 3 Lava Lake Overlook: optional treasure / vista
+                new Vector3(66, -62, 10),    // 2 Crystal Hollow: optional elite + treasure
+                new Vector3(8, -152, 7.5f),  // 3 Lava Lake Overlook: optional treasure / vista
                 new Vector3(4, 15, 6.5f),    // 4 Wilds Skirmish (connecting path): first small fight outside the village
                 // Jungle (JungleClearStart = 5)
                 new Vector3(-74, 104, 8.5f), // 5 Forest Edge: first jungle fight (west)
@@ -228,6 +235,7 @@ namespace Elementia.EditorTools
             // rugged ridges toward the volcanic island edge
             float e = VolcanoIsland.Norm(p);
             volcano += 4.5f * Smooth(0.72f, 0.97f, e) * Perlin(x, z, 0.06f, 4.4f);
+            if (z < -24f) volcano += VolcanoFoothills(p);
             float h = z > 56 ? village : Mathf.Lerp(volcano, strip, Smooth(-34f, -16f, z));
             float low = HLow(x, z);
             h += JungleRelief(p);

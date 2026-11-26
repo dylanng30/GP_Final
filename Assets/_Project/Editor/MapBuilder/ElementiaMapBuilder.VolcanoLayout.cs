@@ -15,6 +15,39 @@ namespace Elementia.EditorTools
     {
         class ConeDef { public string name; public Vector2 c; public float r, h; public bool active; public ConeDef(string n, float x, float z, float r, float h, bool a) { name = n; c = new Vector2(x, z); this.r = r; this.h = h; active = a; } }
 
+        // ---------------- Volcanic island layout data ----------------
+        static readonly Vector2 IgnisC = new Vector2(46, -104);
+        const float IgnisR = 24f, IgnisH = 30f;
+        // rock massifs: x, z, radius, height (large / medium / small, spread around the island, never on roads or fights)
+        static readonly Vector4[] volcanoCrags =
+        {
+            new Vector4(-88, -78, 14, 24), new Vector4(-20, -170, 12, 20), new Vector4(84, -160, 10, 17),   // large massifs
+            new Vector4(20, -70, 7, 12),   new Vector4(-80, -118, 8, 14),  new Vector4(108, -90, 8, 15),    // medium
+            new Vector4(48, -42, 6, 10),   new Vector4(-44, -50, 7, 12),   new Vector4(-108, -124, 6, 11),
+            new Vector4(92, -64, 6, 10),   new Vector4(24, -128, 6, 9),    new Vector4(-24, -38, 6, 9),     // small
+        };
+        static readonly string[] cragNames =
+        {
+            "Massif_West", "Massif_South", "Massif_SouthEast", "Crag_North", "Crag_West", "Crag_EastRim",
+            "Crag_NorthEast", "Crag_NorthWest", "Crag_FarWest", "Crag_EastHollow", "Crag_IgnisShoulder", "Crag_EntryWest",
+        };
+        // ancient arches: x, z, yaw
+        static readonly Vector3[] archSites = { new Vector3(104, -108, 90f), new Vector3(60, -172, 75f), new Vector3(-68, -60, 40f), new Vector3(-100, -136, 20f) };
+
+        // gentle foothills under every mountain so the rock rises out of the ground instead of sitting on it
+        static float VolcanoFoothills(Vector2 p)
+        {
+            float add = 0f;
+            foreach (var cg in volcanoCrags)
+            {
+                float d = Vector2.Distance(p, new Vector2(cg.x, cg.y)), R = cg.z * 1.7f;
+                if (d < R) { float t = 1f - d / R; add = Mathf.Max(add, cg.w * 0.16f * t * t * (3f - 2f * t)); }
+            }
+            float di = Vector2.Distance(p, IgnisC), Ri = IgnisR * 1.45f;
+            if (di < Ri) { float t = 1f - di / Ri; add = Mathf.Max(add, 3.2f * t * t * (3f - 2f * t)); }
+            return add;
+        }
+
         static GameObject Marker(string name, Vector2 p, Transform parent, float yOff = 0.2f)
         {
             var m = Group(name, parent); m.transform.position = Ground(p) + Vector3.up * yOff; return m;
@@ -201,22 +234,25 @@ namespace Elementia.EditorTools
 
             // ---- Landmark + framing volcanoes ----
             var gCones = Group("Volcanoes", zone.transform);
-            BuildCone("Mt_Ignis (Landmark)", new Vector2(30, -95), 26f, 34f, true, gCones.transform, 3.3f, 3, 5f, new[] { 168f, 282f, 4f }, false);
-            Occupy(new Vector2(30, -95), 26f);
+            // one landmark volcano (north-east, smaller than before so it does not swallow the island) ...
+            BuildCone("Mt_Ignis (Landmark)", IgnisC, IgnisR, IgnisH, true, gCones.transform, 3.3f, 3, 4.5f, new[] { 168f, 282f, 4f }, false);
+            Occupy(IgnisC, IgnisR);
+            // ... two small volcanoes framing the road to the arena (Gate of Flames) ...
             var cones = new List<ConeDef>
             {
                 new ConeDef("GateOfFlames_East", -13, -121, 9f, 9.5f, true),
                 new ConeDef("GateOfFlames_West", -47, -108, 8.5f, 8f, false),
-                new ConeDef("Ridge_West_A", -56, -55, 7f, 6f, true),
-                new ConeDef("Ridge_West_B", -70, -79, 6f, 5f, false),
-                new ConeDef("Ridge_North", 12, -68, 6f, 5.5f, false),
-                new ConeDef("Ridge_NorthEast", 36, -40, 5.5f, 4.5f, false),
-                new ConeDef("Ridge_East", 72, -80, 6f, 5f, false),
-                new ConeDef("Ridge_SouthEast", 52, -125, 7f, 6f, true),
-                new ConeDef("Ridge_South", -6, -147, 6f, 5f, false),
             };
             int ci = 0;
             foreach (var cd in cones) { BuildCone(cd.name, cd.c, cd.r, cd.h, cd.active, gCones.transform, 7.1f + ci++ * 1.9f, 1, 2.2f); Occupy(cd.c, cd.r); }
+            // ... and jagged rock massifs of mixed size spread around the island (no repeated cones)
+            var gCrags = Group("Mountains", zone.transform);
+            for (int k = 0; k < volcanoCrags.Length; k++)
+            {
+                var cg = volcanoCrags[k];
+                BuildCrag(cragNames[k], new Vector2(cg.x, cg.y), cg.z, cg.w, k % 3 == 0, gCrags.transform, 61.3f + k * 7.7f);
+                Occupy(new Vector2(cg.x, cg.y), cg.z);
+            }
 
             // ---- Checkpoints ----
             BuildCheckpoint("EntryCamp", new Vector2(14, -37), 0, zone.transform, true);
@@ -254,7 +290,7 @@ namespace Elementia.EditorTools
                     if (onRoad) continue;
                     BuildCrystals("Crystal_Hollow_" + i, p, Rand(1.4f, 2.4f), g.transform);
                 }
-                Vector2 chestP = c + (c - new Vector2(43, -55)).normalized * (cl.z * 0.6f);
+                Vector2 chestP = c + (c - new Vector2(56, -60)).normalized * (cl.z * 0.6f);
                 TreasureChest("TreasureChest_CrystalHollow", Ground(chestP), FaceYaw(chestP, c), g.transform);
                 Marker("Treasure_CrystalHollow", chestP, gameplay.transform);
                 Marker("EliteSpawn_CrystalHollow", c, gameplay.transform);
@@ -275,6 +311,25 @@ namespace Elementia.EditorTools
                 Occupy(c, cl.z);
             }
 
+            // 5. Ancient arches along the east loop and in the open west (stone gates in the ruins language)
+            {
+                var g = Group("AncientArches", gEnc.transform);
+                for (int k = 0; k < archSites.Length; k++)
+                {
+                    Vector2 c = new Vector2(archSites[k].x, archSites[k].y);
+                    if (!Free(c, 3.5f, 1.2f)) continue;
+                    var mb = new MB(); mb.Cyl(Vector3.zero, 4.6f, 4.4f, 0.35f, 9, C_Stone, C_PlazaDark);
+                    var plat = MeshGO("Arch_" + k + "_Platform", mb.ToMesh("Arch_" + k + "_Platform"), matEnv, g.transform, true);
+                    plat.transform.position = Ground(c) + Vector3.down * 0.1f;
+                    var arch = BuildGate("Arch_" + k, c, archSites[k].z, 6.0f, g.transform, C_ConeSide, C_Crust);
+                    arch.transform.position = Ground(c) + Vector3.up * 0.2f; arch.transform.localScale = Vector3.one * 0.8f;
+                    float yr = archSites[k].z * Mathf.Deg2Rad; Vector2 side = new Vector2(Mathf.Cos(yr), -Mathf.Sin(yr));
+                    Kit(k % 2 == 0 ? "Column2" : "Column3", g.transform, Ground(c + side * 4.2f), Rand(0, 360), KitScale * 1.2f);
+                    BuildCrystals("Arch_" + k + "_Crystals", c - side * 4.6f + new Vector2(side.y, -side.x) * 1.5f, Rand(1.0f, 1.5f), g.transform);
+                    Occupy(c, 5f);
+                }
+            }
+
             // ---- Road dressing: boulders framing the roads, crystals on the lava banks ----
             var gRocks = Group("Rocks", zone.transform);
             string[] groupsR = { "SM_Plain_Rock_Group3", "SM_Plain_Rock_Group6", "SM_Plain_Rock_Group14", "SM_Plain_Rock_Group12", "SM_Plain_Rock_Group10" };
@@ -293,13 +348,24 @@ namespace Elementia.EditorTools
                 }
             }
             var gCrys = Group("Crystals", zone.transform);
-            var river = lavaRivers[0];
-            for (int i = 8, k = 0; i < river.pts.Count - 6; i += 16, k++)
+            int kc = 0;
+            foreach (var river in lavaRivers)
+                for (int i = 6; i < river.pts.Count - 4; i += 16, kc++)
+                {
+                    Vector2 fwd = (river.pts[i + 1] - river.pts[i]).normalized, n = new Vector2(-fwd.y, fwd.x);
+                    Vector2 p = river.pts[i] + n * (river.width * 0.5f + 2.6f) * (kc % 2 == 0 ? 1 : -1);
+                    if (!Free(p, 0.9f, 0.6f)) continue;
+                    BuildCrystals("Crystal_Bank_" + kc, p, Rand(0.9f, 1.4f), gCrys.transform); Occupy(p, 1f);
+                }
+            // scattered crystal outcrops and boulders in the open ash plains (sparse, keeps the ground readable)
+            var gScatter = Group("AshPlainProps", zone.transform);
+            int crys = 0, boul = 0;
+            for (int t = 0; t < 900 && (crys < 14 || boul < 26); t++)
             {
-                Vector2 fwd = (river.pts[i + 1] - river.pts[i]).normalized, n = new Vector2(-fwd.y, fwd.x);
-                Vector2 p = river.pts[i] + n * (river.width * 0.5f + 2.6f) * (k % 2 == 0 ? 1 : -1);
-                if (!Free(p, 0.9f, 0.6f)) continue;
-                BuildCrystals("Crystal_Bank_" + k, p, Rand(0.9f, 1.4f), gCrys.transform); Occupy(p, 1f);
+                Vector2 p = isl.c + new Vector2(Rand(-isl.rx, isl.rx), Rand(-isl.rz, isl.rz));
+                if (isl.Norm(p) > 0.86f || p.y > -34f || !Free(p, 2.0f, 1.5f) || InClearing(p, 2f)) continue;
+                if (crys < 14 && t % 3 == 0) { BuildCrystals("Crystal_Outcrop_" + crys, p, Rand(1.1f, 1.9f), gScatter.transform); Occupy(p, 2.2f); crys++; continue; }
+                if (boul < 26) { Kit("SM_Plain_Rock_Group" + (1 + boul % 14), gScatter.transform, Ground(p) + Vector3.down * 0.2f, Rand(0, 360), Rand(1.3f, 2.4f)); Occupy(p, 2.0f); boul++; }
             }
             // ---- Wayfinding (same rule as the village lamps): fire posts along the critical path, obelisks at optional branches ----
             var gWay = Group("Wayfinding", zone.transform);
@@ -311,7 +377,7 @@ namespace Elementia.EditorTools
                 if (!Free(p, 0.7f, 0.2f) || InClearing(p, 0.5f)) { p = mainR.pts[i] - n * (mainR.width * 0.5f + 1.3f) * (k % 2 == 0 ? 1 : -1); if (!Free(p, 0.7f, 0.2f) || InClearing(p, 0.5f)) continue; }
                 BrazierPost("FirePost_" + k, Ground(p), 1.0f, gWay.transform); Occupy(p, 0.9f);
             }
-            foreach (var bn in new[] { "Path_Volcano_CrystalHollow", "Path_Volcano_Overlook" })
+            foreach (var bn in new[] { "Path_Volcano_CrystalHollow", "Path_Volcano_Overlook", "Path_Volcano_EastLoop" })
             {
                 var br = paths.Find(p => p.name == bn);
                 int i = Mathf.Min(16, br.pts.Count - 2);
