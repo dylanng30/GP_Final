@@ -5,6 +5,7 @@ using Game.Events;
 using Game.Gameplay.Controllers;
 using Game.Gameplay.Entities;
 using Game.Managers.Hero;
+using Game.World;
 using UnityEngine;
 
 namespace Game.Managers.Party
@@ -157,6 +158,7 @@ namespace Game.Managers.Party
             if (heroIds == null) return;
 
             var heroDataManager = ServiceLocator.Get<HeroDataManager>();
+            PlayerSpawnPoint spawnPoint = PlayerSpawnPoint.Current;
 
             for (int i = 0; i < heroIds.Length; i++)
             {
@@ -164,11 +166,16 @@ namespace Game.Managers.Party
                 if (!string.IsNullOrEmpty(heroId))
                 {
                     HeroInstance prefabToSpawn = heroDataManager.GetHeroModel(heroId);
-                    
+
                     if (prefabToSpawn != null)
                     {
-                        HeroInstance hero = Instantiate(prefabToSpawn);
-                        hero.SetWorldPosition(Vector3.right * (i - 2) * 2 + Vector3.up);
+                        // Scene không có PlayerSpawnPoint thì giữ cách xếp cũ quanh gốc tọa độ.
+                        Vector3 position = spawnPoint != null
+                            ? spawnPoint.GetFormationPosition(i, heroIds.Length)
+                            : Vector3.right * (i - 2) * 2 + Vector3.up;
+                        Quaternion rotation = spawnPoint != null ? spawnPoint.Rotation : Quaternion.identity;
+
+                        HeroInstance hero = Instantiate(prefabToSpawn, position, rotation);
                         hero.Setup(heroId);
                         _activeHeroes.Add(hero);
                     }

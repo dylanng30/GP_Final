@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/01_Scenes/Sandbox/Combat_Sandbox.unity
     guid: 125eaa981e3127f46a4346e35aed77c1
+  - enabled: 1
+    path: Assets/_Project/01_Scenes/Map/Elementia_Map.unity
+    guid: dca895f805d00804cb3900574d1d9122
   m_configObjects: {}

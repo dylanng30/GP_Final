@@ -239,6 +239,9 @@ namespace Game.Editor.Hero
                 t.canTransitionToSelf   = false;
             }
 
+            // Nối transition hành động qua AnyState, nhảy/rơi/tiếp đất theo cùng quy tắc với các controller cũ.
+            HeroAnimatorTransitionFixer.Apply(controller);
+
             // ── Lưu ──────────────────────────────────────────────────────
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();

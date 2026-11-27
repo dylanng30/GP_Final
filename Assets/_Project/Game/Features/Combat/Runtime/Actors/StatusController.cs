@@ -125,6 +125,7 @@ namespace Game.Combat
 
             GameObject vfx = VfxSpawner.Spawn(definition.LoopVfxPrefab, _owner.Transform.position, _owner.Transform.rotation, _owner.Transform);
             vfx.transform.localPosition = definition.VfxOffset;
+            if (!Mathf.Approximately(definition.LoopVfxScale, 1f)) vfx.transform.localScale *= definition.LoopVfxScale;
             _vfxInstances[instance] = vfx;
         }
     }

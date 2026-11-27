@@ -25,7 +25,7 @@ namespace Game.Combat
 
         private readonly HeroInstance _owner;
         private readonly BasicAttackSO _config;
-        private readonly HeroAnimatorController _animator;
+        private HeroAnimatorController _animator;
         private readonly AttachPoints _attachPoints;
         private readonly List<ITargetable> _meleeCandidates = new List<ITargetable>();
 
@@ -53,6 +53,12 @@ namespace Game.Combat
             _config = config;
             _animator = animator;
             _attachPoints = attachPoints;
+        }
+
+        /// <summary>Đổi Animator nhận lệnh đánh, dùng khi hero đổi model (biến hình).</summary>
+        public void SetAnimator(HeroAnimatorController animator)
+        {
+            _animator = animator;
         }
 
         public void PrewarmPool()

@@ -15,6 +15,7 @@ namespace Game.Combat.Abilities.States
 
         private float _timer;
         private bool _hasTriggeredEffects;
+        private HeroAnimatorController _slowedHero;
         private Animator _slowedAnimator;
 
         public bool IsFinished { get; private set; }
@@ -88,12 +89,26 @@ namespace Game.Combat.Abilities.States
         {
             if (Mathf.Approximately(_ability.AnimationSpeed, 1f) || _ability.AnimationSpeed <= 0f) return;
 
+            // Hero: chỉ chậm state skill qua parameter ActionSpeed, Locomotion và đánh thường không bị ảnh hưởng.
+            _slowedHero = _caster.GetComponentInChildren<HeroAnimatorController>();
+            if (_slowedHero != null)
+            {
+                _slowedHero.SetActionSpeed(_ability.AnimationSpeed);
+                return;
+            }
+
             _slowedAnimator = _caster.GetComponentInChildren<Animator>();
             if (_slowedAnimator != null) _slowedAnimator.speed = _ability.AnimationSpeed;
         }
 
         private void RestoreAnimationSpeed()
         {
+            if (_slowedHero != null)
+            {
+                _slowedHero.SetActionSpeed(1f);
+                _slowedHero = null;
+            }
+
             if (_slowedAnimator == null) return;
 
             _slowedAnimator.speed = 1f;

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityID: Metal_Ultimate_TitanForm
   AbilityName: "C\u1EF1 Nh\xE2n Th\xE9p"
-  Description: "Bi\u1EBFn th\xE0nh d\u1EA1ng kh\u1ED5ng l\u1ED3, t\u0103ng m\u1EA1nh c\xF4ng v\xE0 th\u1EE7."
+  Description: "Bi\u1EBFn th\xE0nh C\u1EF1 Nh\xE2n Th\xE9p, t\u0103ng m\u1EA1nh c\xF4ng v\xE0 th\u1EE7."
   Icon: {fileID: 0}
   Type: 2
   Element: 1
@@ -25,14 +25,16 @@ MonoBehaviour:
   AnimationTriggerName: Skill_0
   AnimationTriggerHash: 0
   TotalCastDuration: 0.6
+  AnimationSpeed: 1
   LocksMovement: 1
   Range: 8
   IndicatorRadius: 2
   IndicatorType: 0
   RequiresTarget: 0
-  CastVfxPrefab: {fileID: 0}
+  CastVfxPrefab: {fileID: 162722, guid: 1fc71432c1bd537489e1be6246b56973, type: 3}
   CastVfxAttachPoint: 
-  CastVfxScale: 1
+  CastVfxScale: 1.2
+  CastVfxLifetime: 0
   CastSoundKey: titan_cast
   ExecuteSoundKey: 
   CastAfterimage: 1
@@ -45,12 +47,13 @@ MonoBehaviour:
     - rid: 4882419973506465839
       type: {class: VfxCueEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
-        Prefab: {fileID: 147642, guid: 685c97d007af49549b239b56b6d2000a, type: 3}
+        Prefab: {fileID: 183926, guid: 96d8221c1bb8b404fb8cd7080f372017, type: 3}
         Origin: 0
         Offset: {x: 0, y: 0, z: 0}
-        Scale: 2
-        Lifetime: 2
+        Scale: 1.5
+        Lifetime: 2.5
         FollowCaster: 0
+        SnapToGround: 0
     - rid: 4882419973506465840
       type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:

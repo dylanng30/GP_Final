@@ -63,6 +63,13 @@ namespace Game.Combat.Feedback
         {
             if (amount <= 0f || duration <= 0f) return;
 
+            // Hero đổi model (biến hình) thì model cũ bị tắt: trả lại dáng cũ cho nó rồi nảy model đang hiện.
+            if (_visual != null && !_visual.gameObject.activeInHierarchy)
+            {
+                if (_isSquashing) StopSquash();
+                _visual = null;
+            }
+
             if (_visual == null)
             {
                 _visual = ResolveVisual();

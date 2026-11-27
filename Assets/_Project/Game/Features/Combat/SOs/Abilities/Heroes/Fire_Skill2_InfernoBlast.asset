@@ -25,7 +25,7 @@ MonoBehaviour:
   AnimationTriggerName: Skill_1
   AnimationTriggerHash: 0
   TotalCastDuration: 1
-  AnimationSpeed: 0.3
+  AnimationSpeed: 1.05
   LocksMovement: 1
   Range: 10
   IndicatorRadius: 3.5

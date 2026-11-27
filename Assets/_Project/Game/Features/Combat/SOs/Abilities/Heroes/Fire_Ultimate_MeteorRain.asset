@@ -25,11 +25,19 @@ MonoBehaviour:
   AnimationTriggerName: Skill_1
   AnimationTriggerHash: 0
   TotalCastDuration: 1
+  AnimationSpeed: 1.05
   LocksMovement: 1
   Range: 10
   IndicatorRadius: 5
   IndicatorType: 2
   RequiresTarget: 0
+  CastVfxPrefab: {fileID: 0}
+  CastVfxAttachPoint: 
+  CastVfxScale: 1
+  CastVfxLifetime: 0
+  CastSoundKey: 
+  ExecuteSoundKey: 
+  CastAfterimage: 0
   Effects:
   - rid: 4882419973506465792
   - rid: 4882419973506465793
@@ -85,6 +93,7 @@ MonoBehaviour:
         Scale: 2.5
         Lifetime: 2
         FollowCaster: 0
+        SnapToGround: 0
     - rid: 4882419973506465799
       type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
@@ -105,6 +114,7 @@ MonoBehaviour:
         Scale: 2.5
         Lifetime: 2
         FollowCaster: 0
+        SnapToGround: 0
     - rid: 4882419973506465801
       type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
@@ -125,6 +135,7 @@ MonoBehaviour:
         Scale: 2.5
         Lifetime: 2
         FollowCaster: 0
+        SnapToGround: 0
     - rid: 4882419973506465803
       type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
@@ -145,6 +156,7 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
+        MissingHealthBonus: 0
     - rid: 4882419973506465805
       type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
@@ -160,6 +172,7 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
+        MissingHealthBonus: 0
     - rid: 4882419973506465807
       type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
@@ -175,6 +188,7 @@ MonoBehaviour:
         UseFalloff: 0
         FalloffRadius: 3
         MinDamagePercent: 0.3
+        MissingHealthBonus: 0
     - rid: 4882419973506465809
       type: {class: ApplyStatusEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:

@@ -238,6 +238,30 @@ namespace Elementia.EditorTools
                 if (t.name.StartsWith("Marker_") || t.name.StartsWith("PlayerSpawn") || t.name.StartsWith("BossSpawn") || t.name.StartsWith("ScaleRef") || t.name.StartsWith("CombatArea")) continue;
                 GameObjectUtility.SetStaticEditorFlags(t.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
             }
+            ExcludeWindShadersFromBatching(root);
+        }
+
+        // Shader cỏ cây của Holotna tính gió theo vị trí object space. Static batching đưa đỉnh sang world space
+        // nên gió bị nhân theo tọa độ world và cỏ, cây phình thành tấm khổng lồ lúc chạy game.
+        const string WindShaderPrefix = "Shader Graphs/Vegetation";
+
+        /// <summary>Bỏ Batching Static (và Occluder, vì lá mỏng không che được gì) khỏi renderer dùng shader gió. Trả về số renderer đã sửa.</summary>
+        public static int ExcludeWindShadersFromBatching(GameObject root)
+        {
+            int count = 0;
+            foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+            {
+                bool usesWind = false;
+                foreach (var m in r.sharedMaterials) if (m != null && m.shader != null && m.shader.name.StartsWith(WindShaderPrefix)) { usesWind = true; break; }
+                if (!usesWind) continue;
+
+                var flags = GameObjectUtility.GetStaticEditorFlags(r.gameObject);
+                var cleared = flags & ~(StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccluderStatic);
+                if (cleared == flags) continue;
+                GameObjectUtility.SetStaticEditorFlags(r.gameObject, cleared);
+                count++;
+            }
+            return count;
         }
 
         static void FrameSceneView()

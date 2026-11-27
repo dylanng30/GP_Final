@@ -116,10 +116,9 @@ namespace Game.Managers.Hero
                 // Clear the current heroes list during testing so that changing testPartySize is reflected immediately on restart
                 SaveData.Heros.Clear();
 
-                int testPartySize = 1; // <--- THAY ĐỔI SỐ LƯỢNG HERO MUỐN TEST TẠI ĐÂY (Ví dụ: 2, 3, 4)
-                string testLeadHeroId = "hero_000000"; // <--- Hero luôn có trong đội khi test (000000 = Fire, 000003 = Mental). Để trống thì lấy theo thứ tự.
-                bool hasLead = !string.IsNullOrEmpty(testLeadHeroId) && remoteData.HeroData.Exists(x => x.HeroId == testLeadHeroId);
-                int addedCount = hasLead ? 1 : 0;
+                // <--- ĐỘI HÌNH TEST: hero trong danh sách này vào đội (000000 Fire, 000001 Wood, 000002 Earth, 000003 Mental, 000004 Water).
+                // Thứ tự slot theo thứ tự trong dữ liệu hero, slot đầu là hero được điều khiển khi vào game.
+                string[] testPartyHeroIds = { "hero_000000", "hero_000003", "hero_000004" };
 
                 foreach (var baseHero in remoteData.HeroData)
                 {
@@ -144,8 +143,7 @@ namespace Game.Managers.Hero
                     */
 
                     // --- LOGIC PHỤC VỤ TEST: Cho phép điền số lượng hero bất kỳ vào Party để kiểm tra đội hình ---
-                    bool isLead = hasLead && baseHero.HeroId == testLeadHeroId;
-                    bool isMember = isLead || addedCount < testPartySize;
+                    bool isMember = System.Array.IndexOf(testPartyHeroIds, baseHero.HeroId) >= 0;
                     HeroDataInstance heroInstance = new HeroDataInstance()
                     {
                         HeroId = baseHero.HeroId,
@@ -155,7 +153,6 @@ namespace Game.Managers.Hero
                         HeroStarLevel = baseHero.HeroStarLevel
                     };
                     SaveData.Heros.Add(heroInstance);
-                    if (isMember && !isLead) addedCount++;
                     hasChanged = true;
                 }
             }

@@ -20,6 +20,9 @@ namespace Game.Animation.Hero
         [Tooltip("Tên parameter bool 'IsFalling' trong Animator")]
         public string IsFallingParam  = "IsFalling";
 
+        [Tooltip("Tên parameter float nhân tốc độ của state skill. Skill làm chậm animation qua đây, không đụng Animator.speed")]
+        public string ActionSpeedParam = "ActionSpeed";
+
         [Header("--- Actions (Trigger names) ---")]
         public string JumpAnim        = "Jump";
         public string LandAnim        = "Land";
@@ -44,6 +47,7 @@ namespace Game.Animation.Hero
         [HideInInspector] public int SpeedHash;
         [HideInInspector] public int IsGroundedHash;
         [HideInInspector] public int IsFallingHash;
+        [HideInInspector] public int ActionSpeedHash;
         [HideInInspector] public int JumpHash;
         [HideInInspector] public int LandHash;
         [HideInInspector] public int RollHash;
@@ -51,7 +55,8 @@ namespace Game.Animation.Hero
         [HideInInspector] public int DeathHash;
         [HideInInspector] public List<int> SkillHashes = new List<int>();
 
-        private bool _isInitialized;
+        // NonSerialized: Unity giữ field private qua domain reload, khiến hash của parameter mới không được tính.
+        [System.NonSerialized] private bool _isInitialized;
 
         /// <summary>
         /// Tính Animator.StringToHash cho tất cả tên animation.
@@ -65,6 +70,7 @@ namespace Game.Animation.Hero
             SpeedHash        = Animator.StringToHash(SpeedParam);
             IsGroundedHash   = Animator.StringToHash(IsGroundedParam);
             IsFallingHash    = Animator.StringToHash(IsFallingParam);
+            ActionSpeedHash  = Animator.StringToHash(ActionSpeedParam);
             JumpHash         = Animator.StringToHash(JumpAnim);
             LandHash         = Animator.StringToHash(LandAnim);
             RollHash         = Animator.StringToHash(RollAnim);

@@ -65,6 +65,7 @@ namespace Game.Gameplay.Entities
         private AbilityRunner _abilityRunner;
         private BasicAttackRunner _basicAttack;
         private object _deathLock;
+        private HeroAnimationConfig _animationConfig;
 
         public string HeroId { get; private set; }
         public StatController Stats { get; private set; }
@@ -213,12 +214,29 @@ namespace Game.Gameplay.Entities
             HeroAsset heroAsset = heroDataManager.GetHeroAsset(heroId);
             if (heroAsset?.AnimationConfig != null)
             {
+                _animationConfig = heroAsset.AnimationConfig;
                 animatorController.Setup(heroAsset.AnimationConfig);
             }
             else
             {
                 Debug.LogWarning($"[HeroInstance] {heroId}: Không tìm thấy AnimationConfig trong HeroLocalDataSO.");
             }
+        }
+
+        public HeroAnimatorController AnimatorController => animatorController;
+
+        /// <summary>
+        /// Chuyển mọi lệnh animation sang Animator của model khác, dùng khi hero đổi model (biến hình).
+        /// Model mới phải đang bật để Animator đọc được parameter.
+        /// </summary>
+        public void SwapAnimatorController(HeroAnimatorController next)
+        {
+            if (next == null || next == animatorController) return;
+
+            animatorController = next;
+            if (_animationConfig != null) next.Setup(_animationConfig);
+            _basicAttack.SetAnimator(next);
+            if (IsDead) next.PlayDeath();
         }
 
         public void SetAsActive(bool isActive)

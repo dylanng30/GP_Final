@@ -317,7 +317,7 @@ namespace Game.Editor.Combat
             {
                 AssetName = "Metal_Ultimate_TitanForm",
                 DisplayName = "Cự Nhân Thép",
-                Description = "Biến thành dạng khổng lồ, tăng mạnh công và thủ.",
+                Description = "Biến thành Cự Nhân Thép, tăng mạnh công và thủ.",
                 Type = AbilityType.ElementalBurst,
                 Element = GameElement.Metal,
                 Cooldown = 25f,
@@ -325,7 +325,7 @@ namespace Game.Editor.Combat
                 Indicator = SkillIndicatorType.None,
                 Effects = new List<IAbilityEffect>
                 {
-                    Vfx("MagicBuffYellow", EffectOrigin.Caster, 2f, 2f),
+                    Vfx("MagicPillarBlastYellow", EffectOrigin.Caster, 1.5f, 2.5f),
                     new ApplyStatusEffect { Status = statuses.TitanForm, ApplyToCaster = true }
                 }
             });

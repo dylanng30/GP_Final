@@ -37,6 +37,8 @@ namespace Game.Combat.Domain
         public float ScaleMultiplier = 1f;
         public GameObject LoopVfxPrefab;
         public Vector3 VfxOffset = Vector3.up;
+        [Tooltip("Hệ số kích thước của VFX lặp, ví dụ dạng khổng lồ cần aura to hơn")]
+        public float LoopVfxScale = 1f;
         [Tooltip("Thời gian phóng to/thu nhỏ theo ScaleMultiplier. 0 là đổi ngay")]
         public float ScaleTweenDuration = 0.35f;
 

@@ -130,7 +130,7 @@ Các mục này chưa thể kiểm chứng tự động:
 
 - Animation: combo và ultimate đang dùng chung clip `Attack`, `Skill_0`, `Skill_1`. Chưa có phản ứng trúng đòn, strafe, cutscene ultimate.
 - VFX riêng cho Mộc Skill 2 và hai skill của Thổ: đang dùng tạm prefab Epic Toon FX.
-- Model dạng khổng lồ của Kim đang là phóng to model hiện có. Gọi pet chưa làm.
+- Dạng Cự Nhân của Kim đổi sang model robot `METAL_2_2711` qua `HeroFormSwitcher`, xem `prototype_p1.md`. Robot chưa có clip skill, nhảy, lăn, chết. Gọi pet chưa làm.
 - Hóa Đá, Trói, Choáng chưa có animation đứng yên riêng.
 - UI: `CombatInfoPanel` và nhãn liên kết dựng bằng code, chưa có icon trạng thái hay art.
 - VFX tạo bằng Instantiate, nên chuyển sang pool nếu thấy tụt khung hình.

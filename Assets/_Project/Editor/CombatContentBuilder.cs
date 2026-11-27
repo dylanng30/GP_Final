@@ -83,7 +83,9 @@ namespace Game.Editor.Combat
                 new StatBuff(StatType.Speed, -0.3f, StatModType.PercentAdd)
             };
 
-            set.TitanForm.ScaleMultiplier = 1.5f;
+            // Dạng Cự Nhân đổi sang model robot (HeroFormSwitcher trên prefab Mental), không phóng to hero.
+            set.TitanForm.ScaleMultiplier = 1f;
+            set.TitanForm.LoopVfxScale = 1.6f;
             set.TitanForm.StatBuffs = new List<StatBuff>
             {
                 new StatBuff(StatType.ATK, 0.4f, StatModType.PercentAdd),

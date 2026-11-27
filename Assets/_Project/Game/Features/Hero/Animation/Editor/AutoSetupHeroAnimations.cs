@@ -147,6 +147,7 @@ namespace Game.Editor.Hero
                 t.AddCondition(AnimatorConditionMode.If, 0, config.DeathAnim);
                 t.hasExitTime = false; t.duration = 0.1f; t.canTransitionToSelf = false;
 
+                HeroAnimatorTransitionFixer.Apply(controller);
                 EditorUtility.SetDirty(controller);
 
                 string prefabPath = AssetDatabase.GetAssetPath(heroAsset.HeroPrefab);
