@@ -18,8 +18,8 @@ MonoBehaviour:
   Icon: {fileID: 0}
   Type: 2
   Element: 1
-  Cooldown: 25
-  EnergyCost: 100
+  Cooldown: 2
+  EnergyCost: 0
   StaminaCost: 0
   UnlockLevel: 1
   AnimationTriggerName: Skill_0

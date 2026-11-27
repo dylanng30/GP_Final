@@ -18,18 +18,26 @@ MonoBehaviour:
   Icon: {fileID: 0}
   Type: 2
   Element: 5
-  Cooldown: 20
-  EnergyCost: 100
+  Cooldown: 2
+  EnergyCost: 0
   StaminaCost: 0
   UnlockLevel: 1
   AnimationTriggerName: Skill_0
   AnimationTriggerHash: 0
   TotalCastDuration: 0.6
+  AnimationSpeed: 1
   LocksMovement: 1
   Range: 8
   IndicatorRadius: 2
   IndicatorType: 0
   RequiresTarget: 0
+  CastVfxPrefab: {fileID: 0}
+  CastVfxAttachPoint: 
+  CastVfxScale: 1
+  CastVfxLifetime: 0
+  CastSoundKey: 
+  ExecuteSoundKey: 
+  CastAfterimage: 0
   Effects:
   - rid: 4882419973506465830
   - rid: 4882419973506465831
@@ -45,6 +53,7 @@ MonoBehaviour:
         Scale: 2
         Lifetime: 3
         FollowCaster: 0
+        SnapToGround: 0
     - rid: 4882419973506465831
       type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:

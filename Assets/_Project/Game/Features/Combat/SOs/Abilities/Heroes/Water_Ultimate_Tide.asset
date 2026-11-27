@@ -14,23 +14,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityID: Water_Ultimate_Tide
   AbilityName: "Th\u1EE7y Tri\u1EC1u H\u1ED3i Sinh"
-  Description: "H\u1ED3i m\xE1u v\xE0 x\xF3a tr\u1EA1ng th\xE1i x\u1EA5u cho c\u1EA3
-    \u0111\u1ED9i."
+  Description: "H\u1ED3i m\xE1u v\xE0 x\xF3a tr\u1EA1ng th\xE1i x\u1EA5u cho c\u1EA3 \u0111\u1ED9i."
   Icon: {fileID: 0}
   Type: 2
   Element: 2
-  Cooldown: 20
-  EnergyCost: 100
+  Cooldown: 2
+  EnergyCost: 0
   StaminaCost: 0
   UnlockLevel: 1
   AnimationTriggerName: Skill_0
   AnimationTriggerHash: 0
   TotalCastDuration: 0.6
+  AnimationSpeed: 1
   LocksMovement: 1
   Range: 8
   IndicatorRadius: 2
   IndicatorType: 0
   RequiresTarget: 0
+  CastVfxPrefab: {fileID: 0}
+  CastVfxAttachPoint: 
+  CastVfxScale: 1
+  CastVfxLifetime: 0
+  CastSoundKey: 
+  ExecuteSoundKey: 
+  CastAfterimage: 0
   Effects:
   - rid: 4882419973506465841
   - rid: 4882419973506465842
@@ -46,6 +53,7 @@ MonoBehaviour:
         Scale: 2
         Lifetime: 2
         FollowCaster: 0
+        SnapToGround: 0
     - rid: 4882419973506465842
       type: {class: AreaEffect, ns: Game.Combat.Abilities.Effects, asm: Assembly-CSharp}
       data:
